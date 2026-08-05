@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>D-AI | Dutkyobot</title>
+
+    <!-- 파비콘 -->
+    <link rel="icon" href="img/favicon.png" type="image/png">
+
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f2f5f8;
+            color: #1e293b;
+        }
+
+        .header-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-card {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: all 0.25s cubic-bezier(0.02, 0.01, 0.47, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08);
+            border-color: #3b82f6;
+        }
+
+        .icon-box {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            margin-bottom: 14px;
+        }
+
+        .brand-gradient {
+            background: linear-gradient(135deg, #00D674 0%, #2F96FD 100%);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #00D674 0%, #2F96FD 100%);
+        }
+
+        .invite-button {
+            transition: all 0.25s ease;
+        }
+
+        .invite-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(47, 150, 253, 0.25);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="header-glass sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center">
+
+            <a href="index.html" class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 brand-gradient rounded-lg flex items-center justify-center shadow-sm">
+                    <img
+                        src="img/icon.png"
+                        alt="D-AI Logo"
+                        class="h-6 w-6 rounded"
+                        onerror="this.src='https://via.placeholder.com/32?text=D'"
+                    >
+                </div>
+
+                <span class="text-lg font-bold tracking-tight text-slate-900">
+                    D-AI
+                </span>
+            </a>
+
+        </div>
+    </header>
+
+
+    <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-10 sm:py-12">
+
+        <!-- Hero -->
+        <section class="mb-12">
+
+            <div class="tool-card overflow-hidden">
+
+                <div class="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
+
+                    <!-- 소개 -->
+                    <div class="p-7 sm:p-9 md:p-10">
+
+                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
+                            D-AI
+                        </h1>
+
+                        <p class="text-lg font-semibold text-slate-700 mt-2">
+                            디스코드에서 만나는 AI 비서
+                        </p>
+
+                        <p class="text-sm text-slate-500 mt-3 leading-relaxed max-w-xl">
+                            D-AI를 호출해 질문하고 대화해보세요.
+                            디스코드에서 간편하게 AI를 사용할 수 있습니다.
+                        </p>
+
+                        <a
+                            href="https://buly.kr/3NKsbdE"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="invite-button inline-flex items-center justify-center mt-6 px-5 py-3 rounded-xl bg-[#5865F2] text-white text-sm font-semibold shadow-sm"
+                        >
+                            <i class="fab fa-discord mr-2 text-base"></i>
+                            D-AI 초대하기
+                        </a>
+
+                    </div>
+
+
+                    <!-- 로고 -->
+                    <div class="hero-gradient min-h-[220px] md:min-h-0 flex items-center justify-center p-8">
+
+                        <div class="text-center text-white">
+
+                            <div class="w-24 h-24 mx-auto bg-white/15 rounded-[26px] flex items-center justify-center backdrop-blur-sm shadow-lg">
+
+                                <img
+                                    src="img/icon.png"
+                                    alt="D-AI"
+                                    class="w-16 h-16 rounded-2xl"
+                                    onerror="this.src='https://via.placeholder.com/80?text=D'"
+                                >
+
+                            </div>
+
+                            <p class="mt-4 text-base font-bold">
+                                D-AI
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 주요 기능 -->
+        <section class="mb-12">
+
+            <h2 class="text-lg font-bold text-slate-900 mb-5 flex items-center">
+                <i class="fas fa-sparkles text-blue-500 mr-2"></i>
+                주요 기능
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+                <!-- 멘션 호출 -->
+                <div class="tool-card p-6">
+
+                    <div class="icon-box bg-blue-500 text-white">
+                        <i class="fas fa-at"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">
+                        멘션으로 바로 호출
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        별도의 명령어 없이 D-AI를 멘션하면
+                        바로 대화를 시작할 수 있습니다.
+                    </p>
+
+                </div>
+
+
+                <!-- 대화 기억 -->
+                <div class="tool-card p-6">
+
+                    <div class="icon-box bg-indigo-500 text-white">
+                        <i class="fas fa-clock-rotate-left"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">
+                        대화 기록 기억
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        사용자별 대화 흐름을 유지해
+                        앞서 나눈 이야기를 이어갈 수 있습니다.
+                    </p>
+
+                    <p class="text-xs text-slate-400 mt-3">
+                        최근 대화 20개 기억
+                    </p>
+
+                </div>
+
+
+                <!-- 상태 확인 -->
+                <div class="tool-card p-6">
+
+                    <div class="icon-box bg-emerald-500 text-white">
+                        <i class="fas fa-heart-pulse"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">
+                        상태 확인
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        '/핑' 명령어를 통해 D-AI의 현재 상태와
+                        연결 정보를 확인할 수 있습니다.
+                    </p>
+
+                </div>
+
+
+                <!-- 한국어 응답 -->
+                <div class="tool-card p-6">
+
+                    <div class="icon-box bg-slate-700 text-white">
+                        <i class="fas fa-language"></i>
+                    </div>
+
+                    <h3 class="text-lg font-bold text-slate-800">
+                        한국어 중심 응답
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                        한국어를 기본으로 이해하고
+                        자연스러운 답변을 제공합니다.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- 마지막 초대 -->
+        <section>
+
+            <div class="tool-card p-7 sm:p-9 flex flex-col sm:flex-row items-center justify-between gap-5">
+
+                <div class="text-center sm:text-left">
+
+                    <h2 class="text-xl font-bold text-slate-900">
+                        D-AI를 디스코드에 추가해보세요
+                    </h2>
+
+                    <p class="text-sm text-slate-500 mt-2">
+                        지금 바로 AI와 대화를 시작할 수 있습니다.
+                    </p>
+
+                </div>
+
+                <a
+                    href="https://buly.kr/3NKsbdE"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="invite-button flex-shrink-0 inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#5865F2] text-white text-sm font-semibold shadow-sm"
+                >
+                    <i class="fab fa-discord mr-2 text-base"></i>
+                    D-AI 초대하기
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-slate-200 mt-auto">
+
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center text-slate-400 text-sm gap-3">
+
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-slate-900">
+                    D-AI
+                </span>
+
+                <span>
+                    &copy; 2026. All Rights Reserved.
+                </span>
+            </div>
+
+            <span>
+                Powered by Dutkyobot
+            </span>
+
+        </div>
+
+    </footer>
+
+</body>
+</html>
