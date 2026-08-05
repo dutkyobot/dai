@@ -4,317 +4,733 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>D-AI | Dutkyobot</title>
+<title>D-AI | Dutkyobot</title>
 
-    <!-- 파비콘 -->
-    <link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="icon" href="img/favicon.png" type="image/png">
 
-    <!-- Tailwind CSS & FontAwesome -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    bg: "#000000",
+                    surface: "#18181B",
+                    line: "#2A2A2E",
+                    mute: "#9B9BA3",
+                    ink: "#FFFFFF",
+                    mint: "#21D67A",
+                    blue: "#3B9EFF",
+                    discord: "#5865F2",
+                },
+                fontFamily: {
+                    sans: ["Pretendard Variable", "Pretendard", "sans-serif"],
+                },
+            },
+        },
+    };
+</script>
 
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #f2f5f8;
-            color: #1e293b;
-        }
+<style>
+    html { scroll-behavior: smooth; }
 
-        .header-glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
+    body {
+        background-color: #000000;
+        color: #FFFFFF;
+    }
 
-        .tool-card {
-            background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            transition: all 0.25s cubic-bezier(0.02, 0.01, 0.47, 1);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
+    /* 플로팅 탭 바 래퍼 (초기 상태) */
+    #site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: center;
+        padding: 0; /* 초기엔 여백 없음 */
+        transition: padding 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 
-        .tool-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08);
-            border-color: #3b82f6;
-        }
+    /* 상단바 내부 박스 (초기: 풀 사이즈 바 형태) */
+    #header-inner {
+        width: 100%;
+        max-width: 100%;
+        height: 4rem; /* h-16 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* 하단 라인 */
+        border-radius: 0;
+        
+        transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
 
-        .icon-box {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 11px;
-            margin-bottom: 14px;
-        }
+    /* 상단바 컨텐츠 정렬 */
+    #header-content {
+        width: 100%;
+        max-width: 64rem; /* max-w-5xl (1024px) */
+        padding: 0 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-        .brand-gradient {
-            background: linear-gradient(135deg, #00D674 0%, #2F96FD 100%);
-        }
+    /* 플로팅 상태 (스크롤 다운 시 전환) */
+    #site-header.is-floating {
+        padding: 1rem; /* 상단 및 양옆 여백 추가 */
+    }
 
-        .hero-gradient {
-            background: linear-gradient(135deg, #00D674 0%, #2F96FD 100%);
-        }
+    #site-header.is-floating #header-inner {
+        max-width: 64rem; /* max-w-5xl 크기로 축소 */
+        border-radius: 9999px; /* 알약(Pill) 형태 변환 */
+        
+        /* 고급스러운 리퀴드 글라스 이펙트 보정 */
+        background: linear-gradient(180deg, rgba(30, 30, 34, 0.65) 0%, rgba(24, 24, 27, 0.65) 100%);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 
+            0 16px 32px -8px rgba(0, 0, 0, 0.8),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+    }
 
-        .invite-button {
-            transition: all 0.25s ease;
-        }
+    .card {
+        background: #18181B;
+        border: 1px solid #2A2A2E;
+        border-radius: 28px;
+        transition: border-color 0.2s ease;
+    }
+    .card:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
 
-        .invite-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(47, 150, 253, 0.25);
-        }
-    </style>
+    .invite-btn {
+        transition: opacity 0.2s ease;
+    }
+    .invite-btn:hover {
+        opacity: 0.88;
+    }
+
+    /* */
+    /* 폴백 릴레이 라인 및 노드 애니메이션 */
+    .relay-line {
+        height: 3px;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    .relay-line.line-active::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, #21D67A, #3B9EFF, transparent);
+        animation: line-pass 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes line-pass {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    .node-running {
+        border-color: #3B9EFF !important;
+        box-shadow: 0 0 18px rgba(59, 158, 255, 0.6);
+        animation: node-pulse 0.8s infinite alternate ease-in-out;
+    }
+    @keyframes node-pulse {
+        0% { box-shadow: 0 0 6px rgba(59, 158, 255, 0.3); }
+        100% { box-shadow: 0 0 20px rgba(59, 158, 255, 0.8); }
+    }
+
+    .node-failed {
+        border-color: #EF4444 !important;
+        box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+        animation: node-shake 0.4s ease-in-out;
+    }
+    @keyframes node-shake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-6px); }
+        40% { transform: translateX(6px); }
+        60% { transform: translateX(-4px); }
+        80% { transform: translateX(4px); }
+    }
+
+    .node-success {
+        border-color: #21D67A !important;
+        box-shadow: 0 0 22px rgba(33, 214, 122, 0.7);
+        animation: node-success-glow 1.5s infinite alternate ease-in-out;
+    }
+    @keyframes node-success-glow {
+        0% { box-shadow: 0 0 10px rgba(33, 214, 122, 0.4); }
+        100% { box-shadow: 0 0 25px rgba(33, 214, 122, 0.8); }
+    }
+
+    .gradient-brand {
+        background: linear-gradient(135deg, #21D67A 0%, #3B9EFF 100%);
+    }
+
+    .caret {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        background: #9B9BA3;
+        margin-left: 2px;
+        vertical-align: -0.15em;
+        animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    @media (prefers-reduced-motion: reduce) {
+        .relay-line.active::after, .caret { animation: none; }
+        #site-header { transition: none !important; }
+        #header-inner { transition: none !important; }
+        * { transition: none !important; }
+    }
+</style>
 </head>
+<body class="min-h-screen flex flex-col font-sans antialiased">
 
-<body class="min-h-screen flex flex-col">
-
-    <!-- Header -->
-    <header class="header-glass sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center">
-
+<header id="site-header">
+    <div id="header-inner">
+        <div id="header-content">
             <a href="index.html" class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 brand-gradient rounded-lg flex items-center justify-center shadow-sm">
+                <div class="w-8 h-8 rounded-[0.5rem] gradient-brand flex items-center justify-center">
                     <img
                         src="img/icon.png"
-                        alt="D-AI Logo"
-                        class="h-6 w-6 rounded"
-                        onerror="this.src='https://via.placeholder.com/32?text=D'"
+                        alt="D-AI"
+                        class="h-5 w-5 rounded"
+                        onerror="this.src='https://via.placeholder.com/28?text=D'"
                     >
                 </div>
-
-                <span class="text-lg font-bold tracking-tight text-slate-900">
-                    D-AI
-                </span>
+                <span class="text-lg font-bold tracking-tight text-ink">D-AI</span>
             </a>
 
-        </div>
-    </header>
-
-
-    <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-10 sm:py-12">
-
-        <!-- Hero -->
-        <section class="mb-12">
-
-            <div class="tool-card overflow-hidden">
-
-                <div class="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
-
-                    <!-- 소개 -->
-                    <div class="p-7 sm:p-9 md:p-10">
-
-                        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-                            D-AI
-                        </h1>
-
-                        <p class="text-lg font-semibold text-slate-700 mt-2">
-                            디스코드에서 만나는 AI 비서
-                        </p>
-
-                        <p class="text-sm text-slate-500 mt-3 leading-relaxed max-w-xl">
-                            D-AI를 호출해 질문하고 대화해보세요.
-                            디스코드에서 간편하게 AI를 사용할 수 있습니다.
-                        </p>
-
-                        <a
-                            href="https://buly.kr/3NKsbdE"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="invite-button inline-flex items-center justify-center mt-6 px-5 py-3 rounded-xl bg-[#5865F2] text-white text-sm font-semibold shadow-sm"
-                        >
-                            <i class="fab fa-discord mr-2 text-base"></i>
-                            D-AI 초대하기
-                        </a>
-
-                    </div>
-
-
-                    <!-- 로고 -->
-                    <div class="hero-gradient min-h-[220px] md:min-h-0 flex items-center justify-center p-8">
-
-                        <div class="text-center text-white">
-
-                            <div class="w-24 h-24 mx-auto bg-white/15 rounded-[26px] flex items-center justify-center backdrop-blur-sm shadow-lg">
-
-                                <img
-                                    src="img/icon.png"
-                                    alt="D-AI"
-                                    class="w-16 h-16 rounded-2xl"
-                                    onerror="this.src='https://via.placeholder.com/80?text=D'"
-                                >
-
-                            </div>
-
-                            <p class="mt-4 text-base font-bold">
-                                D-AI
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- 주요 기능 -->
-        <section class="mb-12">
-
-            <h2 class="text-lg font-bold text-slate-900 mb-5 flex items-center">
-                <i class="fas fa-sparkles text-blue-500 mr-2"></i>
-                주요 기능
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-
-                <!-- 멘션 호출 -->
-                <div class="tool-card p-6">
-
-                    <div class="icon-box bg-blue-500 text-white">
-                        <i class="fas fa-at"></i>
-                    </div>
-
-                    <h3 class="text-lg font-bold text-slate-800">
-                        멘션으로 바로 호출
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-                        별도의 명령어 없이 D-AI를 멘션하면
-                        바로 대화를 시작할 수 있습니다.
-                    </p>
-
-                </div>
-
-
-                <!-- 대화 기억 -->
-                <div class="tool-card p-6">
-
-                    <div class="icon-box bg-indigo-500 text-white">
-                        <i class="fas fa-clock-rotate-left"></i>
-                    </div>
-
-                    <h3 class="text-lg font-bold text-slate-800">
-                        대화 기록 기억
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-                        사용자별 대화 흐름을 유지해
-                        앞서 나눈 이야기를 이어갈 수 있습니다.
-                    </p>
-
-                    <p class="text-xs text-slate-400 mt-3">
-                        최근 대화 20개 기억
-                    </p>
-
-                </div>
-
-
-                <!-- 상태 확인 -->
-                <div class="tool-card p-6">
-
-                    <div class="icon-box bg-emerald-500 text-white">
-                        <i class="fas fa-heart-pulse"></i>
-                    </div>
-
-                    <h3 class="text-lg font-bold text-slate-800">
-                        상태 확인
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-                        '/핑' 명령어를 통해 D-AI의 현재 상태와
-                        연결 정보를 확인할 수 있습니다.
-                    </p>
-
-                </div>
-
-
-                <!-- 한국어 응답 -->
-                <div class="tool-card p-6">
-
-                    <div class="icon-box bg-slate-700 text-white">
-                        <i class="fas fa-language"></i>
-                    </div>
-
-                    <h3 class="text-lg font-bold text-slate-800">
-                        한국어 중심 응답
-                    </h3>
-
-                    <p class="text-sm text-slate-500 mt-2 leading-relaxed">
-                        한국어를 기본으로 이해하고
-                        자연스러운 답변을 제공합니다.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- 마지막 초대 -->
-        <section>
-
-            <div class="tool-card p-7 sm:p-9 flex flex-col sm:flex-row items-center justify-between gap-5">
-
-                <div class="text-center sm:text-left">
-
-                    <h2 class="text-xl font-bold text-slate-900">
-                        D-AI를 디스코드에 추가해보세요
-                    </h2>
-
-                    <p class="text-sm text-slate-500 mt-2">
-                        지금 바로 AI와 대화를 시작할 수 있습니다.
-                    </p>
-
-                </div>
-
+            <div class="flex items-center gap-4 sm:gap-6">
+                <a 
+                    href="https://discord.gg/AdM4hFZkrE" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="text-sm font-semibold text-mute hover:text-ink transition-colors"
+                >
+                    서포트 서버
+                </a>
                 <a
                     href="https://buly.kr/3NKsbdE"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="invite-button flex-shrink-0 inline-flex items-center justify-center px-6 py-3 rounded-xl bg-[#5865F2] text-white text-sm font-semibold shadow-sm"
+                    class="invite-btn hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-discord text-white text-sm font-semibold shadow-sm"
                 >
-                    <i class="fab fa-discord mr-2 text-base"></i>
-                    D-AI 초대하기
+                    <i class="fab fa-discord text-sm"></i>
+                    초대하기
                 </a>
+            </div>
+        </div>
+    </div>
+</header>
 
+<script>
+(function () {
+    var header = document.getElementById('site-header');
+    if (!header) return;
+
+    // 타이머 없이 스크롤 위치 기반으로 즉각 플로팅 스타일 전환
+    window.addEventListener('scroll', function () {
+        if (window.scrollY > 20) {
+            header.classList.add('is-floating');
+        } else {
+            header.classList.remove('is-floating');
+        }
+    }, { passive: true });
+})();
+</script>
+
+
+<main class="flex-1 max-w-5xl mx-auto w-full px-6 pt-32 pb-20 sm:pt-36 sm:pb-28">
+
+    <!-- Hero -->
+    <section class="mb-28">
+
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.05fr] gap-16 items-center">
+
+            <div>
+                <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-ink leading-tight">
+                    멘션 한 번이면,<br>D-AI가 답해요.
+                </h1>
+
+                <p class="text-[15px] text-mute mt-5 leading-relaxed max-w-md">
+                    디스코드에서 D-AI를 멘션해서 편하게 물어보세요.
+                    필요하면 검색이나 시간 조회 같은 도구도 알아서 쓰고,
+                    나눈 대화도 기억해뒀다가 이어서 대답해요.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-3 mt-9">
+                    <a
+                        href="https://buly.kr/3NKsbdE"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="invite-btn inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-discord text-white text-sm font-semibold"
+                    >
+                        <i class="fab fa-discord text-base"></i>
+                        D-AI 초대하기
+                    </a>
+
+                    <a
+                        href="#fallback"
+                        class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-line text-sm font-semibold text-mute hover:text-ink hover:border-white/30 transition-colors"
+                    >
+                        모델 전환 방식 보기
+                        <i class="fas fa-arrow-down text-xs"></i>
+                    </a>
+                </div>
             </div>
 
-        </section>
+            <!-- 예시 대화 (순환 재생) -->
+            <div class="card p-6 sm:p-7 overflow-hidden">
+                <div id="mock-wrap" class="transition-opacity duration-500 min-h-[132px] sm:min-h-[112px]">
 
-    </main>
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-9 h-9 rounded-full bg-bg border border-line flex items-center justify-center text-mute text-xs shrink-0">
+                            <i class="fas fa-user text-[11px]"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <span class="text-ink text-sm font-semibold">유저</span>
+                                <span class="text-mute text-[11px]">오후 9:14</span>
+                            </div>
+                            <div id="mock-user-text" class="text-ink text-[13px] leading-relaxed mt-0.5"></div>
+                        </div>
+                    </div>
 
+                    <div class="flex items-start gap-3">
+                        <div class="w-9 h-9 rounded-full gradient-brand flex items-center justify-center shrink-0">
+                            <img
+                                src="img/icon.png"
+                                alt="D-AI"
+                                class="h-[22px] w-[22px] rounded"
+                                onerror="this.src='https://via.placeholder.com/28?text=D'"
+                            >
+                        </div>
+                        <div class="min-w-0 w-full">
+                            <div class="flex items-center gap-2">
+                                <span class="text-ink text-sm font-semibold">D-AI</span>
+                                <span class="text-[9px] font-bold bg-line text-mute px-1 py-[1px] rounded uppercase tracking-wide">봇</span>
+                                <span class="text-mute text-[11px]">오후 9:14</span>
+                            </div>
+                            <div id="mock-bot-body" class="text-ink text-[13px] leading-relaxed mt-0.5 min-h-[1.4em]"></div>
+                            <div id="mock-bot-footer" class="text-mute text-xs mt-2 flex items-center gap-1.5 flex-wrap min-h-[1em]"></div>
+                        </div>
+                    </div>
 
-    <!-- Footer -->
-    <footer class="py-8 border-t border-slate-200 mt-auto">
-
-        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center text-slate-400 text-sm gap-3">
-
-            <div class="flex items-center space-x-2">
-                <span class="font-bold text-slate-900">
-                    D-AI
-                </span>
-
-                <span>
-                    &copy; 2026. All Rights Reserved.
-                </span>
+                </div>
             </div>
-
-            <span>
-                Powered by Dutkyobot
-            </span>
 
         </div>
 
-    </footer>
+    </section>
 
+    <script>
+    (function () {
+        var examples = [
+            {
+                user: "@D-AI 마인크래프트 더무비가 올바른 이름 맞아?",
+                answer: '네, 정식 명칭은 "마인크래프트: 더 무비"가 맞아요. 2025년에 개봉한 실사 영화예요.',
+                model: "Gemini 2.5 Flash",
+                dot: "bg-mint",
+                time: "1.2s",
+                tool: { icon: "fa-magnifying-glass", label: "Search" }
+            },
+            {
+                user: "@D-AI 지금 뉴욕 몇 시야?",
+                answer: "지금 뉴욕은 오전 8시 42분이에요.",
+                model: "Gemini 2.5 Flash",
+                dot: "bg-mint",
+                time: "0.6s",
+                tool: { icon: "fa-clock", label: "Time" }
+            },
+            {
+                user: "@D-AI 이 파이썬 코드 왜 자꾸 인덱스 에러나?",
+                answer: "리스트 범위를 벗어난 인덱스에 접근하고 있어요. range(len(items))로 반복 범위를 맞춰보세요.",
+                model: "Cerebras · GPT OSS 120B",
+                dot: "bg-blue",
+                time: "0.9s",
+                tool: null
+            },
+            {
+                user: "@D-AI 오늘 서울 날씨 어때?",
+                answer: "오늘 서울은 대체로 맑고 낮 최고기온은 27도로 예상돼요.",
+                model: "Gemini 2.5 Flash",
+                dot: "bg-mint",
+                time: "0.8s",
+                tool: { icon: "fa-cloud-sun", label: "Weather" }
+            },
+            {
+                user: "@D-AI 이번 주 개봉한 영화 뭐 있어?",
+                answer: "이번 주에는 액션, 애니메이션 신작이 여러 편 개봉했어요. 구체적으로 어떤 장르가 궁금해요?",
+                model: "Groq · Llama 3.3 70B",
+                dot: "bg-blue",
+                time: "0.5s",
+                tool: { icon: "fa-magnifying-glass", label: "Search" }
+            },
+            {
+                user: "@D-AI 1부터 100까지 더하면?",
+                answer: "1부터 100까지 더하면 5050이에요.",
+                model: "OpenRouter · Qwen 2.5 72B",
+                dot: "bg-blue",
+                time: "0.4s",
+                tool: null
+            }
+        ];
+
+        var wrap = document.getElementById("mock-wrap");
+        var userText = document.getElementById("mock-user-text");
+        var botBody = document.getElementById("mock-bot-body");
+        var botFooter = document.getElementById("mock-bot-footer");
+
+        if (!wrap || !userText || !botBody || !botFooter) return;
+
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var sleep = function (ms) {
+            return new Promise(function (resolve) { setTimeout(resolve, reduceMotion ? 0 : ms); });
+        };
+
+        function renderFooter(ex) {
+            var toolHtml = ex.tool
+                ? '<span class="text-line">·</span><i class="fas ' + ex.tool.icon + ' text-[10px]"></i> ' + ex.tool.label
+                : "";
+            botFooter.innerHTML =
+                '<span class="w-1.5 h-1.5 rounded-full ' + ex.dot + ' inline-block"></span>' +
+                ex.model +
+                '<span class="text-line">·</span>' +
+                '<i class="fas fa-bolt text-[#F5A623] text-[10px]"></i> ' + ex.time +
+                toolHtml;
+        }
+
+        function playExample(ex) {
+            return Promise.resolve()
+                .then(function () {
+                    userText.textContent = "";
+                    botBody.textContent = "";
+                    botFooter.innerHTML = "";
+                    userText.textContent = ex.user;
+                    return sleep(700);
+                })
+                .then(function () {
+                    botBody.textContent = "🧠 생각 중...";
+                    return sleep(1100);
+                })
+                .then(function () {
+                    botBody.textContent = ex.answer;
+                    renderFooter(ex);
+                    return sleep(3400);
+                });
+        }
+
+        function loop(i) {
+            wrap.style.opacity = "1";
+            playExample(examples[i]).then(function () {
+                if (reduceMotion) {
+                    loop((i + 1) % examples.length);
+                    return;
+                }
+                wrap.style.opacity = "0";
+                setTimeout(function () {
+                    loop((i + 1) % examples.length);
+                }, 400);
+            });
+        }
+
+        loop(0);
+    })();
+    </script>
+
+
+    <!-- 폴백 릴레이 -->
+    <section id="fallback" class="mb-28 scroll-mt-28">
+
+        <div class="card p-8 sm:p-12">
+
+            <h2 class="text-2xl sm:text-3xl font-bold text-ink leading-snug">
+                모델 하나가 막히면,<br class="sm:hidden">
+                다음 모델이 바로 이어받아요.
+            </h2>
+
+            <p class="text-sm text-mute mt-3 max-w-lg leading-relaxed">
+                AI 모델 4개가 순서대로 대기하고 있어서, 하나가 사용량 제한에 걸리거나
+                오류가 나도 대화가 끊기지 않아요.
+            </p>
+
+            <!-- 그림자 짤림 방지를 위한 패딩(py-6 px-3) 추가 -->
+            <div class="mt-8 overflow-x-auto py-6 px-3 -mx-3">
+                <div class="flex items-center min-w-[640px] sm:min-w-0">
+
+                    <div class="flex flex-col items-center gap-3 shrink-0">
+                        <div id="fb-node-0" class="w-14 h-14 rounded-3xl bg-surface border border-line flex items-center justify-center transition-all duration-300">
+                            <span id="fb-text-0" class="font-bold text-mute text-sm transition-colors">Ge</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs font-semibold text-ink">Gemini</div>
+                            <div id="fb-status-0" class="text-[10px] text-mute transition-colors">대기</div>
+                        </div>
+                    </div>
+
+                    <div id="fb-line-0" class="relay-line flex-1 mx-2 mb-7"></div>
+
+                    <div class="flex flex-col items-center gap-3 shrink-0">
+                        <div id="fb-node-1" class="w-14 h-14 rounded-3xl bg-surface border border-line flex items-center justify-center transition-all duration-300">
+                            <span id="fb-text-1" class="font-bold text-mute text-sm transition-colors">Ce</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs font-semibold text-ink">Cerebras</div>
+                            <div id="fb-status-1" class="text-[10px] text-mute transition-colors">대기</div>
+                        </div>
+                    </div>
+
+                    <div id="fb-line-1" class="relay-line flex-1 mx-2 mb-7"></div>
+
+                    <div class="flex flex-col items-center gap-3 shrink-0">
+                        <div id="fb-node-2" class="w-14 h-14 rounded-3xl bg-surface border border-line flex items-center justify-center transition-all duration-300">
+                            <span id="fb-text-2" class="font-bold text-mute text-sm transition-colors">Gr</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs font-semibold text-ink">Groq</div>
+                            <div id="fb-status-2" class="text-[10px] text-mute transition-colors">대기</div>
+                        </div>
+                    </div>
+
+                    <div id="fb-line-2" class="relay-line flex-1 mx-2 mb-7"></div>
+
+                    <div class="flex flex-col items-center gap-3 shrink-0">
+                        <div id="fb-node-3" class="w-14 h-14 rounded-3xl bg-surface border border-line flex items-center justify-center transition-all duration-300">
+                            <span id="fb-text-3" class="font-bold text-mute text-sm transition-colors">Or</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs font-semibold text-ink">OpenRouter</div>
+                            <div id="fb-status-3" class="text-[10px] text-mute transition-colors">대기</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <p class="text-xs text-mute mt-9">
+                Gemini → Cerebras → Groq → OpenRouter 순서로 자동 전환돼요.
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- -->
+    <script>
+    (function () {
+        var nodes = [
+            { box: document.getElementById('fb-node-0'), status: document.getElementById('fb-status-0'), text: document.getElementById('fb-text-0') },
+            { box: document.getElementById('fb-node-1'), status: document.getElementById('fb-status-1'), text: document.getElementById('fb-text-1') },
+            { box: document.getElementById('fb-node-2'), status: document.getElementById('fb-status-2'), text: document.getElementById('fb-text-2') },
+            { box: document.getElementById('fb-node-3'), status: document.getElementById('fb-status-3'), text: document.getElementById('fb-text-3') }
+        ];
+        var lines = [
+            document.getElementById('fb-line-0'),
+            document.getElementById('fb-line-1'),
+            document.getElementById('fb-line-2')
+        ];
+
+        if (!nodes[0].box) return;
+
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var sleep = function (ms) {
+            return new Promise(function (resolve) { setTimeout(resolve, reduceMotion ? 0 : ms); });
+        };
+
+        function resetAll() {
+            for (var i = 0; i < nodes.length; i++) {
+                nodes[i].box.className = "w-14 h-14 rounded-3xl bg-surface border border-line flex items-center justify-center transition-all duration-300";
+                nodes[i].status.className = "text-[10px] text-mute transition-colors";
+                nodes[i].status.textContent = "대기";
+                if (nodes[i].text) nodes[i].text.className = "font-bold text-mute text-sm transition-colors";
+            }
+            for (var j = 0; j < lines.length; j++) {
+                lines[j].classList.remove("line-active");
+            }
+        }
+
+        function runFallbackSequence() {
+            resetAll();
+
+            // 매 회차마다 0~3 중 성공할 모델을 무작위로 결정
+            var targetIdx = Math.floor(Math.random() * nodes.length);
+
+            function step(i) {
+                if (i >= nodes.length) return;
+
+                // 현재 노드 시도 중
+                nodes[i].box.classList.add('node-running');
+                nodes[i].status.textContent = '시도 중...';
+                nodes[i].status.className = 'text-[10px] text-blue font-medium transition-colors';
+                if (nodes[i].text) nodes[i].text.className = 'font-bold text-ink text-sm transition-colors';
+
+                sleep(1000).then(function () {
+                    nodes[i].box.classList.remove('node-running');
+
+                    if (i === targetIdx) {
+                        // 목표 노드에서 성공!
+                        nodes[i].box.classList.add('node-success');
+                        nodes[i].status.textContent = '성공!';
+                        nodes[i].status.className = 'text-[10px] text-mint font-bold transition-colors';
+                        return sleep(3500).then(runFallbackSequence);
+                    } else {
+                        // 실패 후 다음 노드로 전달
+                        nodes[i].box.classList.add('node-failed');
+                        nodes[i].status.textContent = '실패 (오류)';
+                        nodes[i].status.className = 'text-[10px] text-red-400 font-semibold transition-colors';
+                        return sleep(700)
+                            .then(function () {
+                                if (lines[i]) {
+                                    lines[i].classList.add('line-active');
+                                    return sleep(600);
+                                }
+                            })
+                            .then(function () {
+                                if (lines[i]) lines[i].classList.remove('line-active');
+                                step(i + 1);
+                            });
+                    }
+                });
+            }
+
+            step(0);
+        }
+
+        runFallbackSequence();
+    })();
+    </script>
+
+
+    <!-- 주요 기능 -->
+    <section class="mb-24">
+
+        <h2 class="text-lg font-bold text-ink mb-7">주요 기능</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div class="card p-7">
+                <i class="fas fa-at text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">멘션으로 바로 호출</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    명령어 없이 D-AI를 멘션하기만 하면 바로 대화가 시작돼요.
+                </p>
+            </div>
+
+            <div class="card p-7">
+                <i class="fas fa-toolbox text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">필요한 도구는 알아서</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    질문에 따라 검색, 시간 조회 같은 도구를 스스로 판단해서 사용해요.
+                    앞으로 다른 도구도 계속 추가될 예정이에요.
+                </p>
+            </div>
+
+            <div class="card p-7">
+                <i class="fas fa-clock-rotate-left text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">대화 기록 기억</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    사용자별로 최근 대화 흐름을 기억해서 이야기를 이어갈 수 있어요.
+                </p>
+                <p class="text-xs text-mute mt-3 flex items-center gap-1.5">
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-ink font-medium">/초기화</span>
+                    로 언제든 새로 시작
+                </p>
+            </div>
+
+            <div class="card p-7">
+                <i class="fas fa-shield-halved text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">안전한 답변 필터링</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    욕설이나 부적절한 표현 없이, 누구나 안심하고 대화할 수 있어요.
+                </p>
+            </div>
+
+            <div class="card p-7">
+                <i class="fas fa-heart-pulse text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">상태 확인</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    <span class="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-xs align-middle text-ink font-medium">/핑</span>
+                    명령어로 지금 쓰고 있는 모델, 응답 속도, API 연결 상태를 한눈에 볼 수 있어요.
+                </p>
+            </div>
+
+            <div class="card p-7">
+                <i class="fas fa-language text-ink mb-4 block"></i>
+                <h3 class="text-base font-bold text-ink">한국어 중심 응답</h3>
+                <p class="text-sm text-mute mt-2 leading-relaxed">
+                    한국어를 기본으로 이해하고, 디스코드 채팅에 어울리게
+                    짧고 자연스럽게 답해요.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 마지막 초대 -->
+    <section>
+        <div class="card p-9 sm:p-11 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+
+            <div>
+                <h2 class="text-xl font-bold text-ink">D-AI를 디스코드에 추가해보세요</h2>
+                <p class="text-sm text-mute mt-2">
+                    지금 바로 멘션 한 번으로 대화를 시작할 수 있어요.<br class="hidden sm:block">
+                    궁금한 점이 있다면 <a href="https://discord.gg/AdM4hFZkrE" target="_blank" class="text-blue hover:underline font-medium">서포트 서버</a>를 방문해 보세요.
+                </p>
+            </div>
+
+            <a
+                href="https://buly.kr/3NKsbdE"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="invite-btn shrink-0 inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-discord text-white text-sm font-semibold"
+            >
+                <i class="fab fa-discord text-base"></i>
+                D-AI 초대하기
+            </a>
+
+        </div>
+    </section>
+
+</main>
+
+
+<!-- Footer -->
+<footer class="py-9 border-t border-line mt-auto">
+    <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center text-mute text-sm gap-4">
+        <div class="flex items-center gap-2">
+            <span class="font-bold text-ink">D-AI</span>
+            <span>&copy; 2026. All Rights Reserved.</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <a href="https://discord.gg/AdM4hFZkrE" target="_blank" rel="noopener noreferrer" class="font-medium hover:text-ink transition-colors">
+                서포트 서버
+            </a>
+            <span class="w-1 h-1 rounded-full bg-line"></span>
+            <span class="text-xs">Powered by Dutkyobot</span>
+        </div>
+    </div>
+</footer>
 </body>
 </html>
