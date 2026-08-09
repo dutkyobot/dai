@@ -127,6 +127,31 @@
         /* ==========================================================
            공통 컴포넌트
         ========================================================== */
+
+        /* 폴백 다이어그램 가로 스크롤 영역 커스텀 스크롤바 */
+        .themed-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #3A3A40 #18181B;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-track {
+            background: #18181B;
+            border-radius: 9999px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-thumb {
+            background: #3A3A40;
+            border-radius: 9999px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #55555C;
+        }
+
         .card {
             background: #18181B;
             border: 1px solid #2A2A2E;
@@ -371,7 +396,7 @@
                     오류가 나도 대화가 끊기지 않아요.
                 </p>
 
-                <div class="mt-8 overflow-x-auto py-6 px-3 -mx-3">
+                <div class="mt-8 overflow-x-auto themed-scrollbar py-6 px-3 -mx-3">
                     <div class="flex items-center min-w-[640px] sm:min-w-0">
 
                         <div class="flex flex-col items-center gap-3 shrink-0">
