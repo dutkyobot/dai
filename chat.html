@@ -105,7 +105,7 @@
   /* 로고 텍스트: D- 는 민트, AI 는 블루(그라데이션 색), Web 은 사이트 메인 오렌지 */
   .brand-d { color: var(--c-mint); }
   .brand-ai { color: var(--c-blue); }
-  .brand-web { color: var(--c-orange); }
+  .brand-web { color: rgb(var(--c-orange)); }
 
   /* 카드 컴포넌트 (랜딩 페이지 .card 토큰과 동일) */
   .card {
@@ -433,13 +433,18 @@
   }
   #model-menu {
     top: 48px;
-    width: 320px;
+    width: 248px;
+    max-width: calc(100vw - 24px);
     border-radius: 18px;
-    padding: 7px;
+    padding: 6px;
   }
   #model-menu .model-option {
     border-radius: 12px;
     padding: 10px 11px;
+    min-width: 0;
+  }
+  #model-menu .model-option > span {
+    min-width: 0;
   }
   #model-menu .model-option:hover { background: rgb(var(--c-surface2) / 0.72); }
 
@@ -509,12 +514,12 @@
     line-height: 1.78;
   }
   #messages .msg-enter .w-7.h-7 {
-    width: 30px;
-    height: 30px;
+    width: 26px;
+    height: 26px;
     border-radius: 9px;
     margin-top: 2px;
   }
-  #messages .msg-enter .w-7.h-7 span { font-size: 10px; }
+  #messages .msg-enter .w-7.h-7 span { font-size: 9px; }
   #messages .msg-enter .bg-surface2[data-bubble] {
     border-radius: 18px 18px 6px 18px;
     padding: 9px 13px;
@@ -605,7 +610,7 @@
   #messages { width:min(100%,var(--ui-content-width)); padding-left:clamp(14px,3vw,26px); padding-right:clamp(14px,3vw,26px); }
   #messages .msg-enter { width:100%; min-width:0; }
   #messages .msg-enter > .flex-1 { min-width:0; }
-  .assistant-avatar { flex:0 0 30px; width:30px !important; height:30px !important; border-radius:10px !important; }
+  .assistant-avatar { flex:0 0 26px; width:26px !important; height:26px !important; border-radius:8px !important; }
   .assistant-avatar img, .avatar-badge img { display:block; }
   #messages .bg-surface2[data-bubble] { max-width:min(78%,44rem); overflow-wrap:anywhere; word-break:break-word; }
   .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 { padding:8px clamp(10px,2vw,20px) max(14px,env(safe-area-inset-bottom)); }
@@ -621,7 +626,7 @@
     .app-header{height:58px;padding-inline:10px;}
     #model-dropdown-btn{max-width:min(70vw,280px);}
     #model-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    #model-menu{top:46px;width:min(330px,calc(100vw - 20px));max-width:calc(100vw - 20px);}
+    #model-menu{top:46px;width:min(248px,calc(100vw - 20px));max-width:calc(100vw - 20px);}
     #messages{width:100%;padding:20px 10px 132px;gap:28px;}
     #messages .msg-enter{gap:9px;}
     #messages .msg-enter > .flex-1 > div:first-child{font-size:14px;line-height:1.72;}
@@ -691,6 +696,36 @@
     }
   }
   @media (prefers-reduced-motion:reduce){ *{animation:none !important;transition:none !important;} }
+
+  /* v5 polish: compact model picker + smaller assistant identity */
+  #model-menu .model-option {
+    gap: 8px;
+    padding: 9px 10px;
+  }
+  #model-menu .model-option > span {
+    display: block;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  #model-menu .model-option .model-check {
+    flex: 0 0 auto;
+  }
+  .assistant-avatar {
+    width: 24px !important;
+    height: 24px !important;
+    flex-basis: 24px;
+    border-radius: 7px !important;
+  }
+  .assistant-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  #messages .msg-enter { gap: 10px; }
+  @media (max-width: 767px) {
+    #model-menu .model-option { padding: 8px 9px; }
+    .assistant-avatar { width: 22px !important; height: 22px !important; flex-basis: 22px; border-radius: 7px !important; }
+  }
 </style>
 </head>
 
@@ -822,12 +857,11 @@
         </button>
 
         <div id="model-menu"
-          class="hidden card float-card absolute top-11 left-0 w-72 p-2 z-30">
+          class="hidden card float-card absolute top-11 left-0 w-[248px] p-1.5 z-30">
           <button data-model="Gemini 2.5 Flash" data-provider="gemini"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Gemini 2.5 Flash</span>
-              <span class="block text-[11px] text-mute">기본 모델 · 빠르고 균형 잡힌 응답</span>
             </span>
             <i class="fa-solid fa-check text-orange text-xs opacity-100 model-check"></i>
           </button>
@@ -835,7 +869,6 @@
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Cerebras · GPT OSS 120B</span>
-              <span class="block text-[11px] text-mute">1순위 대체 · 초저지연 추론</span>
             </span>
             <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
@@ -843,7 +876,6 @@
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Groq · Llama 3.3 70B</span>
-              <span class="block text-[11px] text-mute">2순위 대체 · 가벼운 작업용</span>
             </span>
             <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
@@ -851,7 +883,6 @@
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">OpenRouter</span>
-              <span class="block text-[11px] text-mute">최종 대체 · 다중 무료 모델</span>
             </span>
             <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
@@ -1416,7 +1447,7 @@ const Messages = {
     const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
     row.innerHTML = `
       <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-cover rounded-full" loading="eager">
+        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-contain rounded-full p-1" loading="eager">
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-[14px] text-ink leading-relaxed whitespace-pre-wrap break-words">${Utils.escapeHtml(m.content)}</div>
@@ -1442,7 +1473,7 @@ const Messages = {
     row.className = "msg-enter flex gap-3";
     row.innerHTML = `
       <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
-        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-cover rounded-full" loading="eager">
+        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-contain rounded-full p-1" loading="eager">
       </div>
       <div class="flex items-center gap-1.5 h-7">
         <span class="typing-dot"></span>
