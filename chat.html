@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>D-AI | Dutkyobot</title>
+<title>D-AI Web | Dutkyobot</title>
 <link rel="icon" href="img/favicon.png" type="image/png">
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -15,14 +15,16 @@
     theme: {
       extend: {
         colors: {
-          bg: "#000000",
-          surface: "#18181B",
-          surface2: "#141416",
-          line: "#2A2A2E",
-          mute: "#9B9BA3",
-          ink: "#FFFFFF",
+          bg: "#FAF9F6",
+          surface: "#FFFFFF",
+          surface2: "#F3F1EA",
+          line: "#E7E2D8",
+          mute: "#8A8478",
+          ink: "#231F1A",
           mint: "#21D67A",
           blue: "#3B9EFF",
+          orange: "#E35B2E",
+          "orange-dark": "#C1471F",
           discord: "#5865F2",
         },
         fontFamily: {
@@ -34,46 +36,53 @@
 </script>
 
 <style>
+  /* 메인 컬러는 진한 오렌지 하나로 통일한다. 민트→블루 그라데이션은
+     사이드바 로고 아이콘 한 곳에만 남겨둔 브랜드 시그니처이고,
+     그 외 UI 요소(아바타, 전송 버튼, 포인트 컬러 등)는 전부 오렌지를 쓴다. */
   :root {
     --c-mint: #21D67A;
     --c-blue: #3B9EFF;
+    --c-orange: #E35B2E;
+    --c-orange-dark: #C1471F;
   }
 
   html, body { height: 100%; overscroll-behavior: none; }
-  body { background-color: #000000; color: #FFFFFF; }
+  body { background-color: #FAF9F6; color: #231F1A; }
 
   a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible {
-    outline: 2px solid var(--c-blue);
+    outline: 2px solid var(--c-orange);
     outline-offset: 2px;
     border-radius: 4px;
   }
 
+  /* 로고 아이콘 전용 그라데이션 — 이 클래스는 사이드바 로고 마크에만 사용한다 */
   .gradient-brand {
     background: linear-gradient(135deg, var(--c-mint) 0%, var(--c-blue) 100%);
   }
-  .gradient-text {
-    background: linear-gradient(135deg, var(--c-mint) 0%, var(--c-blue) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
+
+  /* 로고 텍스트: D- 는 민트, AI 는 블루(그라데이션 색), Web 은 사이트 메인 오렌지 */
+  .brand-d { color: var(--c-mint); }
+  .brand-ai { color: var(--c-blue); }
+  .brand-web { color: var(--c-orange); }
 
   /* 카드 컴포넌트 (랜딩 페이지 .card 토큰과 동일) */
   .card {
-    background: #18181B;
-    border: 1px solid #2A2A2E;
+    background: #FFFFFF;
+    border: 1px solid #E7E2D8;
     border-radius: 28px;
-    transition: border-color 0.2s ease;
+    box-shadow: 0 1px 2px rgba(35, 31, 26, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .card:hover {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(227, 91, 46, 0.4);
+    box-shadow: 0 8px 20px -8px rgba(35, 31, 26, 0.12);
   }
 
   /* 떠 있는 카드(모델 메뉴, 설정 모달)용 입체 그림자 — 헤더 글래스와 동일한 톤 */
   .float-card {
     box-shadow:
-      0 16px 32px -8px rgba(0, 0, 0, 0.8),
-      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      0 16px 32px -8px rgba(35, 31, 26, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   .invite-btn {
@@ -83,9 +92,15 @@
     opacity: 0.88;
   }
 
+  /* 부유형 헤더 컨트롤(사이드바 토글, 모델 선택 등)이 배경과 살짝
+     분리되어 보이도록 미세한 그림자를 얹는다 */
+  .float-pill {
+    box-shadow: 0 1px 3px rgba(35, 31, 26, 0.06);
+  }
+
   /* 스크롤바 */
   .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-  .scroll-thin::-webkit-scrollbar-thumb { background: #2A2A2E; border-radius: 999px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: #DDD7CB; border-radius: 999px; }
   .scroll-thin::-webkit-scrollbar-track { background: transparent; }
 
   /* 사이드바 슬라이드 (모바일 오버레이) */
@@ -102,13 +117,13 @@
     transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
   .app-header.is-scrolled {
-    background: linear-gradient(180deg, rgba(30, 30, 34, 0.65) 0%, rgba(24, 24, 27, 0.65) 100%);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 249, 246, 0.85) 100%);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(35, 31, 26, 0.08);
     box-shadow:
-      0 12px 24px -12px rgba(0, 0, 0, 0.7),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      0 12px 24px -12px rgba(35, 31, 26, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
   }
 
   /* 사이드바 접기(레일) — ChatGPT/Gemini 스타일 아이콘 전용 상태.
@@ -144,8 +159,8 @@
     flex: none;
   }
   #sidebar.is-collapsed #sidebar-collapse-btn {
-    background: #18181B;
-    border: 1px solid #2A2A2E;
+    background: #FFFFFF;
+    border: 1px solid #E7E2D8;
   }
   #sidebar.is-collapsed #sidebar-collapse-btn i,
   #sidebar.is-collapsed #settings-btn .avatar-badge i {
@@ -158,45 +173,46 @@
 
   /* 입력창 */
   .composer-shell {
-    background: #18181B;
-    border: 1px solid #2A2A2E;
+    background: #FFFFFF;
+    border: 1px solid #E7E2D8;
     border-radius: 999px;
+    box-shadow: 0 2px 10px -4px rgba(35, 31, 26, 0.08);
     transition: box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease;
   }
   .composer-shell.is-multiline {
     border-radius: 28px;
   }
   .composer-shell:focus-within {
-    border-color: rgba(59, 158, 255, 0.5);
-    box-shadow: 0 0 0 3px rgba(33, 214, 122, 0.08), 0 0 0 6px rgba(59, 158, 255, 0.06);
+    border-color: rgba(227, 91, 46, 0.5);
+    box-shadow: 0 0 0 3px rgba(227, 91, 46, 0.12);
   }
   #composer-input {
     background: transparent;
-    color: #FFFFFF;
+    color: #231F1A;
     resize: none;
     max-height: 200px;
   }
-  #composer-input::placeholder { color: #9B9BA3; }
+  #composer-input::placeholder { color: #8A8478; }
 
   /* 채팅 이력 아이템 */
   .history-item {
     transition: background-color 0.15s ease;
   }
-  .history-item:hover { background: #18181B; }
-  .history-item.is-active { background: #18181B; }
+  .history-item:hover { background: #F3F1EA; }
+  .history-item.is-active { background: #F3F1EA; }
 
   /* 프로바이더 체인 (시그니처 요소) */
   .chain-dot {
     width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0;
   }
   .chain-line {
-    flex: 1; height: 1px; background: #2A2A2E; min-width: 12px;
+    flex: 1; height: 1px; background: #E7E2D8; min-width: 12px;
   }
 
   /* 타이핑 인디케이터 */
   .typing-dot {
     width: 6px; height: 6px; border-radius: 999px;
-    background: #9B9BA3;
+    background: #8A8478;
     animation: typing-bounce 1.2s infinite ease-in-out;
   }
   .typing-dot:nth-child(2) { animation-delay: 0.15s; }
@@ -215,7 +231,7 @@
   .chip {
     transition: border-color 0.15s ease, background-color 0.15s ease;
   }
-  .chip:hover { border-color: rgba(255,255,255,0.25); background: #18181B; }
+  .chip:hover { border-color: rgba(227, 91, 46, 0.35); background: #FFF6F0; }
 
   /* 사이드바 대화 아이템 액션(이름변경/삭제) */
   .sidebar-item-actions {
@@ -239,17 +255,17 @@
 <div class="h-screen w-screen flex">
 
   <!-- ============================== 사이드바 ============================== -->
-  <aside id="sidebar" class="shrink-0 h-full bg-black border-r border-line flex flex-col">
+  <aside id="sidebar" class="shrink-0 h-full bg-white border-r border-line flex flex-col">
     <div class="p-3">
       <div class="logo-row flex items-center justify-between gap-2 px-1 h-9">
         <a href="index.html" class="flex items-center gap-2.5 min-w-0">
           <div class="w-7 h-7 rounded-[0.45rem] gradient-brand flex items-center justify-center shrink-0">
             <img src="img/icon.png" alt="D-AI" class="h-4 w-4 rounded" onerror="this.style.display='none'">
           </div>
-          <span class="sidebar-label text-[15px] font-bold tracking-tight text-ink whitespace-nowrap">D-AI</span>
+          <span class="sidebar-label text-[15px] font-bold tracking-tight whitespace-nowrap"><span class="brand-d">D-</span><span class="brand-ai">AI</span><span class="brand-web"> Web</span></span>
         </a>
         <button id="sidebar-collapse-btn"
-          class="hidden md:flex w-7 h-7 rounded-full items-center justify-center text-mute hover:text-ink hover:bg-surface transition-colors shrink-0"
+          class="hidden md:flex w-7 h-7 rounded-full items-center justify-center text-mute hover:text-ink hover:bg-surface2 transition-colors shrink-0"
           aria-label="사이드바 접기">
           <i class="fa-solid fa-angles-left text-[11px]"></i>
         </button>
@@ -257,12 +273,12 @@
 
       <div id="new-chat-row" class="flex items-center gap-2 mt-3">
         <button id="new-chat-btn"
-          class="flex-1 min-w-0 flex items-center justify-center gap-2 rounded-full h-10 text-[13px] font-semibold text-ink bg-surface border border-line hover:border-white/30 transition-colors">
+          class="flex-1 min-w-0 flex items-center justify-center gap-2 rounded-full h-10 text-[13px] font-semibold text-ink bg-surface2 border border-line hover:border-orange/40 transition-colors">
           <i class="fa-solid fa-plus text-[11px] text-ink shrink-0"></i>
           <span class="sidebar-label whitespace-nowrap">새 대화</span>
         </button>
         <button id="search-toggle-btn"
-          class="sidebar-label shrink-0 w-10 h-10 rounded-full bg-surface border border-line flex items-center justify-center text-mute hover:text-ink hover:border-white/30 transition-colors"
+          class="sidebar-label shrink-0 w-10 h-10 rounded-full bg-surface2 border border-line flex items-center justify-center text-mute hover:text-ink hover:border-orange/40 transition-colors"
           aria-label="대화 검색">
           <i class="fa-solid fa-magnifying-glass text-[12px]"></i>
         </button>
@@ -275,7 +291,7 @@
             type="text"
             id="history-search"
             placeholder="대화 검색"
-            class="w-full bg-surface border border-line rounded-full pl-8 pr-3 py-2 text-[13px] text-ink placeholder:text-mute focus:outline-none focus:border-blue/50"
+            class="w-full bg-surface2 border border-line rounded-full pl-8 pr-3 py-2 text-[13px] text-ink placeholder:text-mute focus:outline-none focus:border-orange/50"
           >
         </div>
       </div>
@@ -287,8 +303,8 @@
 
     <div class="p-3 border-t border-line">
       <button id="settings-btn"
-        class="flex items-center gap-2.5 w-full rounded-full px-2 py-2 hover:bg-surface transition-colors">
-        <div class="avatar-badge w-7 h-7 rounded-full bg-surface border border-line flex items-center justify-center text-mute text-xs shrink-0">
+        class="flex items-center gap-2.5 w-full rounded-full px-2 py-2 hover:bg-surface2 transition-colors">
+        <div class="avatar-badge w-7 h-7 rounded-full bg-surface2 border border-line flex items-center justify-center text-mute text-xs shrink-0">
           <i class="fa-solid fa-user"></i>
         </div>
         <span class="sidebar-label text-[13px] font-medium text-ink flex-1 text-left truncate">게스트</span>
@@ -298,11 +314,11 @@
   </aside>
 
   <!-- ============================== 설정 모달 ============================== -->
-  <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70">
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/35">
     <div id="settings-card" class="card float-card w-full max-w-sm p-6">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-[16px] font-bold text-ink">설정</h2>
-        <button id="settings-close-btn" class="w-8 h-8 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-black/40" aria-label="닫기">
+        <button id="settings-close-btn" class="w-8 h-8 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2" aria-label="닫기">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
@@ -318,32 +334,32 @@
           <div class="text-[11px] text-mute mt-0.5">끄면 새로고침할 때 대화가 사라져요.</div>
         </div>
         <button id="persist-toggle" class="shrink-0 w-11 h-6 rounded-full bg-line relative transition-colors" role="switch" aria-checked="true">
-          <span id="persist-toggle-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform"></span>
+          <span id="persist-toggle-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-[0_1px_2px_rgba(35,31,26,0.25)] transition-transform"></span>
         </button>
       </div>
 
       <button id="settings-clear-all-btn"
-        class="w-full flex items-center justify-center gap-2 mt-4 rounded-full py-2.5 text-[13px] font-semibold text-red-400 border border-line hover:bg-black/40 transition-colors">
+        class="w-full flex items-center justify-center gap-2 mt-4 rounded-full py-2.5 text-[13px] font-semibold text-orange-dark border border-line hover:bg-surface2 transition-colors">
         <i class="fa-solid fa-trash-can text-[12px]"></i>
         모든 대화 삭제
       </button>
     </div>
   </div>
 
-  <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black/60 z-40 md:hidden"></div>
+  <div id="sidebar-backdrop" class="hidden fixed inset-0 bg-black/35 z-40 md:hidden"></div>
 
   <!-- ============================== 메인 ============================== -->
   <div class="flex-1 min-w-0 flex flex-col h-full relative">
 
     <header class="app-header relative z-20 h-16 shrink-0 flex items-center justify-between px-3 sm:px-4">
       <div class="flex items-center gap-2 relative">
-        <button id="sidebar-toggle" class="md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-white/30">
+        <button id="sidebar-toggle" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-orange/40">
           <i class="fa-solid fa-bars text-sm"></i>
         </button>
 
         <button id="model-dropdown-btn"
-          class="flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-surface/90 border border-line backdrop-blur-sm transition-colors hover:border-white/30">
-          <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+          class="float-pill flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-surface/90 border border-line backdrop-blur-sm transition-colors hover:border-orange/40">
+          <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
           <span id="model-name" class="text-[14px] font-semibold text-ink">Gemini 2.5 Flash</span>
           <i class="fa-solid fa-chevron-down text-[10px] text-mute"></i>
         </button>
@@ -351,45 +367,45 @@
         <div id="model-menu"
           class="hidden card float-card absolute top-11 left-0 w-72 p-2 z-30">
           <button data-model="Gemini 2.5 Flash" data-provider="gemini"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-black/40 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Gemini 2.5 Flash</span>
               <span class="block text-[11px] text-mute">기본 모델 · 빠르고 균형 잡힌 응답</span>
             </span>
-            <i class="fa-solid fa-check text-mint text-xs opacity-100 model-check"></i>
+            <i class="fa-solid fa-check text-orange text-xs opacity-100 model-check"></i>
           </button>
           <button data-model="Cerebras · GPT OSS 120B" data-provider="cerebras"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-black/40 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Cerebras · GPT OSS 120B</span>
               <span class="block text-[11px] text-mute">1순위 대체 · 초저지연 추론</span>
             </span>
-            <i class="fa-solid fa-check text-mint text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
           <button data-model="Groq · Llama 3.3 70B" data-provider="groq"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-black/40 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Groq · Llama 3.3 70B</span>
               <span class="block text-[11px] text-mute">2순위 대체 · 가벼운 작업용</span>
             </span>
-            <i class="fa-solid fa-check text-mint text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
           <button data-model="OpenRouter" data-provider="openrouter"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-black/40 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">OpenRouter</span>
               <span class="block text-[11px] text-mute">최종 대체 · 다중 무료 모델</span>
             </span>
-            <i class="fa-solid fa-check text-mint text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
           </button>
         </div>
       </div>
 
-      <button id="mobile-new-chat" class="md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-white/30">
+      <button id="mobile-new-chat" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-orange/40">
         <i class="fa-regular fa-pen-to-square text-sm"></i>
       </button>
     </header>
@@ -398,18 +414,18 @@
     <main id="chat-scroll" class="flex-1 overflow-y-auto scroll-thin">
 
       <div id="empty-state" class="h-full flex flex-col items-center justify-center px-6 text-center">
-        <div class="w-14 h-14 rounded-2xl gradient-brand flex items-center justify-center mb-5">
-          <img src="img/icon.png" alt="D-AI" class="h-8 w-8 rounded" onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend', '<span class=\'text-black font-extrabold text-xl\'>D</span>')">
+        <div class="w-14 h-14 rounded-2xl bg-orange flex items-center justify-center mb-5">
+          <img src="img/icon.png" alt="D-AI" class="h-8 w-8 rounded" onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend', '<span class=\'text-white font-extrabold text-xl\'>D</span>')">
         </div>
         <h1 class="flex items-center gap-2 text-2xl sm:text-[28px] font-bold tracking-tight">
-          <i class="fa-solid fa-sparkles text-mint text-lg sm:text-xl"></i>
-          <span class="gradient-text">무엇을 도와드릴까요?</span>
+          <i class="fa-solid fa-sparkles text-orange text-lg sm:text-xl"></i>
+          <span class="text-orange">무엇을 도와드릴까요?</span>
         </h1>
         <p class="text-mute text-[14px] mt-2 max-w-sm">필요하면 실시간 검색과 시간 조회도 함께 사용해요.</p>
 
         <!-- 시그니처 요소: 프로바이더 폴백 체인 -->
         <div class="flex items-center gap-1.5 mt-6 max-w-xs w-full">
-          <span class="chain-dot bg-mint shadow-[0_0_0_3px_rgba(33,214,122,0.15)]"></span>
+          <span class="chain-dot bg-orange shadow-[0_0_0_3px_rgba(227,91,46,0.18)]"></span>
           <span class="chain-line"></span>
           <span class="chain-dot bg-line"></span>
           <span class="chain-line"></span>
@@ -426,26 +442,26 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-lg">
           <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
-            <span class="w-8 h-8 rounded-full bg-blue/10 border border-blue/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-magnifying-glass text-blue text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-magnifying-glass text-orange text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug pt-1.5">오늘 서울 날씨 어때?</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
-            <span class="w-8 h-8 rounded-full bg-mint/10 border border-mint/20 flex items-center justify-center shrink-0">
-              <i class="fa-regular fa-clock text-mint text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
+              <i class="fa-regular fa-clock text-orange text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug pt-1.5">도쿄는 지금 몇 시야?</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
-            <span class="w-8 h-8 rounded-full bg-blue/10 border border-blue/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-code text-blue text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-code text-orange text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug pt-1.5">파이썬 정렬 코드 짜줘</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
-            <span class="w-8 h-8 rounded-full bg-mint/10 border border-mint/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-pen text-mint text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-pen text-orange text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug pt-1.5">디스코드 공지 초안 써줘</span>
           </button>
@@ -469,7 +485,7 @@
             type="submit"
             id="send-btn"
             disabled
-            class="invite-btn shrink-0 w-9 h-9 rounded-full gradient-brand flex items-center justify-center text-black disabled:opacity-30 disabled:cursor-not-allowed"
+            class="invite-btn shrink-0 w-9 h-9 rounded-full bg-orange hover:bg-orange-dark transition-colors flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-arrow-up text-sm"></i>
           </button>
@@ -481,40 +497,41 @@
 </div>
 
 <script>
-/* ==========================================================
-   기본 요소 참조
-========================================================== */
-const sidebar = document.getElementById("sidebar");
-const sidebarBackdrop = document.getElementById("sidebar-backdrop");
-const sidebarToggle = document.getElementById("sidebar-toggle");
-const sidebarCollapseBtn = document.getElementById("sidebar-collapse-btn");
-const appHeader = document.querySelector(".app-header");
-const modelBtn = document.getElementById("model-dropdown-btn");
-const modelMenu = document.getElementById("model-menu");
-const modelNameEl = document.getElementById("model-name");
-const input = document.getElementById("composer-input");
-const sendBtn = document.getElementById("send-btn");
-const composerShell = document.getElementById("composer-shell");
-const form = document.getElementById("composer-form");
-const emptyState = document.getElementById("empty-state");
-const messagesEl = document.getElementById("messages");
-const chatScroll = document.getElementById("chat-scroll");
-const historyGroupsEl = document.getElementById("history-groups");
-const historySearchEl = document.getElementById("history-search");
-const searchToggleBtn = document.getElementById("search-toggle-btn");
-const searchRow = document.getElementById("search-row");
-const settingsBtn = document.getElementById("settings-btn");
-const settingsModal = document.getElementById("settings-modal");
-const settingsCard = document.getElementById("settings-card");
-const settingsCloseBtn = document.getElementById("settings-close-btn");
-const settingsModelListEl = document.getElementById("settings-model-list");
-const persistToggle = document.getElementById("persist-toggle");
-const persistToggleKnob = document.getElementById("persist-toggle-knob");
-const settingsClearAllBtn = document.getElementById("settings-clear-all-btn");
+const dom = {
+  sidebar: document.getElementById("sidebar"),
+  sidebarBackdrop: document.getElementById("sidebar-backdrop"),
+  sidebarToggle: document.getElementById("sidebar-toggle"),
+  sidebarCollapseBtn: document.getElementById("sidebar-collapse-btn"),
+  appHeader: document.querySelector(".app-header"),
 
-/* ==========================================================
-   프로바이더 정의 (디스코드 봇의 폴백 체인과 동일)
-========================================================== */
+  modelBtn: document.getElementById("model-dropdown-btn"),
+  modelMenu: document.getElementById("model-menu"),
+  modelNameEl: document.getElementById("model-name"),
+
+  input: document.getElementById("composer-input"),
+  sendBtn: document.getElementById("send-btn"),
+  composerShell: document.getElementById("composer-shell"),
+  form: document.getElementById("composer-form"),
+
+  emptyState: document.getElementById("empty-state"),
+  messagesEl: document.getElementById("messages"),
+  chatScroll: document.getElementById("chat-scroll"),
+
+  historyGroupsEl: document.getElementById("history-groups"),
+  historySearchEl: document.getElementById("history-search"),
+  searchToggleBtn: document.getElementById("search-toggle-btn"),
+  searchRow: document.getElementById("search-row"),
+
+  settingsBtn: document.getElementById("settings-btn"),
+  settingsModal: document.getElementById("settings-modal"),
+  settingsCard: document.getElementById("settings-card"),
+  settingsCloseBtn: document.getElementById("settings-close-btn"),
+  settingsModelListEl: document.getElementById("settings-model-list"),
+  persistToggle: document.getElementById("persist-toggle"),
+  persistToggleKnob: document.getElementById("persist-toggle-knob"),
+  settingsClearAllBtn: document.getElementById("settings-clear-all-btn"),
+};
+
 const PROVIDERS = {
   gemini:     { label: "Gemini 2.5 Flash",        sub: "기본 모델 · 빠르고 균형 잡힌 응답" },
   cerebras:   { label: "Cerebras · GPT OSS 120B",  sub: "1순위 대체 · 초저지연 추론" },
@@ -522,199 +539,203 @@ const PROVIDERS = {
   openrouter: { label: "OpenRouter",               sub: "최종 대체 · 다중 무료 모델" },
 };
 
-/* ==========================================================
-   저장소 (localStorage) — 대화 목록 / 마지막으로 연 대화 / 설정
-========================================================== */
-const STORAGE_KEY = "dai_conversations_v1";
-const CURRENT_KEY = "dai_current_conversation_v1";
-const PERSIST_KEY = "dai_persist_enabled_v1";
-const DEFAULT_MODEL_STORAGE_KEY = "dai_default_model_v1";
+const Utils = {
+  uid() {
+    return crypto.randomUUID
+      ? crypto.randomUUID()
+      : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  },
+  escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  },
+  scrollToBottom() {
+    dom.chatScroll.scrollTop = dom.chatScroll.scrollHeight;
+  },
+  groupLabel(ts) {
+    const d = new Date(ts);
+    const now = new Date();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const nOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const diffDays = Math.round((nOnly - dOnly) / dayMs);
+    if (diffDays <= 0) return "오늘";
+    if (diffDays === 1) return "어제";
+    if (diffDays <= 7) return "지난 7일";
+    return "이전";
+  },
+};
 
-function loadPersistSetting() {
-  try {
-    const v = localStorage.getItem(PERSIST_KEY);
-    return v === null ? true : v === "1"; // 기본값: 저장 켜짐
-  } catch (e) { return true; }
-}
-function savePersistSetting(enabled) {
-  try { localStorage.setItem(PERSIST_KEY, enabled ? "1" : "0"); } catch (e) { /* 무시 */ }
-}
+const Storage = {
+  KEYS: {
+    conversations: "dai_conversations_v1",
+    current: "dai_current_conversation_v1",
+    persist: "dai_persist_enabled_v1",
+    defaultModel: "dai_default_model_v1",
+    sidebarCollapsed: "dai_sidebar_collapsed_v1",
+  },
 
-function loadDefaultModel() {
-  try {
-    const v = localStorage.getItem(DEFAULT_MODEL_STORAGE_KEY);
-    return (v && PROVIDERS[v]) ? v : "gemini";
-  } catch (e) { return "gemini"; }
-}
-function saveDefaultModel(key) {
-  try { localStorage.setItem(DEFAULT_MODEL_STORAGE_KEY, key); } catch (e) { /* 무시 */ }
-}
+  loadPersistSetting() {
+    try {
+      const v = localStorage.getItem(this.KEYS.persist);
+      return v === null ? true : v === "1"; // 기본값: 저장 켜짐
+    } catch (e) { return true; }
+  },
+  savePersistSetting(enabled) {
+    try { localStorage.setItem(this.KEYS.persist, enabled ? "1" : "0"); } catch (e) { }
+  },
 
-function loadConversations() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    console.warn("대화 기록을 불러오지 못했어요:", e);
-    return [];
-  }
-}
-function saveConversations() {
-  if (!persistEnabled) return; // 저장 옵션이 꺼져 있으면 메모리에만 유지
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-  } catch (e) {
-    console.warn("대화 기록을 저장하지 못했어요:", e);
-  }
-}
-function loadCurrentId() {
-  try { return localStorage.getItem(CURRENT_KEY); } catch (e) { return null; }
-}
-function setCurrentConversationId(id) {
-  currentConversationId = id;
-  if (!persistEnabled) return;
-  try {
-    if (id) localStorage.setItem(CURRENT_KEY, id);
-    else localStorage.removeItem(CURRENT_KEY);
-  } catch (e) { /* 저장 불가 환경 무시 */ }
-}
+  loadDefaultModel() {
+    try {
+      const v = localStorage.getItem(this.KEYS.defaultModel);
+      return (v && PROVIDERS[v]) ? v : "gemini";
+    } catch (e) { return "gemini"; }
+  },
+  saveDefaultModel(key) {
+    try { localStorage.setItem(this.KEYS.defaultModel, key); } catch (e) { }
+  },
 
-function uid() {
-  return (crypto.randomUUID ? crypto.randomUUID() : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2));
-}
+  loadConversations() {
+    try {
+      const raw = localStorage.getItem(this.KEYS.conversations);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.warn("대화 기록을 불러오지 못했어요:", e);
+      return [];
+    }
+  },
+  saveConversations(conversations) {
+    if (!State.persistEnabled) return; // 저장 옵션이 꺼져 있으면 메모리에만 유지
+    try {
+      localStorage.setItem(this.KEYS.conversations, JSON.stringify(conversations));
+    } catch (e) {
+      console.warn("대화 기록을 저장하지 못했어요:", e);
+    }
+  },
 
-let persistEnabled = loadPersistSetting();
-let defaultModelKey = loadDefaultModel();
-let conversations = loadConversations();
-let currentConversationId = null;
-let isGenerating = false;
-let currentAbortController = null;
+  loadCurrentId() {
+    try { return localStorage.getItem(this.KEYS.current); } catch (e) { return null; }
+  },
+  saveCurrentId(id) {
+    if (!State.persistEnabled) return;
+    try {
+      if (id) localStorage.setItem(this.KEYS.current, id);
+      else localStorage.removeItem(this.KEYS.current);
+    } catch (e) { }
+  },
 
-/* ==========================================================
-   유틸
-========================================================== */
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str;
-  return div.innerHTML;
-}
-function getConversation(id) {
-  return conversations.find(c => c.id === id) || null;
-}
-function scrollToBottom() {
-  chatScroll.scrollTop = chatScroll.scrollHeight;
-}
-function groupLabel(ts) {
-  const d = new Date(ts);
-  const now = new Date();
-  const dayMs = 24 * 60 * 60 * 1000;
-  const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const nOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const diffDays = Math.round((nOnly - dOnly) / dayMs);
-  if (diffDays <= 0) return "오늘";
-  if (diffDays === 1) return "어제";
-  if (diffDays <= 7) return "지난 7일";
-  return "이전";
-}
+  clearPersisted() {
+    try {
+      localStorage.removeItem(this.KEYS.conversations);
+      localStorage.removeItem(this.KEYS.current);
+    } catch (e) { }
+  },
 
-/* ==========================================================
-   사이드바 토글 (모바일)
-========================================================== */
-function openSidebar() {
-  sidebar.classList.add("is-open");
-  sidebarBackdrop.classList.remove("hidden");
-}
-function closeSidebar() {
-  sidebar.classList.remove("is-open");
-  sidebarBackdrop.classList.add("hidden");
-}
-sidebarToggle.addEventListener("click", () => {
-  sidebar.classList.contains("is-open") ? closeSidebar() : openSidebar();
-});
-sidebarBackdrop.addEventListener("click", closeSidebar);
+  loadSidebarCollapsed() {
+    try { return localStorage.getItem(this.KEYS.sidebarCollapsed) === "1"; } catch (e) { return false; }
+  },
+  saveSidebarCollapsed(collapsed) {
+    try { localStorage.setItem(this.KEYS.sidebarCollapsed, collapsed ? "1" : "0"); } catch (e) { }
+  },
+};
 
-/* ==========================================================
-   대화 검색 — 평소엔 숨겨두고 아이콘을 누르면 펼쳐지는 방식으로
-   사이드바 상단이 차지하는 공간을 줄인다
-========================================================== */
-function openSearchRow() {
-  searchRow.classList.remove("hidden");
-  historySearchEl.focus();
-}
-function closeSearchRow() {
-  searchRow.classList.add("hidden");
-  if (historySearchEl.value) {
-    historySearchEl.value = "";
-    renderSidebar();
-  }
-}
-if (searchToggleBtn) {
-  searchToggleBtn.addEventListener("click", () => {
-    searchRow.classList.contains("hidden") ? openSearchRow() : closeSearchRow();
-  });
-}
-historySearchEl.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeSearchRow();
-});
+const State = {
+  persistEnabled: Storage.loadPersistSetting(),
+  defaultModelKey: Storage.loadDefaultModel(),
+  conversations: Storage.loadConversations(),
+  currentConversationId: null,
+  isGenerating: false,
+  abortController: null,
 
-/* ==========================================================
-   사이드바 접기(레일) — 데스크톱 전용, ChatGPT/Gemini 스타일
-========================================================== */
-const SIDEBAR_COLLAPSE_KEY = "dai_sidebar_collapsed_v1";
-function loadSidebarCollapsed() {
-  try { return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "1"; } catch (e) { return false; }
-}
-function applySidebarCollapsed(collapsed) {
-  sidebar.classList.toggle("is-collapsed", collapsed);
-  if (collapsed) closeSearchRow();
-  if (sidebarCollapseBtn) {
-    sidebarCollapseBtn.querySelector("i").className =
-      "fa-solid " + (collapsed ? "fa-angles-right" : "fa-angles-left") + " text-[11px]";
-    sidebarCollapseBtn.setAttribute("aria-label", collapsed ? "사이드바 펼치기" : "사이드바 접기");
-  }
-}
-if (sidebarCollapseBtn) {
-  applySidebarCollapsed(loadSidebarCollapsed());
-  sidebarCollapseBtn.addEventListener("click", () => {
-    const collapsed = !sidebar.classList.contains("is-collapsed");
-    applySidebarCollapsed(collapsed);
-    try { localStorage.setItem(SIDEBAR_COLLAPSE_KEY, collapsed ? "1" : "0"); } catch (e) { /* 무시 */ }
-  });
+  getConversation(id) {
+    return this.conversations.find(c => c.id === id) || null;
+  },
+  getCurrentConversation() {
+    return this.currentConversationId ? this.getConversation(this.currentConversationId) : null;
+  },
+  setCurrentConversationId(id) {
+    this.currentConversationId = id;
+    Storage.saveCurrentId(id);
+  },
+  persist() {
+    Storage.saveConversations(this.conversations);
+  },
+};
+
+/**
+ * 응답 생성 중일 때만 사용자에게 중단 여부를 확인하고, 동의하면 생성을 멈춘다.
+ * 생성 중이 아니면 그냥 통과. 취소하면 false를 반환해 호출부에서 동작을 막는다.
+ */
+function confirmInterruptIfGenerating(message) {
+  if (!State.isGenerating) return true;
+  if (!window.confirm(message)) return false;
+  Chat.stopGeneration();
+  return true;
 }
 
-/* ==========================================================
-   헤더 — 채팅 영역을 스크롤하면 랜딩 페이지와 동일한 유리 질감 등장
-========================================================== */
-function updateHeaderScrollState() {
-  if (!appHeader) return;
-  appHeader.classList.toggle("is-scrolled", chatScroll.scrollTop > 8);
-}
-chatScroll.addEventListener("scroll", updateHeaderScrollState, { passive: true });
+const Sidebar = {
+  open() {
+    dom.sidebar.classList.add("is-open");
+    dom.sidebarBackdrop.classList.remove("hidden");
+  },
+  close() {
+    dom.sidebar.classList.remove("is-open");
+    dom.sidebarBackdrop.classList.add("hidden");
+  },
 
-/* ==========================================================
-   사이드바 렌더링 (검색 + 날짜별 그룹 + 이름변경/삭제)
-========================================================== */
-function renderSidebar() {
-  const query = historySearchEl.value.trim().toLowerCase();
-  const sorted = [...conversations].sort((a, b) => b.updatedAt - a.updatedAt);
-  const filtered = query ? sorted.filter(c => c.title.toLowerCase().includes(query)) : sorted;
+  openSearch() {
+    dom.searchRow.classList.remove("hidden");
+    dom.historySearchEl.focus();
+  },
+  closeSearch() {
+    dom.searchRow.classList.add("hidden");
+    if (dom.historySearchEl.value) {
+      dom.historySearchEl.value = "";
+      this.render();
+    }
+  },
 
-  const groups = { "오늘": [], "어제": [], "지난 7일": [], "이전": [] };
-  filtered.forEach(c => groups[groupLabel(c.updatedAt)].push(c));
+  applyCollapsed(collapsed) {
+    dom.sidebar.classList.toggle("is-collapsed", collapsed);
+    if (collapsed) this.closeSearch();
+    if (dom.sidebarCollapseBtn) {
+      dom.sidebarCollapseBtn.querySelector("i").className =
+        "fa-solid " + (collapsed ? "fa-angles-right" : "fa-angles-left") + " text-[11px]";
+      dom.sidebarCollapseBtn.setAttribute("aria-label", collapsed ? "사이드바 펼치기" : "사이드바 접기");
+    }
+  },
 
-  historyGroupsEl.innerHTML = "";
+  updateHeaderScrollState() {
+    if (!dom.appHeader) return;
+    dom.appHeader.classList.toggle("is-scrolled", dom.chatScroll.scrollTop > 8);
+  },
 
-  const hasAny = filtered.length > 0;
-  if (!hasAny) {
-    const p = document.createElement("p");
-    p.className = "text-[12px] text-mute px-2 py-6 text-center";
-    p.textContent = query ? "검색 결과가 없어요" : "아직 대화가 없어요";
-    historyGroupsEl.appendChild(p);
-    return;
-  }
+  render() {
+    const query = dom.historySearchEl.value.trim().toLowerCase();
+    const sorted = [...State.conversations].sort((a, b) => b.updatedAt - a.updatedAt);
+    const filtered = query ? sorted.filter(c => c.title.toLowerCase().includes(query)) : sorted;
 
-  Object.entries(groups).forEach(([label, items]) => {
-    if (!items.length) return;
+    const groups = { "오늘": [], "어제": [], "지난 7일": [], "이전": [] };
+    filtered.forEach(c => groups[Utils.groupLabel(c.updatedAt)].push(c));
+
+    dom.historyGroupsEl.innerHTML = "";
+
+    if (!filtered.length) {
+      const p = document.createElement("p");
+      p.className = "text-[12px] text-mute px-2 py-6 text-center";
+      p.textContent = query ? "검색 결과가 없어요" : "아직 대화가 없어요";
+      dom.historyGroupsEl.appendChild(p);
+      return;
+    }
+
+    Object.entries(groups).forEach(([label, items]) => {
+      if (!items.length) return;
+      dom.historyGroupsEl.appendChild(this._buildGroupSection(label, items));
+    });
+  },
+
+  _buildGroupSection(label, items) {
     const section = document.createElement("div");
 
     const heading = document.createElement("div");
@@ -724,592 +745,599 @@ function renderSidebar() {
 
     const ul = document.createElement("ul");
     ul.className = "space-y-0.5";
+    items.forEach(c => ul.appendChild(this._buildItem(c)));
+    section.appendChild(ul);
 
-    items.forEach(c => {
-      const li = document.createElement("li");
-      li.className = "sidebar-item relative flex items-center";
-      const isActive = c.id === currentConversationId;
-      li.innerHTML = `
-        <button data-id="${c.id}" class="sidebar-conv-btn history-item ${isActive ? "is-active text-ink" : "text-mute hover:text-ink"} flex-1 min-w-0 text-left truncate pl-3 pr-1 py-2 rounded-full text-[13px]">${escapeHtml(c.title)}</button>
-        <span class="sidebar-item-actions flex items-center gap-0.5 pr-1 shrink-0">
-          <button data-id="${c.id}" class="sidebar-rename-btn w-6 h-6 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-black/40" aria-label="이름 변경">
-            <i class="fa-solid fa-pen text-[10px]"></i>
-          </button>
-          <button data-id="${c.id}" class="sidebar-delete-btn w-6 h-6 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-black/40" aria-label="삭제">
-            <i class="fa-solid fa-trash-can text-[10px]"></i>
-          </button>
-        </span>`;
-      ul.appendChild(li);
+    return section;
+  },
+
+  _buildItem(conv) {
+    const li = document.createElement("li");
+    li.className = "sidebar-item relative flex items-center";
+    const isActive = conv.id === State.currentConversationId;
+    li.innerHTML = `
+      <button data-id="${conv.id}" class="sidebar-conv-btn history-item ${isActive ? "is-active text-ink" : "text-mute hover:text-ink"} flex-1 min-w-0 text-left truncate pl-3 pr-1 py-2 rounded-full text-[13px]">${Utils.escapeHtml(conv.title)}</button>
+      <span class="sidebar-item-actions flex items-center gap-0.5 pr-1 shrink-0">
+        <button data-id="${conv.id}" class="sidebar-rename-btn w-6 h-6 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2" aria-label="이름 변경">
+          <i class="fa-solid fa-pen text-[10px]"></i>
+        </button>
+        <button data-id="${conv.id}" class="sidebar-delete-btn w-6 h-6 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2" aria-label="삭제">
+          <i class="fa-solid fa-trash-can text-[10px]"></i>
+        </button>
+      </span>`;
+    return li;
+  },
+
+  renameConversation(id) {
+    const conv = State.getConversation(id);
+    if (!conv) return;
+    const newTitle = window.prompt("대화 이름 변경", conv.title);
+    if (newTitle === null) return;
+    const trimmed = newTitle.trim();
+    if (!trimmed) return;
+    conv.title = trimmed.slice(0, 60);
+    State.persist();
+    this.render();
+  },
+
+  deleteConversation(id) {
+    if (!window.confirm("이 대화를 삭제할까요? 되돌릴 수 없어요.")) return;
+    State.conversations = State.conversations.filter(c => c.id !== id);
+    State.persist();
+    if (State.currentConversationId === id) {
+      State.setCurrentConversationId(null);
+      Messages.render(null);
+      ModelPicker.updateHeader(State.defaultModelKey);
+    }
+    this.render();
+  },
+};
+
+const ModelPicker = {
+  updateHeader(providerKey) {
+    const meta = PROVIDERS[providerKey] || { label: providerKey };
+    dom.modelNameEl.textContent = meta.label;
+    this._updateHeaderCheckmarks(providerKey);
+  },
+
+  _updateHeaderCheckmarks(providerKey) {
+    document.querySelectorAll(".model-option").forEach(opt => {
+      const check = opt.querySelector(".model-check");
+      check.classList.toggle("opacity-100", opt.dataset.provider === providerKey);
+      check.classList.toggle("opacity-0", opt.dataset.provider !== providerKey);
+    });
+  },
+
+  select(providerKey) {
+    this.updateHeader(providerKey);
+    const conv = State.getCurrentConversation();
+    if (conv) {
+      conv.model = providerKey;
+      conv.updatedAt = Date.now();
+      State.persist();
+    } else {
+      State.defaultModelKey = providerKey;
+      Storage.saveDefaultModel(providerKey);
+    }
+    dom.modelMenu.classList.add("hidden");
+  },
+};
+
+const SettingsModal = {
+  renderModelList() {
+    dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
+      <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+        <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
+        <span class="flex-1 min-w-0">
+          <span class="block text-[13px] text-ink">${meta.label}</span>
+        </span>
+        <i class="fa-solid fa-check text-orange text-xs settings-model-check ${key === State.defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
+      </button>
+    `).join("");
+  },
+
+  renderPersistToggle() {
+    dom.persistToggle.classList.toggle("bg-orange", State.persistEnabled);
+    dom.persistToggle.classList.toggle("bg-line", !State.persistEnabled);
+    dom.persistToggleKnob.style.transform = State.persistEnabled ? "translateX(20px)" : "translateX(0)";
+    dom.persistToggle.setAttribute("aria-checked", String(State.persistEnabled));
+  },
+
+  togglePersist() {
+    State.persistEnabled = !State.persistEnabled;
+    Storage.savePersistSetting(State.persistEnabled);
+    this.renderPersistToggle();
+
+    if (State.persistEnabled) {
+      // 다시 켜면 지금 메모리에 있는 대화를 그대로 저장
+      State.persist();
+      State.setCurrentConversationId(State.currentConversationId);
+    } else {
+      // 끄면 이미 저장된 것도 즉시 지워서 "저장 안 함" 상태를 바로 반영
+      Storage.clearPersisted();
+    }
+  },
+
+  open() {
+    this.renderModelList();
+    this.renderPersistToggle();
+    dom.settingsModal.classList.remove("hidden");
+  },
+  close() {
+    dom.settingsModal.classList.add("hidden");
+  },
+
+  clearAll() {
+    if (!confirmInterruptIfGenerating("응답을 생성하는 중이에요. 전체 삭제하면 중단돼요. 계속할까요?")) return;
+    if (!window.confirm("모든 대화를 삭제할까요? 되돌릴 수 없어요.")) return;
+    State.conversations = [];
+    State.persist();
+    State.setCurrentConversationId(null);
+    Messages.render(null);
+    ModelPicker.updateHeader(State.defaultModelKey);
+    Sidebar.render();
+    this.close();
+  },
+};
+
+const Composer = {
+  updateSendButtonState() {
+    if (State.isGenerating) { dom.sendBtn.disabled = false; return; }
+    dom.sendBtn.disabled = dom.input.value.trim().length === 0;
+  },
+
+  autoResize() {
+    dom.input.style.height = "auto";
+    const singleLineHeight = 24;
+    dom.input.style.height = Math.min(dom.input.scrollHeight, 200) + "px";
+    dom.composerShell.classList.toggle("is-multiline", dom.input.scrollHeight > singleLineHeight + 4);
+    this.updateSendButtonState();
+  },
+
+  setGenerating(active) {
+    State.isGenerating = active;
+    dom.input.disabled = active;
+    dom.sendBtn.innerHTML = active
+      ? '<i class="fa-solid fa-square text-xs"></i>'
+      : '<i class="fa-solid fa-arrow-up text-sm"></i>';
+    this.updateSendButtonState();
+  },
+
+  clear() {
+    dom.input.value = "";
+    this.autoResize();
+  },
+};
+
+const Messages = {
+  render(conv) {
+    dom.messagesEl.innerHTML = "";
+
+    if (!conv || conv.messages.length === 0) {
+      dom.emptyState.classList.remove("hidden");
+      dom.messagesEl.classList.add("hidden");
+      return;
+    }
+
+    dom.emptyState.classList.add("hidden");
+    dom.messagesEl.classList.remove("hidden");
+
+    let lastAssistantIdx = -1;
+    conv.messages.forEach((m, i) => { if (m.role === "assistant") lastAssistantIdx = i; });
+
+    conv.messages.forEach((m, idx) => {
+      dom.messagesEl.appendChild(
+        m.role === "user"
+          ? this._buildUserRow(conv.id, m)
+          : this._buildAssistantRow(conv.id, m, idx === lastAssistantIdx)
+      );
     });
 
-    section.appendChild(ul);
-    historyGroupsEl.appendChild(section);
-  });
-}
+    Utils.scrollToBottom();
+  },
 
-historySearchEl.addEventListener("input", renderSidebar);
+  _buildUserRow(convId, m) {
+    const row = document.createElement("div");
+    row.className = "msg-enter group flex justify-end items-start gap-2";
+    row.innerHTML = `
+      <button data-conv="${convId}" data-msg="${m.id}" class="edit-msg-btn opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2 shrink-0 mt-1" aria-label="메시지 수정">
+        <i class="fa-solid fa-pen text-[11px]"></i>
+      </button>
+      <div class="max-w-[80%] bg-surface2 border border-line rounded-[22px] rounded-br-lg px-4 py-2.5 text-[14px] text-ink whitespace-pre-wrap break-words" data-bubble>${Utils.escapeHtml(m.content)}</div>
+    `;
+    return row;
+  },
 
-historyGroupsEl.addEventListener("click", (e) => {
-  const renameBtn = e.target.closest(".sidebar-rename-btn");
-  if (renameBtn) { e.stopPropagation(); renameConversation(renameBtn.dataset.id); return; }
-
-  const deleteBtn = e.target.closest(".sidebar-delete-btn");
-  if (deleteBtn) { e.stopPropagation(); deleteConversation(deleteBtn.dataset.id); return; }
-
-  const convBtn = e.target.closest(".sidebar-conv-btn");
-  if (convBtn) { switchConversation(convBtn.dataset.id); }
-});
-
-function renameConversation(id) {
-  const conv = getConversation(id);
-  if (!conv) return;
-  const newTitle = window.prompt("대화 이름 변경", conv.title);
-  if (newTitle === null) return;
-  const trimmed = newTitle.trim();
-  if (!trimmed) return;
-  conv.title = trimmed.slice(0, 60);
-  saveConversations();
-  renderSidebar();
-}
-
-function deleteConversation(id) {
-  if (!window.confirm("이 대화를 삭제할까요? 되돌릴 수 없어요.")) return;
-  conversations = conversations.filter(c => c.id !== id);
-  saveConversations();
-  if (currentConversationId === id) {
-    setCurrentConversationId(null);
-    renderMessages(null);
-    updateHeaderModel(defaultModelKey);
-  }
-  renderSidebar();
-}
-
-/* ==========================================================
-   모델 드롭다운
-========================================================== */
-function updateModelCheckmarks(providerKey) {
-  document.querySelectorAll(".model-option").forEach(opt => {
-    const check = opt.querySelector(".model-check");
-    check.classList.toggle("opacity-100", opt.dataset.provider === providerKey);
-    check.classList.toggle("opacity-0", opt.dataset.provider !== providerKey);
-  });
-}
-function updateHeaderModel(providerKey) {
-  const meta = PROVIDERS[providerKey] || { label: providerKey };
-  modelNameEl.textContent = meta.label;
-  updateModelCheckmarks(providerKey);
-}
-
-modelBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  modelMenu.classList.toggle("hidden");
-});
-document.addEventListener("click", () => modelMenu.classList.add("hidden"));
-modelMenu.addEventListener("click", (e) => e.stopPropagation());
-
-document.querySelectorAll(".model-option").forEach(opt => {
-  opt.addEventListener("click", () => {
-    const providerKey = opt.dataset.provider;
-    updateHeaderModel(providerKey);
-    if (currentConversationId) {
-      const conv = getConversation(currentConversationId);
-      if (conv) {
-        conv.model = providerKey;
-        conv.updatedAt = Date.now();
-        saveConversations();
-      }
-    } else {
-      defaultModelKey = providerKey;
-      saveDefaultModel(defaultModelKey);
-    }
-    modelMenu.classList.add("hidden");
-  });
-});
-
-/* ==========================================================
-   설정 모달 — 기본 모델 / 로컬 저장 여부 / 전체 삭제
-========================================================== */
-function renderSettingsModelList() {
-  settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
-    <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-black/40 text-left">
-      <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
-      <span class="flex-1 min-w-0">
-        <span class="block text-[13px] text-ink">${meta.label}</span>
-      </span>
-      <i class="fa-solid fa-check text-mint text-xs settings-model-check ${key === defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
-    </button>
-  `).join("");
-}
-
-settingsModelListEl.addEventListener("click", (e) => {
-  const opt = e.target.closest(".settings-model-option");
-  if (!opt) return;
-  defaultModelKey = opt.dataset.provider;
-  saveDefaultModel(defaultModelKey);
-  renderSettingsModelList();
-  if (!currentConversationId) updateHeaderModel(defaultModelKey);
-});
-
-function renderPersistToggle() {
-  persistToggle.classList.toggle("bg-mint", persistEnabled);
-  persistToggle.classList.toggle("bg-line", !persistEnabled);
-  persistToggleKnob.style.transform = persistEnabled ? "translateX(20px)" : "translateX(0)";
-  persistToggle.setAttribute("aria-checked", String(persistEnabled));
-}
-
-persistToggle.addEventListener("click", () => {
-  persistEnabled = !persistEnabled;
-  savePersistSetting(persistEnabled);
-  renderPersistToggle();
-
-  if (persistEnabled) {
-    // 다시 켜면 지금 메모리에 있는 대화를 그대로 저장
-    saveConversations();
-    setCurrentConversationId(currentConversationId);
-  } else {
-    // 끄면 이미 저장된 것도 즉시 지워서 "저장 안 함" 상태를 바로 반영
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(CURRENT_KEY);
-    } catch (e) { /* 무시 */ }
-  }
-});
-
-function openSettingsModal() {
-  renderSettingsModelList();
-  renderPersistToggle();
-  settingsModal.classList.remove("hidden");
-}
-function closeSettingsModal() {
-  settingsModal.classList.add("hidden");
-}
-
-settingsBtn.addEventListener("click", openSettingsModal);
-settingsCloseBtn.addEventListener("click", closeSettingsModal);
-settingsModal.addEventListener("click", (e) => {
-  if (!settingsCard.contains(e.target)) closeSettingsModal();
-});
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !settingsModal.classList.contains("hidden")) closeSettingsModal();
-});
-
-settingsClearAllBtn.addEventListener("click", () => {
-  if (isGenerating) {
-    if (!window.confirm("응답을 생성하는 중이에요. 전체 삭제하면 중단돼요. 계속할까요?")) return;
-    stopGeneration();
-  }
-  if (!window.confirm("모든 대화를 삭제할까요? 되돌릴 수 없어요.")) return;
-  conversations = [];
-  saveConversations();
-  setCurrentConversationId(null);
-  renderMessages(null);
-  updateHeaderModel(defaultModelKey);
-  renderSidebar();
-  closeSettingsModal();
-});
-
-/* ==========================================================
-   입력창 자동 높이 조절 + 전송/정지 버튼 상태
-========================================================== */
-function updateSendButtonState() {
-  if (isGenerating) { sendBtn.disabled = false; return; }
-  sendBtn.disabled = input.value.trim().length === 0;
-}
-function autoResize() {
-  input.style.height = "auto";
-  const singleLineHeight = 24;
-  input.style.height = Math.min(input.scrollHeight, 200) + "px";
-  composerShell.classList.toggle("is-multiline", input.scrollHeight > singleLineHeight + 4);
-  updateSendButtonState();
-}
-input.addEventListener("input", autoResize);
-input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    form.requestSubmit();
-  }
-});
-
-function setGenerating(active) {
-  isGenerating = active;
-  input.disabled = active;
-  sendBtn.innerHTML = active
-    ? '<i class="fa-solid fa-square text-xs"></i>'
-    : '<i class="fa-solid fa-arrow-up text-sm"></i>';
-  updateSendButtonState();
-}
-
-/* ==========================================================
-   메시지 렌더링
-========================================================== */
-function renderMessages(conv) {
-  messagesEl.innerHTML = "";
-
-  if (!conv || conv.messages.length === 0) {
-    emptyState.classList.remove("hidden");
-    messagesEl.classList.add("hidden");
-    return;
-  }
-
-  emptyState.classList.add("hidden");
-  messagesEl.classList.remove("hidden");
-
-  let lastAssistantIdx = -1;
-  conv.messages.forEach((m, i) => { if (m.role === "assistant") lastAssistantIdx = i; });
-
-  conv.messages.forEach((m, idx) => {
-    if (m.role === "user") {
-      messagesEl.appendChild(buildUserRow(conv.id, m));
-    } else {
-      messagesEl.appendChild(buildAssistantRow(conv.id, m, idx === lastAssistantIdx));
-    }
-  });
-
-  scrollToBottom();
-}
-
-function buildUserRow(convId, m) {
-  const row = document.createElement("div");
-  row.className = "msg-enter group flex justify-end items-start gap-2";
-  row.innerHTML = `
-    <button data-conv="${convId}" data-msg="${m.id}" class="edit-msg-btn opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface shrink-0 mt-1" aria-label="메시지 수정">
-      <i class="fa-solid fa-pen text-[11px]"></i>
-    </button>
-    <div class="max-w-[80%] bg-surface border border-line rounded-[22px] rounded-br-lg px-4 py-2.5 text-[14px] text-ink whitespace-pre-wrap break-words" data-bubble>${escapeHtml(m.content)}</div>
-  `;
-  return row;
-}
-
-function buildAssistantRow(convId, m, isLast) {
-  const row = document.createElement("div");
-  row.className = "msg-enter flex gap-3";
-  const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
-  row.innerHTML = `
-    <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center shrink-0 mt-0.5">
-      <span class="text-black text-[11px] font-extrabold">D</span>
-    </div>
-    <div class="flex-1 min-w-0">
-      <div class="text-[14px] text-ink leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(m.content)}</div>
-      <div class="flex items-center gap-0.5 mt-1.5 -ml-1.5">
-        <button class="copy-msg-btn w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface" data-text="${encodeURIComponent(m.content)}" aria-label="복사">
-          <i class="fa-regular fa-copy text-[12px]"></i>
-        </button>
-        ${isLast && !m.aborted ? `<button class="regen-msg-btn w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface" data-conv="${convId}" aria-label="다시 생성">
-          <i class="fa-solid fa-rotate-right text-[12px]"></i>
-        </button>` : ""}
-        <span class="text-[11px] text-mute flex items-center gap-1.5 ml-1.5">
-          <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>${providerLabel}
-        </span>
+  _buildAssistantRow(convId, m, isLast) {
+    const row = document.createElement("div");
+    row.className = "msg-enter flex gap-3";
+    const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
+    row.innerHTML = `
+      <div class="w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5">
+        <span class="text-white text-[11px] font-extrabold">D</span>
       </div>
-    </div>`;
-  return row;
-}
+      <div class="flex-1 min-w-0">
+        <div class="text-[14px] text-ink leading-relaxed whitespace-pre-wrap break-words">${Utils.escapeHtml(m.content)}</div>
+        <div class="flex items-center gap-0.5 mt-1.5 -ml-1.5">
+          <button class="copy-msg-btn w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2" data-text="${encodeURIComponent(m.content)}" aria-label="복사">
+            <i class="fa-regular fa-copy text-[12px]"></i>
+          </button>
+          ${isLast && !m.aborted ? `<button class="regen-msg-btn w-7 h-7 rounded-full flex items-center justify-center text-mute hover:text-ink hover:bg-surface2" data-conv="${convId}" aria-label="다시 생성">
+            <i class="fa-solid fa-rotate-right text-[12px]"></i>
+          </button>` : ""}
+          <span class="text-[11px] text-mute flex items-center gap-1.5 ml-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>${providerLabel}
+          </span>
+        </div>
+      </div>`;
+    return row;
+  },
 
-function appendTypingRow() {
-  const id = "typing-" + uid();
-  const row = document.createElement("div");
-  row.id = id;
-  row.className = "msg-enter flex gap-3";
-  row.innerHTML = `
-    <div class="w-7 h-7 rounded-full gradient-brand flex items-center justify-center shrink-0 mt-0.5">
-      <span class="text-black text-[11px] font-extrabold">D</span>
-    </div>
-    <div class="flex items-center gap-1.5 h-7">
-      <span class="typing-dot"></span>
-      <span class="typing-dot"></span>
-      <span class="typing-dot"></span>
-    </div>`;
-  messagesEl.appendChild(row);
-  scrollToBottom();
-  return id;
-}
-function removeRow(id) {
-  const el = document.getElementById(id);
-  if (el) el.remove();
-}
+  appendTypingRow() {
+    const id = "typing-" + Utils.uid();
+    const row = document.createElement("div");
+    row.id = id;
+    row.className = "msg-enter flex gap-3";
+    row.innerHTML = `
+      <div class="w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5">
+        <span class="text-white text-[11px] font-extrabold">D</span>
+      </div>
+      <div class="flex items-center gap-1.5 h-7">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>`;
+    dom.messagesEl.appendChild(row);
+    Utils.scrollToBottom();
+    return id;
+  },
 
-/* 메시지 영역 클릭 위임: 복사 / 다시 생성 / 수정 */
-messagesEl.addEventListener("click", (e) => {
-  const copyBtn = e.target.closest(".copy-msg-btn");
-  if (copyBtn) { handleCopy(copyBtn); return; }
+  removeRow(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  },
 
-  const regenBtn = e.target.closest(".regen-msg-btn");
-  if (regenBtn) { regenerate(regenBtn.dataset.conv); return; }
-
-  const editBtn = e.target.closest(".edit-msg-btn");
-  if (editBtn) { beginEditMessage(editBtn.dataset.conv, editBtn.dataset.msg, editBtn); return; }
-});
-
-function handleCopy(btn) {
-  const text = decodeURIComponent(btn.dataset.text);
-  const icon = btn.querySelector("i");
-  const markCopied = () => {
-    icon.className = "fa-solid fa-check text-[12px] text-mint";
-    setTimeout(() => { icon.className = "fa-regular fa-copy text-[12px]"; }, 1200);
-  };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(markCopied).catch(() => fallbackCopy(text, markCopied));
-  } else {
-    fallbackCopy(text, markCopied);
-  }
-}
-function fallbackCopy(text, cb) {
-  const ta = document.createElement("textarea");
-  ta.value = text;
-  ta.style.position = "fixed";
-  ta.style.opacity = "0";
-  document.body.appendChild(ta);
-  ta.select();
-  try { document.execCommand("copy"); cb(); } catch (e) { /* 무시 */ }
-  document.body.removeChild(ta);
-}
-
-function beginEditMessage(convId, msgId, btn) {
-  if (isGenerating) return;
-  const row = btn.closest(".group");
-  const bubble = row.querySelector("[data-bubble]");
-  const original = bubble.textContent;
-
-  const wrap = document.createElement("div");
-  wrap.className = "max-w-[80%] flex flex-col gap-2 items-end";
-  wrap.innerHTML = `
-    <textarea class="edit-textarea w-full bg-surface border border-blue/40 rounded-[20px] px-4 py-2.5 text-[14px] text-ink focus:outline-none" rows="2"></textarea>
-    <div class="flex gap-2">
-      <button type="button" class="cancel-edit-btn text-[12px] text-mute hover:text-ink px-3 py-1.5 rounded-full hover:bg-surface">취소</button>
-      <button type="button" class="save-edit-btn text-[12px] font-semibold text-black gradient-brand px-3 py-1.5 rounded-full">저장하고 다시 전송</button>
-    </div>`;
-  bubble.replaceWith(wrap);
-
-  const ta = wrap.querySelector(".edit-textarea");
-  ta.value = original;
-  ta.focus();
-  ta.setSelectionRange(ta.value.length, ta.value.length);
-
-  wrap.querySelector(".cancel-edit-btn").addEventListener("click", () => {
-    renderMessages(getConversation(convId));
-  });
-  wrap.querySelector(".save-edit-btn").addEventListener("click", () => {
-    const newText = ta.value.trim();
-    if (!newText) return;
-    saveEditAndResend(convId, msgId, newText);
-  });
-}
-
-function saveEditAndResend(convId, msgId, newText) {
-  const conv = getConversation(convId);
-  if (!conv) return;
-  const idx = conv.messages.findIndex(m => m.id === msgId);
-  if (idx === -1) return;
-
-  conv.messages[idx].content = newText;
-  conv.messages = conv.messages.slice(0, idx + 1); // 이후 대화는 다시 생성되므로 제거
-  conv.updatedAt = Date.now();
-  saveConversations();
-  renderMessages(conv);
-  renderSidebar();
-  runAssistantTurn(conv);
-}
-
-/* ==========================================================
-   AI 호출 지점 (여기만 실제 API 연동하면 전체가 바로 작동)
-========================================================== */
-/* ============================================================
-   TODO: 실제 AI 연동 지점
-   conversation.model  → 선택된 프로바이더 키 ("gemini" 등)
-   conversation.messages → [{ role: "user" | "assistant", content }] 전체 대화 내역
-
-   여기서 실제로 할 일:
-   1) 아래 Promise 내부를, 백엔드(/api/chat 같은 엔드포인트)를
-      fetch로 호출해 디스코드 봇과 동일한 폴백 체인
-      (Gemini → Cerebras → Groq → OpenRouter)의 응답 문자열을
-      resolve 하도록 바꾸면 됩니다.
-   2) options.signal(AbortSignal)을 fetch에 그대로 넘기면
-      "정지" 버튼이 실제 요청 중단까지 그대로 작동합니다.
-   3) 실패 시 reject(error)만 해주면 에러 처리도 이미 되어 있습니다.
-
-   이 함수 밖의 대화 저장/렌더링/재생성/중지/수정 로직은
-   전부 이미 완성되어 있어 손댈 필요가 없습니다.
-============================================================ */
-function callAI(conversation, options = {}) {
-  const { signal } = options;
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      resolve("아직 실제 AI가 연결되지 않았어요. callAI() 함수 안에 API 호출만 넣으면 이 자리에 진짜 답변이 표시됩니다.");
-    }, 900 + Math.random() * 500);
-
-    if (signal) {
-      if (signal.aborted) { clearTimeout(timer); reject(new DOMException("중단됨", "AbortError")); return; }
-      signal.addEventListener("abort", () => {
-        clearTimeout(timer);
-        reject(new DOMException("중단됨", "AbortError"));
-      });
-    }
-  });
-}
-
-async function runAssistantTurn(conv) {
-  setGenerating(true);
-  const typingId = appendTypingRow();
-  const controller = new AbortController();
-  currentAbortController = controller;
-
-  try {
-    const replyText = await callAI(conv, { signal: controller.signal });
-    removeRow(typingId);
-    conv.messages.push({ id: uid(), role: "assistant", content: replyText, model: conv.model, createdAt: Date.now() });
-    conv.updatedAt = Date.now();
-    saveConversations();
-    renderMessages(conv);
-    renderSidebar();
-  } catch (err) {
-    removeRow(typingId);
-    if (err && err.name === "AbortError") {
-      conv.messages.push({ id: uid(), role: "assistant", content: "생성이 중지됐어요.", model: conv.model, createdAt: Date.now(), aborted: true });
-      conv.updatedAt = Date.now();
-      saveConversations();
-      renderMessages(conv);
-      renderSidebar();
+  handleCopy(btn) {
+    const text = decodeURIComponent(btn.dataset.text);
+    const icon = btn.querySelector("i");
+    const markCopied = () => {
+      icon.className = "fa-solid fa-check text-[12px] text-orange";
+      setTimeout(() => { icon.className = "fa-regular fa-copy text-[12px]"; }, 1200);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(markCopied).catch(() => this._fallbackCopy(text, markCopied));
     } else {
-      console.error("[AI 오류]", err);
-      conv.messages.push({ id: uid(), role: "assistant", content: "답변을 가져오지 못했어요. 잠시 후 다시 시도해 주세요.", model: conv.model, createdAt: Date.now() });
-      saveConversations();
-      renderMessages(conv);
-      renderSidebar();
+      this._fallbackCopy(text, markCopied);
     }
-  } finally {
-    setGenerating(false);
-    currentAbortController = null;
-    scrollToBottom();
-  }
-}
+  },
 
-function stopGeneration() {
-  if (currentAbortController) currentAbortController.abort();
-}
+  _fallbackCopy(text, cb) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); cb(); } catch (e) { }
+    document.body.removeChild(ta);
+  },
 
-function regenerate(convId) {
-  if (isGenerating) return;
-  const conv = getConversation(convId);
-  if (!conv) return;
-  if (conv.messages.length && conv.messages[conv.messages.length - 1].role === "assistant") {
-    conv.messages.pop();
-  }
-  renderMessages(conv);
-  saveConversations();
-  runAssistantTurn(conv);
-}
+  beginEdit(convId, msgId, btn) {
+    if (State.isGenerating) return;
+    const row = btn.closest(".group");
+    const bubble = row.querySelector("[data-bubble]");
+    const original = bubble.textContent;
 
-/* ==========================================================
-   대화 생성 / 전환 / 전송
-========================================================== */
-function createConversationObject() {
-  return {
-    id: uid(),
-    title: "새 대화",
-    model: defaultModelKey,
-    messages: [],
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
-}
+    const wrap = document.createElement("div");
+    wrap.className = "max-w-[80%] flex flex-col gap-2 items-end";
+    wrap.innerHTML = `
+      <textarea class="edit-textarea w-full bg-surface2 border border-orange/40 rounded-[20px] px-4 py-2.5 text-[14px] text-ink focus:outline-none" rows="2"></textarea>
+      <div class="flex gap-2">
+        <button type="button" class="cancel-edit-btn text-[12px] text-mute hover:text-ink px-3 py-1.5 rounded-full hover:bg-surface2">취소</button>
+        <button type="button" class="save-edit-btn text-[12px] font-semibold text-white bg-orange hover:bg-orange-dark transition-colors px-3 py-1.5 rounded-full">저장하고 다시 전송</button>
+      </div>`;
+    bubble.replaceWith(wrap);
 
-function sendMessage(text) {
-  if (isGenerating) return;
+    const ta = wrap.querySelector(".edit-textarea");
+    ta.value = original;
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
 
-  let conv = currentConversationId ? getConversation(currentConversationId) : null;
-  if (!conv) {
-    conv = createConversationObject();
-    conversations.unshift(conv);
-    setCurrentConversationId(conv.id);
-    updateHeaderModel(conv.model);
-  }
+    wrap.querySelector(".cancel-edit-btn").addEventListener("click", () => {
+      this.render(State.getConversation(convId));
+    });
+    wrap.querySelector(".save-edit-btn").addEventListener("click", () => {
+      const newText = ta.value.trim();
+      if (!newText) return;
+      Chat.saveEditAndResend(convId, msgId, newText);
+    });
+  },
+};
 
-  const isFirst = conv.messages.length === 0;
-  conv.messages.push({ id: uid(), role: "user", content: text, createdAt: Date.now() });
-  if (isFirst) conv.title = text.slice(0, 40) + (text.length > 40 ? "…" : "");
-  conv.updatedAt = Date.now();
+const Chat = {
+  createConversation() {
+    return {
+      id: Utils.uid(),
+      title: "새 대화",
+      model: State.defaultModelKey,
+      messages: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+  },
 
-  saveConversations();
-  renderMessages(conv);
-  renderSidebar();
+  /* ============================================================
+     TODO: 실제 AI 연동 지점
+     conversation.model  → 선택된 프로바이더 키 ("gemini" 등)
+     conversation.messages → [{ role: "user" | "assistant", content }] 전체 대화 내역
 
-  input.value = "";
-  autoResize();
+     여기서 실제로 할 일:
+     1) 아래 Promise 내부를, 백엔드(/api/chat 같은 엔드포인트)를
+        fetch로 호출해 디스코드 봇과 동일한 폴백 체인
+        (Gemini → Cerebras → Groq → OpenRouter)의 응답 문자열을
+        resolve 하도록 바꾸면 됩니다.
+     2) options.signal(AbortSignal)을 fetch에 그대로 넘기면
+        "정지" 버튼이 실제 요청 중단까지 그대로 작동합니다.
+     3) 실패 시 reject(error)만 해주면 에러 처리도 이미 되어 있습니다.
 
-  runAssistantTurn(conv);
-}
+     이 함수 밖의 대화 저장/렌더링/재생성/중지/수정 로직은
+     전부 이미 완성되어 있어 손댈 필요가 없습니다.
+  ============================================================ */
+  callAI(conversation, options = {}) {
+    const { signal } = options;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        resolve("아직 실제 AI가 연결되지 않았어요. callAI() 함수 안에 API 호출만 넣으면 이 자리에 진짜 답변이 표시됩니다.");
+      }, 900 + Math.random() * 500);
 
-function switchConversation(id) {
-  if (id === currentConversationId) { closeSidebar(); return; }
-  if (isGenerating) {
-    if (!window.confirm("응답을 생성하는 중이에요. 대화를 전환하면 중단돼요. 계속할까요?")) return;
-    stopGeneration();
-  }
-  const conv = getConversation(id);
-  if (!conv) return;
-  setCurrentConversationId(id);
-  renderMessages(conv);
-  renderSidebar();
-  updateHeaderModel(conv.model);
-  closeSidebar();
-}
+      if (signal) {
+        if (signal.aborted) { clearTimeout(timer); reject(new DOMException("중단됨", "AbortError")); return; }
+        signal.addEventListener("abort", () => {
+          clearTimeout(timer);
+          reject(new DOMException("중단됨", "AbortError"));
+        });
+      }
+    });
+  },
 
-function newChat() {
-  if (isGenerating) {
-    if (!window.confirm("응답을 생성하는 중이에요. 새 대화를 시작하면 중단돼요. 계속할까요?")) return;
-    stopGeneration();
-  }
-  setCurrentConversationId(null);
-  renderMessages(null);
-  renderSidebar();
-  updateHeaderModel(defaultModelKey);
-  input.value = "";
-  autoResize();
-  closeSidebar();
-}
-document.getElementById("new-chat-btn").addEventListener("click", newChat);
-document.getElementById("mobile-new-chat").addEventListener("click", newChat);
+  async runAssistantTurn(conv) {
+    Composer.setGenerating(true);
+    const typingId = Messages.appendTypingRow();
+    const controller = new AbortController();
+    State.abortController = controller;
 
-/* ==========================================================
-   전송 폼 제출 (전송 ↔ 정지 겸용)
-========================================================== */
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (isGenerating) { stopGeneration(); return; }
-  const text = input.value.trim();
-  if (!text) return;
-  sendMessage(text);
-});
+    try {
+      const replyText = await this.callAI(conv, { signal: controller.signal });
+      Messages.removeRow(typingId);
+      conv.messages.push({ id: Utils.uid(), role: "assistant", content: replyText, model: conv.model, createdAt: Date.now() });
+      conv.updatedAt = Date.now();
+      State.persist();
+      Messages.render(conv);
+      Sidebar.render();
+    } catch (err) {
+      Messages.removeRow(typingId);
+      if (err && err.name === "AbortError") {
+        conv.messages.push({ id: Utils.uid(), role: "assistant", content: "생성이 중지됐어요.", model: conv.model, createdAt: Date.now(), aborted: true });
+      } else {
+        console.error("[AI 오류]", err);
+        conv.messages.push({ id: Utils.uid(), role: "assistant", content: "답변을 가져오지 못했어요. 잠시 후 다시 시도해 주세요.", model: conv.model, createdAt: Date.now() });
+      }
+      conv.updatedAt = Date.now();
+      State.persist();
+      Messages.render(conv);
+      Sidebar.render();
+    } finally {
+      Composer.setGenerating(false);
+      State.abortController = null;
+      Utils.scrollToBottom();
+    }
+  },
 
-/* ==========================================================
-   추천 프롬프트 칩 — 클릭 시 바로 전송
-========================================================== */
-document.querySelectorAll(".suggestion-chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    if (isGenerating) return;
-    const text = chip.querySelector("span:last-child").textContent;
-    sendMessage(text);
+  stopGeneration() {
+    if (State.abortController) State.abortController.abort();
+  },
+
+  regenerate(convId) {
+    if (State.isGenerating) return;
+    const conv = State.getConversation(convId);
+    if (!conv) return;
+    if (conv.messages.length && conv.messages[conv.messages.length - 1].role === "assistant") {
+      conv.messages.pop();
+    }
+    Messages.render(conv);
+    State.persist();
+    this.runAssistantTurn(conv);
+  },
+
+  sendMessage(text) {
+    if (State.isGenerating) return;
+
+    let conv = State.getCurrentConversation();
+    if (!conv) {
+      conv = this.createConversation();
+      State.conversations.unshift(conv);
+      State.setCurrentConversationId(conv.id);
+      ModelPicker.updateHeader(conv.model);
+    }
+
+    const isFirst = conv.messages.length === 0;
+    conv.messages.push({ id: Utils.uid(), role: "user", content: text, createdAt: Date.now() });
+    if (isFirst) conv.title = text.slice(0, 40) + (text.length > 40 ? "…" : "");
+    conv.updatedAt = Date.now();
+
+    State.persist();
+    Messages.render(conv);
+    Sidebar.render();
+    Composer.clear();
+
+    this.runAssistantTurn(conv);
+  },
+
+  saveEditAndResend(convId, msgId, newText) {
+    const conv = State.getConversation(convId);
+    if (!conv) return;
+    const idx = conv.messages.findIndex(m => m.id === msgId);
+    if (idx === -1) return;
+
+    conv.messages[idx].content = newText;
+    conv.messages = conv.messages.slice(0, idx + 1); // 이후 대화는 다시 생성되므로 제거
+    conv.updatedAt = Date.now();
+    State.persist();
+    Messages.render(conv);
+    Sidebar.render();
+    this.runAssistantTurn(conv);
+  },
+
+  switchConversation(id) {
+    if (id === State.currentConversationId) { Sidebar.close(); return; }
+    if (!confirmInterruptIfGenerating("응답을 생성하는 중이에요. 대화를 전환하면 중단돼요. 계속할까요?")) return;
+
+    const conv = State.getConversation(id);
+    if (!conv) return;
+    State.setCurrentConversationId(id);
+    Messages.render(conv);
+    Sidebar.render();
+    ModelPicker.updateHeader(conv.model);
+    Sidebar.close();
+  },
+
+  newChat() {
+    if (!confirmInterruptIfGenerating("응답을 생성하는 중이에요. 새 대화를 시작하면 중단돼요. 계속할까요?")) return;
+
+    State.setCurrentConversationId(null);
+    Messages.render(null);
+    Sidebar.render();
+    ModelPicker.updateHeader(State.defaultModelKey);
+    Composer.clear();
+    Sidebar.close();
+  },
+};
+
+function bindEvents() {
+  dom.sidebarToggle.addEventListener("click", () => {
+    dom.sidebar.classList.contains("is-open") ? Sidebar.close() : Sidebar.open();
   });
-});
+  dom.sidebarBackdrop.addEventListener("click", () => Sidebar.close());
 
-/* ==========================================================
-   초기 로드: 마지막으로 연 대화 복원
-========================================================== */
-(function init() {
-  const savedId = loadCurrentId();
-  const savedConv = savedId ? getConversation(savedId) : null;
+  if (dom.searchToggleBtn) {
+    dom.searchToggleBtn.addEventListener("click", () => {
+      dom.searchRow.classList.contains("hidden") ? Sidebar.openSearch() : Sidebar.closeSearch();
+    });
+  }
+  dom.historySearchEl.addEventListener("input", () => Sidebar.render());
+  dom.historySearchEl.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") Sidebar.closeSearch();
+  });
+
+  if (dom.sidebarCollapseBtn) {
+    Sidebar.applyCollapsed(Storage.loadSidebarCollapsed());
+    dom.sidebarCollapseBtn.addEventListener("click", () => {
+      const collapsed = !dom.sidebar.classList.contains("is-collapsed");
+      Sidebar.applyCollapsed(collapsed);
+      Storage.saveSidebarCollapsed(collapsed);
+    });
+  }
+
+  dom.chatScroll.addEventListener("scroll", () => Sidebar.updateHeaderScrollState(), { passive: true });
+
+  dom.historyGroupsEl.addEventListener("click", (e) => {
+    const renameBtn = e.target.closest(".sidebar-rename-btn");
+    if (renameBtn) { e.stopPropagation(); Sidebar.renameConversation(renameBtn.dataset.id); return; }
+
+    const deleteBtn = e.target.closest(".sidebar-delete-btn");
+    if (deleteBtn) { e.stopPropagation(); Sidebar.deleteConversation(deleteBtn.dataset.id); return; }
+
+    const convBtn = e.target.closest(".sidebar-conv-btn");
+    if (convBtn) { Chat.switchConversation(convBtn.dataset.id); }
+  });
+
+  dom.modelBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dom.modelMenu.classList.toggle("hidden");
+  });
+  document.addEventListener("click", () => dom.modelMenu.classList.add("hidden"));
+  dom.modelMenu.addEventListener("click", (e) => e.stopPropagation());
+  document.querySelectorAll(".model-option").forEach(opt => {
+    opt.addEventListener("click", () => ModelPicker.select(opt.dataset.provider));
+  });
+
+  dom.settingsModelListEl.addEventListener("click", (e) => {
+    const opt = e.target.closest(".settings-model-option");
+    if (!opt) return;
+    State.defaultModelKey = opt.dataset.provider;
+    Storage.saveDefaultModel(State.defaultModelKey);
+    SettingsModal.renderModelList();
+    if (!State.currentConversationId) ModelPicker.updateHeader(State.defaultModelKey);
+  });
+  dom.persistToggle.addEventListener("click", () => SettingsModal.togglePersist());
+  dom.settingsBtn.addEventListener("click", () => SettingsModal.open());
+  dom.settingsCloseBtn.addEventListener("click", () => SettingsModal.close());
+  dom.settingsModal.addEventListener("click", (e) => {
+    if (!dom.settingsCard.contains(e.target)) SettingsModal.close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !dom.settingsModal.classList.contains("hidden")) SettingsModal.close();
+  });
+  dom.settingsClearAllBtn.addEventListener("click", () => SettingsModal.clearAll());
+
+  dom.input.addEventListener("input", () => Composer.autoResize());
+  dom.input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      dom.form.requestSubmit();
+    }
+  });
+
+  dom.messagesEl.addEventListener("click", (e) => {
+    const copyBtn = e.target.closest(".copy-msg-btn");
+    if (copyBtn) { Messages.handleCopy(copyBtn); return; }
+
+    const regenBtn = e.target.closest(".regen-msg-btn");
+    if (regenBtn) { Chat.regenerate(regenBtn.dataset.conv); return; }
+
+    const editBtn = e.target.closest(".edit-msg-btn");
+    if (editBtn) { Messages.beginEdit(editBtn.dataset.conv, editBtn.dataset.msg, editBtn); return; }
+  });
+
+  document.getElementById("new-chat-btn").addEventListener("click", () => Chat.newChat());
+  document.getElementById("mobile-new-chat").addEventListener("click", () => Chat.newChat());
+
+  dom.form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (State.isGenerating) { Chat.stopGeneration(); return; }
+    const text = dom.input.value.trim();
+    if (!text) return;
+    Chat.sendMessage(text);
+  });
+
+  document.querySelectorAll(".suggestion-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      if (State.isGenerating) return;
+      const text = chip.querySelector("span:last-child").textContent;
+      Chat.sendMessage(text);
+    });
+  });
+}
+
+function init() {
+  bindEvents();
+
+  const savedId = Storage.loadCurrentId();
+  const savedConv = savedId ? State.getConversation(savedId) : null;
 
   if (savedConv) {
-    currentConversationId = savedConv.id;
-    renderMessages(savedConv);
-    updateHeaderModel(savedConv.model);
+    State.currentConversationId = savedConv.id;
+    Messages.render(savedConv);
+    ModelPicker.updateHeader(savedConv.model);
   } else {
-    currentConversationId = null;
-    renderMessages(null);
-    updateHeaderModel(defaultModelKey);
+    State.currentConversationId = null;
+    Messages.render(null);
+    ModelPicker.updateHeader(State.defaultModelKey);
   }
-  renderSidebar();
-})();
+  Sidebar.render();
+}
+
+init();
 </script>
 </body>
 </html>
