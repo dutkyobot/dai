@@ -6,6 +6,17 @@
 <title>D-AI Web | Dutkyobot</title>
 <link rel="icon" href="img/favicon.png" type="image/png">
 
+<!-- 저장된 테마를 첫 페인트 전에 적용해서 화면이 잠깐 밝게 번쩍이는 걸 막는다 -->
+<script>
+  (function () {
+    try {
+      if (localStorage.getItem("dai_theme_v1") === "dark") {
+        document.documentElement.classList.add("dark");
+      }
+    } catch (e) { /* 저장소 접근 불가 환경은 라이트 모드로 진행 */ }
+  })();
+</script>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
@@ -15,16 +26,16 @@
     theme: {
       extend: {
         colors: {
-          bg: "#FAF9F6",
-          surface: "#FFFFFF",
-          surface2: "#F3F1EA",
-          line: "#E7E2D8",
-          mute: "#8A8478",
-          ink: "#231F1A",
+          bg: "rgb(var(--c-bg) / <alpha-value>)",
+          surface: "rgb(var(--c-surface) / <alpha-value>)",
+          surface2: "rgb(var(--c-surface2) / <alpha-value>)",
+          line: "rgb(var(--c-line) / <alpha-value>)",
+          mute: "rgb(var(--c-mute) / <alpha-value>)",
+          ink: "rgb(var(--c-ink) / <alpha-value>)",
           mint: "#21D67A",
           blue: "#3B9EFF",
-          orange: "#E35B2E",
-          "orange-dark": "#C1471F",
+          orange: "rgb(var(--c-orange) / <alpha-value>)",
+          "orange-dark": "rgb(var(--c-orange-dark) / <alpha-value>)",
           discord: "#5865F2",
         },
         fontFamily: {
@@ -38,19 +49,50 @@
 <style>
   /* 메인 컬러는 진한 오렌지 하나로 통일한다. 민트→블루 그라데이션은
      사이드바 로고 아이콘 한 곳에만 남겨둔 브랜드 시그니처이고,
-     그 외 UI 요소(아바타, 전송 버튼, 포인트 컬러 등)는 전부 오렌지를 쓴다. */
+     그 외 UI 요소(아바타, 전송 버튼, 포인트 컬러 등)는 전부 오렌지를 쓴다.
+
+     모든 색은 "R G B" 형태의 CSS 변수로 정의하고 rgb(var(--x) / a) 형태로
+     사용한다. html.dark 가 붙으면 아래 값이 통째로 다크 팔레트로 바뀌면서
+     Tailwind 유틸리티(bg-bg, text-ink 등)까지 자동으로 테마를 따라간다. */
   :root {
+    /* 눈부심을 줄인 웜 라이트 팔레트: 순백색 면적과 강한 대비를 낮춘다 */
+    --c-bg: 232 229 222;
+    --c-surface: 244 242 237;
+    --c-surface2: 222 219 211;
+    --c-line: 208 203 193;
+    --c-mute: 112 108 99;
+    --c-ink: 47 44 39;
+    --c-orange: 220 84 40;
+    --c-orange-dark: 188 67 29;
+    --c-shadow: 40 36 30;
+    --c-sheen-alpha: 0.35;
+
     --c-mint: #21D67A;
     --c-blue: #3B9EFF;
-    --c-orange: #E35B2E;
-    --c-orange-dark: #C1471F;
+  }
+
+  html.dark {
+    --c-bg: 23 22 20;
+    --c-surface: 31 29 26;
+    --c-surface2: 39 36 32;
+    --c-line: 57 53 47;
+    --c-mute: 163 156 143;
+    --c-ink: 236 231 222;
+    --c-orange: 237 133 96;
+    --c-orange-dark: 214 103 61;
+    --c-shadow: 0 0 0;
+    --c-sheen-alpha: 0.05;
   }
 
   html, body { height: 100%; overscroll-behavior: none; }
-  body { background-color: #FAF9F6; color: #231F1A; }
+  body {
+    background-color: rgb(var(--c-bg));
+    color: rgb(var(--c-ink));
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
 
   a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible {
-    outline: 2px solid var(--c-orange);
+    outline: 2px solid rgb(var(--c-orange));
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -67,22 +109,23 @@
 
   /* 카드 컴포넌트 (랜딩 페이지 .card 토큰과 동일) */
   .card {
-    background: #FFFFFF;
-    border: 1px solid #E7E2D8;
+    background: rgb(var(--c-surface));
+    border: 1px solid rgb(var(--c-line));
     border-radius: 28px;
-    box-shadow: 0 1px 2px rgba(35, 31, 26, 0.04);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 1px 2px rgb(var(--c-shadow) / 0.04);
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .card:hover {
-    border-color: rgba(227, 91, 46, 0.4);
-    box-shadow: 0 8px 20px -8px rgba(35, 31, 26, 0.12);
+    border-color: rgb(var(--c-orange) / 0.4);
+    box-shadow: 0 8px 20px -8px rgb(var(--c-shadow) / 0.12);
   }
 
-  /* 떠 있는 카드(모델 메뉴, 설정 모달)용 입체 그림자 — 헤더 글래스와 동일한 톤 */
+  /* 떠 있는 카드(모델 메뉴, 설정 모달)용 입체 그림자 — 헤더 글래스와 동일한 톤.
+     위쪽 하이라이트 선은 --c-sheen-alpha로 다크 모드에서 자동으로 옅어진다. */
   .float-card {
     box-shadow:
-      0 16px 32px -8px rgba(35, 31, 26, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      0 16px 32px -8px rgb(var(--c-shadow) / 0.16),
+      inset 0 1px 0 rgb(255 255 255 / var(--c-sheen-alpha));
   }
 
   .invite-btn {
@@ -95,12 +138,12 @@
   /* 부유형 헤더 컨트롤(사이드바 토글, 모델 선택 등)이 배경과 살짝
      분리되어 보이도록 미세한 그림자를 얹는다 */
   .float-pill {
-    box-shadow: 0 1px 3px rgba(35, 31, 26, 0.06);
+    box-shadow: 0 1px 3px rgb(var(--c-shadow) / 0.06);
   }
 
   /* 스크롤바 */
   .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-  .scroll-thin::-webkit-scrollbar-thumb { background: #DDD7CB; border-radius: 999px; }
+  .scroll-thin::-webkit-scrollbar-thumb { background: rgb(var(--c-line)); border-radius: 999px; }
   .scroll-thin::-webkit-scrollbar-track { background: transparent; }
 
   /* 사이드바 슬라이드 (모바일 오버레이) */
@@ -117,13 +160,13 @@
     transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   }
   .app-header.is-scrolled {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 249, 246, 0.85) 100%);
+    background: linear-gradient(180deg, rgb(var(--c-surface) / 0.9) 0%, rgb(var(--c-bg) / 0.85) 100%);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-bottom: 1px solid rgba(35, 31, 26, 0.08);
+    border-bottom: 1px solid rgb(var(--c-shadow) / 0.08);
     box-shadow:
-      0 12px 24px -12px rgba(35, 31, 26, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      0 12px 24px -12px rgb(var(--c-shadow) / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / var(--c-sheen-alpha));
   }
 
   /* 사이드바 접기(레일) — ChatGPT/Gemini 스타일 아이콘 전용 상태.
@@ -159,8 +202,8 @@
     flex: none;
   }
   #sidebar.is-collapsed #sidebar-collapse-btn {
-    background: #FFFFFF;
-    border: 1px solid #E7E2D8;
+    background: rgb(var(--c-surface));
+    border: 1px solid rgb(var(--c-line));
   }
   #sidebar.is-collapsed #sidebar-collapse-btn i,
   #sidebar.is-collapsed #settings-btn .avatar-badge i {
@@ -173,46 +216,46 @@
 
   /* 입력창 */
   .composer-shell {
-    background: #FFFFFF;
-    border: 1px solid #E7E2D8;
+    background: rgb(var(--c-surface));
+    border: 1px solid rgb(var(--c-line));
     border-radius: 999px;
-    box-shadow: 0 2px 10px -4px rgba(35, 31, 26, 0.08);
-    transition: box-shadow 0.2s ease, border-color 0.2s ease, border-radius 0.2s ease;
+    box-shadow: 0 2px 10px -4px rgb(var(--c-shadow) / 0.08);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
   .composer-shell.is-multiline {
-    border-radius: 28px;
+    border-radius: 999px;
   }
   .composer-shell:focus-within {
-    border-color: rgba(227, 91, 46, 0.5);
-    box-shadow: 0 0 0 3px rgba(227, 91, 46, 0.12);
+    border-color: rgb(var(--c-orange) / 0.5);
+    box-shadow: 0 0 0 3px rgb(var(--c-orange) / 0.12);
   }
   #composer-input {
     background: transparent;
-    color: #231F1A;
+    color: rgb(var(--c-ink));
     resize: none;
     max-height: 200px;
   }
-  #composer-input::placeholder { color: #8A8478; }
+  #composer-input::placeholder { color: rgb(var(--c-mute)); }
 
   /* 채팅 이력 아이템 */
   .history-item {
     transition: background-color 0.15s ease;
   }
-  .history-item:hover { background: #F3F1EA; }
-  .history-item.is-active { background: #F3F1EA; }
+  .history-item:hover { background: rgb(var(--c-surface2)); }
+  .history-item.is-active { background: rgb(var(--c-surface2)); }
 
   /* 프로바이더 체인 (시그니처 요소) */
   .chain-dot {
     width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0;
   }
   .chain-line {
-    flex: 1; height: 1px; background: #E7E2D8; min-width: 12px;
+    flex: 1; height: 1px; background: rgb(var(--c-line)); min-width: 12px;
   }
 
   /* 타이핑 인디케이터 */
   .typing-dot {
     width: 6px; height: 6px; border-radius: 999px;
-    background: #8A8478;
+    background: rgb(var(--c-mute));
     animation: typing-bounce 1.2s infinite ease-in-out;
   }
   .typing-dot:nth-child(2) { animation-delay: 0.15s; }
@@ -231,7 +274,16 @@
   .chip {
     transition: border-color 0.15s ease, background-color 0.15s ease;
   }
-  .chip:hover { border-color: rgba(227, 91, 46, 0.35); background: #FFF6F0; }
+  .chip:hover { border-color: rgb(var(--c-orange) / 0.35); background: rgb(var(--c-orange) / 0.08); }
+
+  /* 설정 모달의 라이트/다크 세그먼트 버튼 */
+  .theme-option {
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  .theme-option.is-active {
+    background: rgb(var(--c-orange));
+    color: #fff;
+  }
 
   /* 사이드바 대화 아이템 액션(이름변경/삭제) */
   .sidebar-item-actions {
@@ -245,9 +297,400 @@
 
   #composer-input:disabled { opacity: 0.6; }
 
-  @media (prefers-reduced-motion: reduce) {
-    * { animation: none !important; transition: none !important; }
+  @media (prefers-color-scheme: light) {
+    /* 시스템 라이트 환경에서도 수동 테마가 우선되도록 색상만 부드럽게 유지 */
   }
+
+  html:not(.dark) .app-header.is-scrolled {
+    backdrop-filter: blur(18px) saturate(110%);
+    -webkit-backdrop-filter: blur(18px) saturate(110%);
+    box-shadow:
+      0 10px 22px -14px rgb(var(--c-shadow) / 0.10),
+      inset 0 1px 0 rgb(255 255 255 / var(--c-sheen-alpha));
+  }
+
+  html:not(.dark) .float-card {
+    box-shadow:
+      0 14px 28px -12px rgb(var(--c-shadow) / 0.12),
+      inset 0 1px 0 rgb(255 255 255 / var(--c-sheen-alpha));
+  }
+
+
+
+  /* ============================================================
+     D-AI Web UI refresh — modern AI workspace layout
+     Existing 기능/DOM은 유지하고 시각적 구조만 정돈한다.
+     ============================================================ */
+  :root {
+    --ui-radius-lg: 22px;
+    --ui-radius-md: 15px;
+    --ui-content-width: 52rem;
+  }
+
+  body { letter-spacing: -0.01em; }
+
+  /* Sidebar: compact, calm, app-like */
+  #sidebar {
+    width: 268px;
+    background: rgb(var(--c-surface));
+    border-right-color: rgb(var(--c-line) / 0.82);
+  }
+  #sidebar .p-3 { padding: 14px 12px; }
+  #sidebar .logo-row {
+    height: 34px;
+    padding-inline: 4px;
+  }
+  #sidebar .logo-row a > div {
+    box-shadow: 0 2px 8px rgb(var(--c-shadow) / 0.08);
+  }
+  #new-chat-row { margin-top: 14px; }
+  #new-chat-btn {
+    height: 42px;
+    background: rgb(var(--c-surface2) / 0.55);
+    border-color: rgb(var(--c-line) / 0.8);
+    font-size: 13px;
+    box-shadow: none;
+  }
+  #new-chat-btn:hover,
+  #search-toggle-btn:hover {
+    background: rgb(var(--c-surface2));
+  }
+  #search-toggle-btn {
+    width: 42px;
+    height: 42px;
+    background: transparent;
+    border-color: transparent;
+  }
+  #search-row input { background: rgb(var(--c-bg) / 0.65); }
+
+  #history-list { padding-inline: 8px; margin-top: 8px; }
+  #history-groups { gap: 18px !important; }
+  #history-groups > div > div {
+    padding-inline: 8px;
+    margin-bottom: 6px;
+    font-size: 10px;
+    letter-spacing: 0.09em;
+  }
+  .history-item {
+    border-radius: 11px;
+    padding: 8px 10px;
+    color: rgb(var(--c-mute) / 0.95);
+  }
+  .history-item:hover {
+    background: rgb(var(--c-surface2) / 0.7);
+    color: rgb(var(--c-ink));
+  }
+  .history-item.is-active {
+    background: rgb(var(--c-surface2));
+    color: rgb(var(--c-ink)) !important;
+    box-shadow: inset 2px 0 0 rgb(var(--c-orange));
+  }
+  .sidebar-item-actions { padding-right: 4px; }
+
+  #sidebar > .p-3:last-child {
+    padding-top: 12px;
+    padding-bottom: 14px;
+  }
+  #settings-btn {
+    min-height: 42px;
+    padding: 7px 9px;
+    background: transparent;
+    border: 1px solid transparent;
+  }
+  #settings-btn:hover {
+    background: rgb(var(--c-surface2) / 0.72);
+    border-color: rgb(var(--c-line) / 0.65);
+  }
+  #settings-btn .avatar-badge {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Main header: less pill-heavy, more like a native AI workspace */
+  .app-header {
+    height: 60px;
+    padding-inline: 18px;
+    background: rgb(var(--c-bg) / 0.74);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom-color: transparent;
+  }
+  .app-header.is-scrolled {
+    background: rgb(var(--c-bg) / 0.88);
+    border-bottom-color: rgb(var(--c-line) / 0.58);
+    box-shadow: 0 8px 24px -18px rgb(var(--c-shadow) / 0.28);
+  }
+  #model-dropdown-btn {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 7px 8px;
+    border-radius: 10px;
+  }
+  #model-dropdown-btn:hover {
+    background: rgb(var(--c-surface2) / 0.72);
+    border-color: transparent;
+  }
+  #model-menu {
+    top: 48px;
+    width: 320px;
+    border-radius: 18px;
+    padding: 7px;
+  }
+  #model-menu .model-option {
+    border-radius: 12px;
+    padding: 10px 11px;
+  }
+  #model-menu .model-option:hover { background: rgb(var(--c-surface2) / 0.72); }
+
+  /* Conversation canvas */
+  #chat-scroll {
+    scroll-behavior: smooth;
+  }
+  #empty-state {
+    min-height: calc(100% - 16px);
+    padding-top: 8vh;
+    padding-bottom: 104px;
+  }
+  #empty-state > .w-14 {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 10px 26px -14px rgb(var(--c-orange) / 0.35);
+  }
+  #empty-state h1 {
+    font-size: clamp(28px, 3vw, 36px);
+    line-height: 1.08;
+    letter-spacing: -0.045em;
+  }
+  #empty-state h1 > span { color: rgb(var(--c-ink)) !important; }
+  #empty-state h1 > i { color: rgb(var(--c-orange)); }
+  #empty-state > p {
+    max-width: 31rem;
+    font-size: 13px;
+    margin-top: 11px;
+  }
+  #empty-state .suggestion-chip {
+    min-height: 78px;
+    border-radius: 16px;
+    padding: 14px 15px;
+    background: rgb(var(--c-surface) / 0.74);
+    border-color: rgb(var(--c-line) / 0.68);
+    box-shadow: 0 2px 9px rgb(var(--c-shadow) / 0.03);
+  }
+  #empty-state .suggestion-chip:hover {
+    transform: translateY(-1px);
+    border-color: rgb(var(--c-orange) / 0.28);
+    background: rgb(var(--c-surface));
+    box-shadow: 0 10px 24px -18px rgb(var(--c-shadow) / 0.24);
+  }
+  #empty-state .suggestion-chip > span:first-child {
+    width: 31px;
+    height: 31px;
+    border-radius: 10px;
+  }
+  #empty-state .suggestion-chip > span:last-child { font-size: 13px; }
+
+  .chain-line { opacity: 0.7; }
+  #empty-state .max-w-xs { max-width: 17rem; }
+
+  /* Messages: wider, quieter, more readable */
+  #messages {
+    max-width: var(--ui-content-width);
+    padding-inline: 18px;
+    padding-top: 30px;
+    padding-bottom: 150px;
+    gap: 32px;
+  }
+  #messages .msg-enter { gap: 12px; }
+  #messages .msg-enter > .flex-1 > div:first-child {
+    font-size: 14px;
+    line-height: 1.78;
+  }
+  #messages .msg-enter .w-7.h-7 {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    margin-top: 2px;
+  }
+  #messages .msg-enter .w-7.h-7 span { font-size: 10px; }
+  #messages .msg-enter .bg-surface2[data-bubble] {
+    border-radius: 18px 18px 6px 18px;
+    padding: 9px 13px;
+    background: rgb(var(--c-surface2) / 0.78);
+    border-color: rgb(var(--c-line) / 0.62);
+    line-height: 1.62;
+  }
+  #messages .msg-enter .mt-1\.5 {
+    opacity: 0.88;
+  }
+
+  /* Composer: centerpiece of the UI */
+  .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 {
+    padding: 8px 18px 16px;
+    background: linear-gradient(180deg, transparent 0%, rgb(var(--c-bg) / 0.82) 28%, rgb(var(--c-bg)) 62%);
+  }
+  #composer-form { max-width: var(--ui-content-width); }
+  .composer-shell {
+    min-height: 58px;
+    padding: 8px 10px 8px 17px;
+    border-radius: var(--ui-radius-lg);
+    background: rgb(var(--c-surface));
+    border-color: rgb(var(--c-line) / 0.92);
+    box-shadow:
+      0 12px 34px -20px rgb(var(--c-shadow) / 0.34),
+      0 1px 3px rgb(var(--c-shadow) / 0.06);
+  }
+  .composer-shell:focus-within {
+    border-color: rgb(var(--c-orange) / 0.42);
+    box-shadow:
+      0 14px 34px -21px rgb(var(--c-shadow) / 0.36),
+      0 0 0 3px rgb(var(--c-orange) / 0.08);
+  }
+  #composer-input { font-size: 14px; line-height: 1.65; padding-top: 7px; padding-bottom: 7px; }
+  #send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+    box-shadow: 0 5px 13px -8px rgb(var(--c-orange) / 0.72);
+  }
+  .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 > form > p {
+    margin-top: 7px;
+    font-size: 10px;
+    opacity: 0.78;
+  }
+
+  /* Compact rail mode stays coherent with the new design */
+  #sidebar.is-collapsed { width: 74px; }
+  #sidebar.is-collapsed .logo-row { gap: 9px; }
+  #sidebar.is-collapsed #new-chat-row { margin-top: 16px; }
+
+  /* Dark-mode refinements */
+  html.dark .app-header {
+    background: rgb(var(--c-bg) / 0.78);
+  }
+  html.dark .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 {
+    background: linear-gradient(180deg, transparent 0%, rgb(var(--c-bg) / 0.84) 28%, rgb(var(--c-bg)) 64%);
+  }
+  html.dark .composer-shell {
+    box-shadow:
+      0 16px 36px -22px rgb(0 0 0 / 0.58),
+      0 1px 3px rgb(0 0 0 / 0.28);
+  }
+
+  @media (max-width: 767px) {
+    #sidebar { width: 268px; }
+    .app-header { height: 56px; padding-inline: 12px; }
+    #messages { padding-inline: 12px; padding-top: 22px; padding-bottom: 128px; }
+    .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 { padding: 7px 10px 12px; }
+    .composer-shell { min-height: 54px; border-radius: 19px; padding-left: 14px; }
+    #empty-state { padding-top: 4vh; }
+  }
+
+  /* D-AI Web polish v3: pill-first AI UI, alignment and responsive guards */
+  :root { --ui-pill-radius: 999px; --ui-panel-radius: 24px; --ui-content-width: 56rem; }
+  #sidebar, .flex-1.min-w-0.flex.flex-col.h-full.relative, #chat-scroll, #messages, #composer-form { min-width: 0; }
+  .float-pill, #model-dropdown-btn, #search-toggle-btn, #new-chat-btn, #settings-btn { border-radius: 999px !important; }
+  .app-header { height: 64px; padding-inline: clamp(12px,2vw,24px); background: transparent; backdrop-filter:none; -webkit-backdrop-filter:none; }
+  .app-header.is-scrolled { background: rgb(var(--c-bg) / .82); backdrop-filter: blur(22px) saturate(125%); -webkit-backdrop-filter: blur(22px) saturate(125%); border-bottom-color: rgb(var(--c-line) / .5); }
+  #model-dropdown-btn { min-height:40px; padding:7px 13px 7px 11px; background:rgb(var(--c-surface) / .9); border:1px solid rgb(var(--c-line) / .82); box-shadow:0 2px 10px rgb(var(--c-shadow) / .05); }
+  #model-dropdown-btn:hover { background:rgb(var(--c-surface)); border-color:rgb(var(--c-orange) / .25); transform:translateY(-1px); }
+  #model-menu { top:50px; left:0; width:min(340px,calc(100vw - 24px)); max-width:calc(100vw - 24px); border-radius:var(--ui-panel-radius); }
+  #model-menu .model-option { border-radius:999px; min-width:0; }
+  #new-chat-btn { background:rgb(var(--c-surface2) / .72); border-color:rgb(var(--c-line) / .75); }
+  #search-toggle-btn { background:rgb(var(--c-surface2) / .58); border-color:rgb(var(--c-line) / .5); }
+  .history-item { border-radius:999px !important; }
+  .history-item.is-active { box-shadow:none; }
+  #messages { width:min(100%,var(--ui-content-width)); padding-left:clamp(14px,3vw,26px); padding-right:clamp(14px,3vw,26px); }
+  #messages .msg-enter { width:100%; min-width:0; }
+  #messages .msg-enter > .flex-1 { min-width:0; }
+  .assistant-avatar { flex:0 0 30px; width:30px !important; height:30px !important; border-radius:10px !important; }
+  .assistant-avatar img, .avatar-badge img { display:block; }
+  #messages .bg-surface2[data-bubble] { max-width:min(78%,44rem); overflow-wrap:anywhere; word-break:break-word; }
+  .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 { padding:8px clamp(10px,2vw,20px) max(14px,env(safe-area-inset-bottom)); }
+  #composer-form { width:min(100%,var(--ui-content-width)); }
+  .composer-shell { width:100%; min-width:0; min-height:60px; border-radius:999px; padding:9px 9px 9px 18px; }
+  .composer-shell.is-multiline { border-radius:25px; }
+  #composer-input { min-width:0; }
+  #send-btn { flex:0 0 40px; border-radius:999px; }
+  #empty-state .suggestion-chip { min-width:0; min-height:68px; border-radius:20px; }
+  @media (max-width:1024px) { #sidebar{width:248px;} #messages{max-width:50rem;} #empty-state{padding-inline:16px;} }
+  @media (max-width:767px) {
+    #sidebar{width:min(286px,86vw);max-width:86vw;}
+    .app-header{height:58px;padding-inline:10px;}
+    #model-dropdown-btn{max-width:min(70vw,280px);}
+    #model-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    #model-menu{top:46px;width:min(330px,calc(100vw - 20px));max-width:calc(100vw - 20px);}
+    #messages{width:100%;padding:20px 10px 132px;gap:28px;}
+    #messages .msg-enter{gap:9px;}
+    #messages .msg-enter > .flex-1 > div:first-child{font-size:14px;line-height:1.72;}
+    #messages .bg-surface2[data-bubble]{max-width:88%;}
+    #empty-state{width:100%;min-height:calc(100% - 6px);padding:3vh 14px 108px;}
+    #empty-state h1{font-size:clamp(25px,8vw,31px);}
+    #empty-state .grid{grid-template-columns:1fr;width:min(100%,34rem);gap:8px;}
+    #empty-state .suggestion-chip{min-height:58px;padding:11px 13px;border-radius:18px;}
+    .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4{padding:6px 8px calc(10px + env(safe-area-inset-bottom));}
+    .composer-shell{min-height:54px;padding:7px 7px 7px 15px;border-radius:999px;}
+    .composer-shell.is-multiline{border-radius:22px;}
+    #composer-input{font-size:14px;max-height:150px;}
+    #send-btn{flex-basis:38px;width:38px;height:38px;}
+  }
+  @media (max-width:380px){ .app-header{padding-inline:8px;} #model-dropdown-btn{max-width:62vw;padding-right:10px;} #messages{padding-inline:8px;} #empty-state{padding-inline:10px;} .composer-shell{padding-left:12px;} }
+  @media (min-width:768px){ #sidebar.is-collapsed{width:74px;} }
+
+  /* v4 precision fixes: consistent pill geometry, logo rail, and card alignment */
+  #sidebar .logo-row a > div {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 9px !important;
+  }
+  #sidebar.is-collapsed .logo-row {
+    align-items: center;
+    gap: 10px;
+  }
+  #sidebar.is-collapsed .logo-row a > div {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+  }
+  #sidebar.is-collapsed .logo-row a > div img {
+    width: 22px !important;
+    height: 22px !important;
+  }
+  #settings-btn .avatar-badge {
+    overflow: hidden;
+  }
+  .composer-shell {
+    border-radius: 999px !important;
+  }
+  .composer-shell.is-multiline {
+    border-radius: 28px !important;
+  }
+  #empty-state .suggestion-chip {
+    align-items: center !important;
+  }
+  #empty-state .suggestion-chip > span:last-child {
+    padding-top: 0 !important;
+    line-height: 1.45 !important;
+    align-self: center;
+  }
+  #empty-state .suggestion-chip > span:first-child {
+    margin-top: 0 !important;
+  }
+  @media (max-width: 767px) {
+    #sidebar.is-collapsed .logo-row a > div {
+      width: 40px !important;
+      height: 40px !important;
+    }
+    .composer-shell {
+      border-radius: 999px !important;
+    }
+    .composer-shell.is-multiline {
+      border-radius: 24px !important;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){ *{animation:none !important;transition:none !important;} }
 </style>
 </head>
 
@@ -255,7 +698,7 @@
 <div class="h-screen w-screen flex">
 
   <!-- ============================== 사이드바 ============================== -->
-  <aside id="sidebar" class="shrink-0 h-full bg-white border-r border-line flex flex-col">
+  <aside id="sidebar" class="shrink-0 h-full bg-surface border-r border-line flex flex-col">
     <div class="p-3">
       <div class="logo-row flex items-center justify-between gap-2 px-1 h-9">
         <a href="index.html" class="flex items-center gap-2.5 min-w-0">
@@ -304,8 +747,8 @@
     <div class="p-3 border-t border-line">
       <button id="settings-btn"
         class="flex items-center gap-2.5 w-full rounded-full px-2 py-2 hover:bg-surface2 transition-colors">
-        <div class="avatar-badge w-7 h-7 rounded-full bg-surface2 border border-line flex items-center justify-center text-mute text-xs shrink-0">
-          <i class="fa-solid fa-user"></i>
+        <div class="avatar-badge w-7 h-7 rounded-full bg-surface2 border border-line flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-user text-[12px] text-mute" aria-hidden="true"></i>
         </div>
         <span class="sidebar-label text-[13px] font-medium text-ink flex-1 text-left truncate">게스트</span>
         <i class="sidebar-label fa-solid fa-gear text-mute text-xs"></i>
@@ -330,11 +773,26 @@
 
       <div class="flex items-center justify-between gap-3 py-4 border-t border-line">
         <div class="min-w-0">
+          <div class="text-[13px] font-medium text-ink">화면 테마</div>
+          <div class="text-[11px] text-mute mt-0.5">눈이 편한 다크 모드로 바꿀 수 있어요.</div>
+        </div>
+        <div id="theme-switch" class="shrink-0 flex items-center gap-0.5 p-0.5 rounded-full bg-surface2 border border-line">
+          <button type="button" data-theme="light" class="theme-option w-8 h-8 rounded-full flex items-center justify-center text-mute" aria-label="라이트 모드">
+            <i class="fa-solid fa-sun text-[12px]"></i>
+          </button>
+          <button type="button" data-theme="dark" class="theme-option w-8 h-8 rounded-full flex items-center justify-center text-mute" aria-label="다크 모드">
+            <i class="fa-solid fa-moon text-[12px]"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-3 py-4 border-t border-line">
+        <div class="min-w-0">
           <div class="text-[13px] font-medium text-ink">이 브라우저에 대화 기록 저장</div>
           <div class="text-[11px] text-mute mt-0.5">끄면 새로고침할 때 대화가 사라져요.</div>
         </div>
         <button id="persist-toggle" class="shrink-0 w-11 h-6 rounded-full bg-line relative transition-colors" role="switch" aria-checked="true">
-          <span id="persist-toggle-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-[0_1px_2px_rgba(35,31,26,0.25)] transition-transform"></span>
+          <span id="persist-toggle-knob" class="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-surface shadow-[0_1px_2px_rgb(var(--c-shadow)/0.25)] transition-transform"></span>
         </button>
       </div>
 
@@ -359,7 +817,6 @@
 
         <button id="model-dropdown-btn"
           class="float-pill flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-surface/90 border border-line backdrop-blur-sm transition-colors hover:border-orange/40">
-          <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
           <span id="model-name" class="text-[14px] font-semibold text-ink">Gemini 2.5 Flash</span>
           <i class="fa-solid fa-chevron-down text-[10px] text-mute"></i>
         </button>
@@ -368,7 +825,6 @@
           class="hidden card float-card absolute top-11 left-0 w-72 p-2 z-30">
           <button data-model="Gemini 2.5 Flash" data-provider="gemini"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Gemini 2.5 Flash</span>
               <span class="block text-[11px] text-mute">기본 모델 · 빠르고 균형 잡힌 응답</span>
@@ -377,7 +833,6 @@
           </button>
           <button data-model="Cerebras · GPT OSS 120B" data-provider="cerebras"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Cerebras · GPT OSS 120B</span>
               <span class="block text-[11px] text-mute">1순위 대체 · 초저지연 추론</span>
@@ -386,7 +841,6 @@
           </button>
           <button data-model="Groq · Llama 3.3 70B" data-provider="groq"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Groq · Llama 3.3 70B</span>
               <span class="block text-[11px] text-mute">2순위 대체 · 가벼운 작업용</span>
@@ -395,7 +849,6 @@
           </button>
           <button data-model="OpenRouter" data-provider="openrouter"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">OpenRouter</span>
               <span class="block text-[11px] text-mute">최종 대체 · 다중 무료 모델</span>
@@ -415,55 +868,36 @@
 
       <div id="empty-state" class="h-full flex flex-col items-center justify-center px-6 text-center">
         <div class="w-14 h-14 rounded-2xl bg-orange flex items-center justify-center mb-5">
-          <img src="img/icon.png" alt="D-AI" class="h-8 w-8 rounded" onerror="this.remove(); this.parentElement.insertAdjacentHTML('beforeend', '<span class=\'text-white font-extrabold text-xl\'>D</span>')">
+          <img src="img/icon.png" alt="D-AI" class="h-8 w-8 rounded" loading="eager">
         </div>
         <h1 class="flex items-center gap-2 text-2xl sm:text-[28px] font-bold tracking-tight">
           <i class="fa-solid fa-sparkles text-orange text-lg sm:text-xl"></i>
           <span class="text-orange">무엇을 도와드릴까요?</span>
         </h1>
-        <p class="text-mute text-[14px] mt-2 max-w-sm">필요하면 실시간 검색과 시간 조회도 함께 사용해요.</p>
-
-        <!-- 시그니처 요소: 프로바이더 폴백 체인 -->
-        <div class="flex items-center gap-1.5 mt-6 max-w-xs w-full">
-          <span class="chain-dot bg-orange shadow-[0_0_0_3px_rgba(227,91,46,0.18)]"></span>
-          <span class="chain-line"></span>
-          <span class="chain-dot bg-line"></span>
-          <span class="chain-line"></span>
-          <span class="chain-dot bg-line"></span>
-          <span class="chain-line"></span>
-          <span class="chain-dot bg-line"></span>
-        </div>
-        <div class="flex items-center gap-1.5 mt-1.5 max-w-xs w-full text-[10px] text-mute font-medium tracking-wide">
-          <span class="flex-1 text-center">Gemini</span>
-          <span class="flex-1 text-center">Cerebras</span>
-          <span class="flex-1 text-center">Groq</span>
-          <span class="flex-1 text-center">OpenRouter</span>
-        </div>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-lg">
-          <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
+          <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
             <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-magnifying-glass text-orange text-[12px]"></i>
             </span>
-            <span class="text-[13px] text-ink leading-snug pt-1.5">오늘 서울 날씨 어때?</span>
+            <span class="text-[13px] text-ink leading-snug">오늘 서울 날씨 어때?</span>
           </button>
-          <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
+          <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
             <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
               <i class="fa-regular fa-clock text-orange text-[12px]"></i>
             </span>
-            <span class="text-[13px] text-ink leading-snug pt-1.5">도쿄는 지금 몇 시야?</span>
+            <span class="text-[13px] text-ink leading-snug">도쿄는 지금 몇 시야?</span>
           </button>
-          <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
+          <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
             <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-code text-orange text-[12px]"></i>
             </span>
-            <span class="text-[13px] text-ink leading-snug pt-1.5">파이썬 정렬 코드 짜줘</span>
+            <span class="text-[13px] text-ink leading-snug">파이썬 정렬 코드 짜줘</span>
           </button>
-          <button class="suggestion-chip card text-left p-4 flex items-start gap-3">
+          <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
             <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
               <i class="fa-solid fa-pen text-orange text-[12px]"></i>
             </span>
-            <span class="text-[13px] text-ink leading-snug pt-1.5">디스코드 공지 초안 써줘</span>
+            <span class="text-[13px] text-ink leading-snug">디스코드 공지 초안 써줘</span>
           </button>
         </div>
       </div>
@@ -530,6 +964,7 @@ const dom = {
   persistToggle: document.getElementById("persist-toggle"),
   persistToggleKnob: document.getElementById("persist-toggle-knob"),
   settingsClearAllBtn: document.getElementById("settings-clear-all-btn"),
+  themeSwitch: document.getElementById("theme-switch"),
 };
 
 const PROVIDERS = {
@@ -567,10 +1002,39 @@ const Utils = {
   },
 };
 
+const Theme = {
+  apply(theme) {
+    const isDark = theme === "dark";
+    document.documentElement.classList.toggle("dark", isDark);
+    if (dom.themeSwitch) {
+      dom.themeSwitch.querySelectorAll(".theme-option").forEach(btn => {
+        btn.classList.toggle("is-active", btn.dataset.theme === (isDark ? "dark" : "light"));
+        btn.setAttribute("aria-pressed", String(btn.dataset.theme === (isDark ? "dark" : "light")));
+      });
+    }
+  },
+  load() {
+    try {
+      const saved = localStorage.getItem("dai_theme_v1");
+      return saved === "dark" ? "dark" : "light";
+    } catch (e) {
+      return "light";
+    }
+  },
+  set(theme) {
+    const next = theme === "dark" ? "dark" : "light";
+    try {
+      localStorage.setItem("dai_theme_v1", next);
+    } catch (e) {}
+    this.apply(next);
+  },
+};
+
 const Storage = {
   KEYS: {
     conversations: "dai_conversations_v1",
     current: "dai_current_conversation_v1",
+    theme: "dai_theme_v1",
     persist: "dai_persist_enabled_v1",
     defaultModel: "dai_default_model_v1",
     sidebarCollapsed: "dai_sidebar_collapsed_v1",
@@ -827,7 +1291,6 @@ const SettingsModal = {
   renderModelList() {
     dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
       <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
-        <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] text-ink">${meta.label}</span>
         </span>
@@ -888,9 +1351,8 @@ const Composer = {
 
   autoResize() {
     dom.input.style.height = "auto";
-    const singleLineHeight = 24;
     dom.input.style.height = Math.min(dom.input.scrollHeight, 200) + "px";
-    dom.composerShell.classList.toggle("is-multiline", dom.input.scrollHeight > singleLineHeight + 4);
+    dom.composerShell.classList.add("is-multiline");
     this.updateSendButtonState();
   },
 
@@ -953,8 +1415,8 @@ const Messages = {
     row.className = "msg-enter flex gap-3";
     const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
     row.innerHTML = `
-      <div class="w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5">
-        <span class="text-white text-[11px] font-extrabold">D</span>
+      <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-cover rounded-full" loading="eager">
       </div>
       <div class="flex-1 min-w-0">
         <div class="text-[14px] text-ink leading-relaxed whitespace-pre-wrap break-words">${Utils.escapeHtml(m.content)}</div>
@@ -966,7 +1428,7 @@ const Messages = {
             <i class="fa-solid fa-rotate-right text-[12px]"></i>
           </button>` : ""}
           <span class="text-[11px] text-mute flex items-center gap-1.5 ml-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange"></span>${providerLabel}
+            ${providerLabel}
           </span>
         </div>
       </div>`;
@@ -979,8 +1441,8 @@ const Messages = {
     row.id = id;
     row.className = "msg-enter flex gap-3";
     row.innerHTML = `
-      <div class="w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5">
-        <span class="text-white text-[11px] font-extrabold">D</span>
+      <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+        <img src="img/icon.png" alt="D-AI" class="w-full h-full object-cover rounded-full" loading="eager">
       </div>
       <div class="flex items-center gap-1.5 h-7">
         <span class="typing-dot"></span>
@@ -1270,6 +1732,13 @@ function bindEvents() {
     if (!State.currentConversationId) ModelPicker.updateHeader(State.defaultModelKey);
   });
   dom.persistToggle.addEventListener("click", () => SettingsModal.togglePersist());
+  if (dom.themeSwitch) {
+    dom.themeSwitch.addEventListener("click", (e) => {
+      const btn = e.target.closest(".theme-option");
+      if (!btn) return;
+      Theme.set(btn.dataset.theme);
+    });
+  }
   dom.settingsBtn.addEventListener("click", () => SettingsModal.open());
   dom.settingsCloseBtn.addEventListener("click", () => SettingsModal.close());
   dom.settingsModal.addEventListener("click", (e) => {
@@ -1320,6 +1789,7 @@ function bindEvents() {
 }
 
 function init() {
+  Theme.apply(Theme.load());
   bindEvents();
 
   const savedId = Storage.loadCurrentId();
