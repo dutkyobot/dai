@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>입체도형 청사진 · 3D Solid Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root{
+    --bg: #0c2338;
+    --bg-deep: #081a2b;
+    --paper: #0f2b44;
+    --paper-raised: #123252;
+    --line: #3f6f8f;
+    --line-soft: rgba(111,168,201,0.22);
+    --ink: #eaf3fa;
+    --ink-dim: #9fc1d9;
+    --ink-faint: #6c93ac;
+    --amber: #ffb84d;
+    --amber-dim: #a97a3d;
+    --mint: #7ce0c6;
+    --danger: #ff8f8f;
+    --radius: 3px;
+    font-size: 16px;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: radial-gradient(circle at 50% 0%, rgba(124,224,198,0.05), transparent 55%), var(--bg-deep);
+    color: var(--ink);
+    font-family: 'Pretendard', -apple-system, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 28px 16px 60px;
+    line-height: 1.55;
+  }
+  .grid-field{
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.35;
+    mask-image: radial-gradient(ellipse at 50% 20%, black 0%, transparent 75%);
+  }
+  .sheet{
+    position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 4px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+  }
+  .crop{ position:absolute; width:16px; height:16px; z-index:2; }
+  .crop::before, .crop::after{ content:""; position:absolute; background: var(--ink-faint); }
+  .crop::before{ width:16px; height:1px; top:0; left:0; }
+  .crop::after{ width:1px; height:16px; top:0; left:0; }
+  .crop.tl{ top:-1px; left:-1px; }
+  .crop.tr{ top:-1px; right:-1px; transform: scaleX(-1); }
+  .crop.bl{ bottom:-1px; left:-1px; transform: scaleY(-1); }
+  .crop.br{ bottom:-1px; right:-1px; transform: scale(-1,-1); }
+
+  header.masthead{
+    padding: 34px 40px 26px; border-bottom: 1px solid var(--line);
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap;
+  }
+  .masthead h1{ margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.01em; }
+  .masthead h1 span{ color: var(--mint); }
+  .masthead p{ margin: 8px 0 0; color: var(--ink-dim); font-size: 14.5px; max-width: 48ch; }
+  .masthead .tag{
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-faint);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; white-space: nowrap;
+  }
+
+  main{ padding: 32px 40px 40px; }
+  .layout{ display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 860px){ .layout{ grid-template-columns: 1fr; } }
+
+  .rail{ position: relative; }
+  .step{ position: relative; padding: 0 0 26px 30px; border-left: 1px dashed var(--line); margin-left: 9px; }
+  .step:last-child{ border-left-color: transparent; padding-bottom: 0; }
+  .step .num{
+    position: absolute; left: -10px; top: -2px; width: 19px; height: 19px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--ink-faint); color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center;
+  }
+  .step.active .num{ border-color: var(--mint); color: var(--mint); }
+  .step h2{ margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--ink); }
+  .step .desc{ margin: 0 0 12px; font-size: 12.5px; color: var(--ink-faint); }
+
+  label.field-label{ display:block; font-size: 12px; color: var(--ink-dim); margin-bottom: 6px; }
+  .key-row{ display:flex; gap:6px; }
+  input[type="password"], input[type="text"], select{
+    width: 100%; background: var(--paper); border: 1px solid var(--line); color: var(--ink);
+    border-radius: var(--radius); padding: 9px 10px; font-size: 13.5px; font-family: 'JetBrains Mono', monospace;
+  }
+  input::placeholder{ color: var(--ink-faint); }
+  input:focus, select:focus, button:focus-visible{ outline: 2px solid var(--mint); outline-offset: 1px; }
+  .icon-btn{
+    background: var(--paper); border: 1px solid var(--line); color: var(--ink-dim);
+    border-radius: var(--radius); width: 36px; cursor: pointer; font-size: 13px; flex-shrink: 0;
+  }
+  .icon-btn:hover{ color: var(--ink); }
+  .helper-link{
+    display: inline-block; margin-top: 7px; font-size: 11.5px; color: var(--mint);
+    text-decoration: none; border-bottom: 1px solid rgba(124,224,198,0.35);
+  }
+  .helper-link:hover{ color: var(--ink); }
+  .adv-toggle{ margin-top: 14px; font-size: 12px; color: var(--ink-faint); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; text-decoration-style: dotted; }
+  .adv-panel{ display:none; margin-top: 12px; }
+  .adv-panel.open{ display:block; }
+
+  .dropzone{
+    border: 1px dashed var(--line); border-radius: var(--radius); padding: 22px 14px; text-align: center;
+    cursor: pointer; background: var(--paper); transition: border-color .15s ease, background .15s ease;
+  }
+  .dropzone:hover, .dropzone.drag{ border-color: var(--mint); background: var(--paper-raised); }
+  .dropzone .dz-icon{ font-size: 22px; color: var(--ink-faint); margin-bottom: 8px; }
+  .dropzone p{ margin: 0; font-size: 12.5px; color: var(--ink-dim); }
+  .dropzone .sub{ font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+  .preview-thumb{ display: none; margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .preview-thumb img{ display:block; width:100%; }
+  .preview-thumb .thumb-cap{ display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; border-top: 1px solid var(--line); }
+  .preview-thumb .thumb-cap button{ background:none;border:none;color:var(--amber);cursor:pointer;font-size:11px; font-family: 'JetBrains Mono', monospace; }
+
+  .go-btn{
+    width: 100%; margin-top: 4px; background: var(--amber); color: #23180a; border: none;
+    border-radius: var(--radius); padding: 12px 14px; font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600; font-size: 14.5px; cursor: pointer; transition: transform .1s ease, background .15s ease;
+  }
+  .go-btn:hover:not(:disabled){ background: #ffc669; }
+  .go-btn:active:not(:disabled){ transform: translateY(1px); }
+  .go-btn:disabled{ background: var(--amber-dim); color: #4a3c26; cursor: not-allowed; }
+
+  .status-line{ margin-top: 10px; font-size: 12px; font-family: 'JetBrains Mono', monospace; display: none; align-items: center; gap: 8px; }
+  .status-line.show{ display:flex; }
+  .status-line.err{ color: var(--danger); }
+  .status-line.ok{ color: var(--mint); }
+  .status-line.busy{ color: var(--ink-dim); }
+  .spinner{ width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--ink-faint); border-top-color: var(--mint); animation: spin .8s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .board{ border: 1px solid var(--line); border-radius: 4px; background: var(--paper); min-height: 420px; display: flex; flex-direction: column; }
+  .board-empty{ flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--ink-faint); padding: 60px 20px; text-align: center; }
+  .board-empty p{ margin:0; font-size: 13px; max-width: 34ch; }
+  .board-body{ display:none; }
+  .board-body.show{ display:block; }
+
+  /* ---- 3D viewer hero ---- */
+  .viewer-card{ padding: 16px 16px 0; }
+  .viewer-toolbar{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; flex-wrap: wrap; gap:8px; }
+  .viewer-toolbar .vt-label{ font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); }
+  .viewer-toolbar .vt-btns{ display:flex; gap:6px; }
+  .vt-btn{
+    background: var(--bg); border: 1px solid var(--line); color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; border-radius: 3px; padding: 6px 10px; cursor: pointer;
+  }
+  .vt-btn:hover{ border-color: var(--mint); color: var(--mint); }
+  .vt-btn.on{ border-color: var(--mint); color: var(--mint); background: rgba(124,224,198,0.08); }
+  .viewer-canvas-wrap{
+    position: relative; height: 420px; border: 1px solid var(--line); border-radius: var(--radius);
+    background:
+      radial-gradient(circle at 50% 40%, rgba(124,224,198,0.06), transparent 60%),
+      repeating-linear-gradient(var(--line-soft) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 26px),
+      var(--bg);
+    overflow: hidden; touch-action: none; cursor: grab;
+  }
+  .viewer-canvas-wrap:active{ cursor: grabbing; }
+  .viewer-canvas-wrap canvas{ display:block; }
+  .label-layer{ position:absolute; inset:0; pointer-events:none; }
+  .v-label{
+    position:absolute; transform: translate(-50%,-140%);
+    font-family:'JetBrains Mono', monospace; font-size: 10.5px; color:#23180a;
+    background: var(--amber); padding: 1px 5px; border-radius: 2px; white-space:nowrap;
+  }
+  .viewer-hint{ text-align:center; font-size: 11px; color: var(--ink-faint); padding: 8px 0 4px; }
+  .viewer-caveat{ font-size: 10.5px; color: var(--ink-faint); padding: 0 4px 12px; line-height:1.6; }
+
+  .support-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 16px 16px; }
+  @media (max-width: 720px){ .support-grid{ grid-template-columns: 1fr; } }
+
+  .card{ border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); padding: 14px 15px; }
+  .card h3{ margin: 0 0 10px; font-size: 12px; letter-spacing: .04em; color: var(--ink-faint); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+
+  .photo-wrap{ position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; line-height:0; }
+  .photo-wrap img{ width: 100%; display:block; }
+  .marker{ position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); pointer-events: none; }
+  .marker .dot{ width: 7px; height: 7px; border-radius: 50%; background: var(--amber); border: 1px solid #23180a; margin: 5.5px auto 0; box-shadow: 0 0 0 3px rgba(255,184,77,0.22); }
+  .marker .tag{ position: absolute; top: -2px; left: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #23180a; background: var(--amber); padding: 1px 4px; border-radius: 2px; white-space: nowrap; }
+
+  .shape-name{ font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: var(--mint); margin: 0 0 4px; }
+  .shape-type{ font-size: 12.5px; color: var(--ink-dim); margin: 0; }
+  .swatches{ display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .swatch{ display:flex; align-items:center; gap:6px; font-size: 11.5px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
+  .swatch i{ width: 13px; height: 13px; border-radius: 3px; display:inline-block; border: 1px solid rgba(255,255,255,0.2); }
+  .counts{ display:flex; gap: 14px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .counts .c{ text-align:center; flex:1; }
+  .counts .c b{ display:block; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--ink); }
+  .counts .c span{ font-size: 10.5px; color: var(--ink-faint); }
+  .euler{ margin-top: 8px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--ink-faint); }
+  .euler b{ color: var(--mint); }
+
+  table.vtable{ width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
+  table.vtable th{ text-align: left; color: var(--ink-faint); font-weight: 500; padding: 4px 6px; border-bottom: 1px solid var(--line); font-size: 10px; }
+  table.vtable td{ padding: 4px 6px; color: var(--ink); border-bottom: 1px solid rgba(111,168,201,0.12); }
+  table.vtable td.label{ color: var(--amber); }
+  .copy-row{ text-align: right; margin-top: 8px; }
+  .copy-row button{ background:none;border:1px solid var(--line);color:var(--ink-dim); font-family:'JetBrains Mono', monospace; font-size: 10.5px; border-radius: 3px; padding: 4px 8px; cursor:pointer; }
+  .copy-row button:hover{ color: var(--mint); border-color: var(--mint); }
+
+  .formula{ font-family: 'JetBrains Mono', monospace; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 9px 11px; font-size: 12.5px; margin-bottom: 8px; color: var(--mint); overflow-x: auto; white-space: nowrap; }
+  .formula .lbl{ display:block; color: var(--ink-faint); font-size: 10.5px; margin-bottom: 3px; font-family: 'Pretendard'; }
+  .tip{ font-size: 12.5px; color: var(--ink-dim); margin-top: 4px; }
+
+  .titleblock{ border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+  .titleblock div{ padding: 9px 14px; border-right: 1px solid var(--line); }
+  .titleblock div:last-child{ border-right:none; }
+  .titleblock span{ display:block; color: var(--ink-faint); margin-bottom: 3px; }
+  .titleblock b{ color: var(--ink); font-weight: 500; }
+  @media (max-width: 620px){ .titleblock{ grid-template-columns: 1fr 1fr; } }
+
+  .note{ font-size: 11px; color: var(--ink-faint); margin-top: 10px; line-height: 1.6; }
+  footer{ text-align:center; color: var(--ink-faint); font-size: 11.5px; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="grid-field"></div>
+
+<div class="sheet">
+  <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+
+  <header class="masthead">
+    <div>
+      <h1>입체도형 <span>청사진</span></h1>
+      <p>교과서·문제집 속 입체도형 사진에서 좌표와 색상을 뽑아, 직접 돌려볼 수 있는 3D 모형으로 재구성해 드려요.</p>
+    </div>
+    <span class="tag">GOOGLE AI STUDIO · GEMINI VISION → 3D</span>
+  </header>
+
+  <main>
+    <div class="layout">
+
+      <div class="rail">
+        <div class="step active">
+          <span class="num">1</span>
+          <h2>API 키 입력</h2>
+          <p class="desc">Google AI Studio에서 발급받은 Gemini API 키를 입력하세요. 키는 브라우저에만 저장되고, 이 페이지를 벗어나면 사라집니다.</p>
+          <label class="field-label" for="apiKey">Gemini API Key</label>
+          <div class="key-row">
+            <input type="password" id="apiKey" placeholder="AIza...">
+            <button class="icon-btn" id="toggleKey" title="키 표시/숨기기" type="button">👁</button>
+          </div>
+          <a class="helper-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio에서 키 발급받기 ↗</a>
+
+          <button class="adv-toggle" id="advToggle" type="button">모델 옵션 펼치기</button>
+          <div class="adv-panel" id="advPanel">
+            <label class="field-label" for="modelSelect">분석 모델</label>
+            <select id="modelSelect">
+              <option value="gemini-flash-latest">gemini-flash-latest (빠름, 기본)</option>
+              <option value="gemini-pro-latest">gemini-pro-latest (더 정확함, 느림)</option>
+              <option value="custom">직접 입력...</option>
+            </select>
+            <div id="customModelWrap" style="display:none; margin-top:8px;">
+              <input type="text" id="customModel" placeholder="예: gemini-2.5-flash">
+            </div>
+          </div>
+        </div>
+
+        <div class="step active">
+          <span class="num">2</span>
+          <h2>도형 이미지 업로드</h2>
+          <p class="desc">도형 하나가 선명하게 보이는 사진일수록 좌표 추정과 3D 재구성 정확도가 높아집니다.</p>
+          <div class="dropzone" id="dropzone">
+            <div class="dz-icon">▲</div>
+            <p>클릭하거나 이미지를 끌어다 놓으세요</p>
+            <p class="sub">JPG · PNG · WEBP</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" style="display:none;">
+          <div class="preview-thumb" id="previewThumb">
+            <img id="previewImg" alt="업로드한 이미지 미리보기">
+            <div class="thumb-cap">
+              <span id="fileName">-</span>
+              <button id="clearImg" type="button">지우기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="num">3</span>
+          <h2>3D로 재구성</h2>
+          <p class="desc">AI가 뽑아낸 꼭짓점 좌표·색상으로 3D 모형을 만들고, 겉넓이·부피 공식도 함께 정리합니다.</p>
+          <button class="go-btn" id="analyzeBtn" disabled>3D로 분석하기</button>
+          <div class="status-line" id="statusLine"><span class="spinner" id="spinnerEl"></span><span id="statusText"></span></div>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="board-empty" id="boardEmpty">
+          <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M32 6L58 20V44L32 58L6 44V20L32 6Z" stroke="#3f6f8f" stroke-width="1.5"/><path d="M32 6V32M32 32L58 20M32 32L6 20M32 32V58" stroke="#3f6f8f" stroke-width="1.5"/></svg>
+          <p>왼쪽에서 API 키와 이미지를 준비하고 분석을 실행하면, 이곳에 돌려볼 수 있는 3D 모형이 나타납니다.</p>
+        </div>
+
+        <div class="board-body" id="boardBody">
+
+          <div class="viewer-card">
+            <div class="viewer-toolbar">
+              <span class="vt-label">3D 재구성 모형</span>
+              <div class="vt-btns">
+                <button class="vt-btn on" id="autoRotateBtn" type="button">자동회전 켜짐</button>
+                <button class="vt-btn" id="resetViewBtn" type="button">처음 시점으로</button>
+              </div>
+            </div>
+            <div class="viewer-canvas-wrap" id="viewerWrap">
+              <div class="label-layer" id="labelLayer"></div>
+            </div>
+            <div class="viewer-hint">드래그해서 회전 · 스크롤(또는 핀치)로 확대·축소</div>
+            <div class="viewer-caveat">꼭짓점 좌표를 볼록 껍질(convex hull)로 이어 붙여 재구성한 모형이에요. 실제 도형과 미세하게 다를 수 있으니, 구조를 이해하는 용도로 참고해주세요.</div>
+          </div>
+
+          <div class="support-grid">
+            <div class="card">
+              <h3>원본 사진 · 인식된 꼭짓점</h3>
+              <div class="photo-wrap" id="photoWrap">
+                <img id="boardImg" alt="분석된 도형 이미지">
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>도형 분류 · 색상</h3>
+              <p class="shape-name" id="outShapeName">-</p>
+              <p class="shape-type" id="outShapeType">-</p>
+              <div class="swatches" id="outSwatches"></div>
+              <div class="counts">
+                <div class="c"><b id="cntV">-</b><span>꼭짓점 V</span></div>
+                <div class="c"><b id="cntE">-</b><span>모서리 E</span></div>
+                <div class="c"><b id="cntF">-</b><span>면 F</span></div>
+              </div>
+              <div class="euler" id="eulerNote"></div>
+            </div>
+
+            <div class="card">
+              <h3>꼭짓점 좌표 (AI 추정)</h3>
+              <table class="vtable">
+                <thead><tr><th>라벨</th><th>x</th><th>y</th><th>z</th></tr></thead>
+                <tbody id="outVerticesBody"></tbody>
+              </table>
+              <div class="copy-row"><button id="copyVerts" type="button">표 복사하기</button></div>
+              <p class="note">실제 측정값이 아니라, 도형 구조를 보여주기 위한 <b>상대적 추정 좌표</b>입니다.</p>
+            </div>
+
+            <div class="card">
+              <h3>공식 · 학습 팁</h3>
+              <div class="formula"><span class="lbl">겉넓이</span><span id="outSurface">-</span></div>
+              <div class="formula"><span class="lbl">부피</span><span id="outVolume">-</span></div>
+              <p class="tip" id="outTip">-</p>
+            </div>
+          </div>
+
+          <div class="titleblock">
+            <div><span>도형명</span><b id="tbName">-</b></div>
+            <div><span>분석 모델</span><b id="tbModel">-</b></div>
+            <div><span>생성 시각</span><b id="tbDate">-</b></div>
+            <div><span>상태</span><b id="tbStatus">-</b></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<footer>API 키는 서버로 전송되지 않고 이 브라우저에서 Google Gemini API로 직접 요청을 보냅니다 · 새로고침 시 키는 초기화됩니다</footer>
+
+<script>
+(function(){
+  const $ = (id) => document.getElementById(id);
+
+  const apiKeyInput = $('apiKey');
+  const toggleKeyBtn = $('toggleKey');
+  const advToggle = $('advToggle');
+  const advPanel = $('advPanel');
+  const modelSelect = $('modelSelect');
+  const customModelWrap = $('customModelWrap');
+  const customModel = $('customModel');
+
+  const dropzone = $('dropzone');
+  const fileInput = $('fileInput');
+  const previewThumb = $('previewThumb');
+  const previewImg = $('previewImg');
+  const fileNameEl = $('fileName');
+  const clearImgBtn = $('clearImg');
+
+  const analyzeBtn = $('analyzeBtn');
+  const statusLine = $('statusLine');
+  const statusText = $('statusText');
+  const spinnerEl = $('spinnerEl');
+
+  const boardEmpty = $('boardEmpty');
+  const boardBody = $('boardBody');
+  const boardImg = $('boardImg');
+  const photoWrap = $('photoWrap');
+
+  const viewerWrap = $('viewerWrap');
+  const labelLayer = $('labelLayer');
+  const autoRotateBtn = $('autoRotateBtn');
+  const resetViewBtn = $('resetViewBtn');
+
+  let currentFile = null;
+  let currentBase64 = null;
+  let currentMime = null;
+
+  toggleKeyBtn.addEventListener('click', () => {
+    apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
+    toggleKeyBtn.textContent = apiKeyInput.type === 'password' ? '👁' : '🙈';
+  });
+
+  advToggle.addEventListener('click', () => {
+    const open = advPanel.classList.toggle('open');
+    advToggle.textContent = open ? '모델 옵션 접기' : '모델 옵션 펼치기';
+  });
+  modelSelect.addEventListener('change', () => {
+    customModelWrap.style.display = modelSelect.value === 'custom' ? 'block' : 'none';
+  });
+  function getModelName(){
+    if (modelSelect.value === 'custom') return (customModel.value || '').trim() || 'gemini-flash-latest';
+    return modelSelect.value;
+  }
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropzone.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
+  clearImgBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    currentFile = null; currentBase64 = null; currentMime = null;
+    fileInput.value = '';
+    previewThumb.style.display = 'none';
+    dropzone.style.display = 'block';
+    updateGoState();
+  });
+
+  function handleFile(file){
+    if (!file.type.startsWith('image/')){ setStatus('err', '이미지 파일만 업로드할 수 있어요.'); return; }
+    currentFile = file; currentMime = file.type;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      currentBase64 = result.split(',')[1];
+      previewImg.src = result;
+      fileNameEl.textContent = file.name.length > 22 ? file.name.slice(0,19)+'...' : file.name;
+      previewThumb.style.display = 'block';
+      dropzone.style.display = 'none';
+      updateGoState();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  apiKeyInput.addEventListener('input', updateGoState);
+  function updateGoState(){ analyzeBtn.disabled = !(apiKeyInput.value.trim() && currentBase64); }
+
+  function setStatus(kind, text){
+    statusLine.className = 'status-line show ' + kind;
+    spinnerEl.style.display = kind === 'busy' ? 'inline-block' : 'none';
+    statusText.textContent = text;
+  }
+
+  const PROMPT = `당신은 한국 중·고등학교 수학 교사이자 3D 모델러입니다. 첨부된 이미지 속 입체도형(3차원 도형) 하나를 분석해서, 그 도형을 3D로 재구성할 수 있는 데이터를 만드세요.
+반드시 아래 JSON 스키마 그대로, 다른 설명 없이 JSON만 출력하세요. 모든 텍스트 값은 한국어로 작성하세요.
+
+{
+  "shape_name_ko": "도형의 한국어 이름 (예: 삼각기둥, 사각뿔, 원기둥)",
+  "shape_type": "도형의 분류/특징을 한 문장으로",
+  "primary_color": "#RRGGBB 형식, 도형의 대표 색상 하나",
+  "colors": ["#RRGGBB", "이미지에서 관찰되는 색상들"],
+  "vertex_count": 정수,
+  "edge_count": 정수,
+  "face_count": 정수,
+  "vertices": [
+    {
+      "label": "A",
+      "image_x": 0.0~1.0 사이, 이미지 내 가로 위치,
+      "image_y": 0.0~1.0 사이, 이미지 내 세로 위치,
+      "coord_x": -1.0~1.0 범위의 3D 재구성용 x좌표,
+      "coord_y": -1.0~1.0 범위의 3D 재구성용 y좌표,
+      "coord_z": -1.0~1.0 범위의 3D 재구성용 z좌표
+    }
+  ],
+  "surface_area_formula": "겉넓이를 구하는 일반 공식 (기호 설명 포함, 한 줄)",
+  "volume_formula": "부피를 구하는 일반 공식 (기호 설명 포함, 한 줄)",
+  "study_tip": "이 도형을 공부할 때 도움이 되는 한두 문장 코멘트"
+}
+
+3D 좌표(coord_x, coord_y, coord_z) 작성 시 매우 중요한 규칙:
+- 이 좌표들을 볼록 껍질(convex hull)로 이었을 때 실제 도형과 비슷한 형태가 나오도록, 기하학적으로 타당한 3D 위치를 추정해서 배치하세요. 단순히 이미지 속 픽셀 위치가 아니라, 도형을 여러 각도에서 봤을 때의 입체적 구조를 반영해야 합니다.
+- 각기둥/각뿔/정육면체 등 꼭짓점이 뚜렷한 도형: 실제 꼭짓점 개수만큼 좌표를 주세요 (보통 4~12개).
+- 원기둥/원뿔/구처럼 곡면이 있는 도형: 꼭짓점이 없으므로, 원 둘레를 따라 8~14개의 점을 고르게 샘플링해서 (예: 원기둥이면 윗면 원과 아랫면 원에 각각 6~8개씩, 원뿔이면 밑면 원에 8~10개 + 꼭짓점 1개, 구면이면 위도·경도로 12~16개) 곡면을 볼록 껍질로 근사할 수 있게 하세요. 이 경우 vertices의 label은 P1, P2... 처럼 순번으로 붙이고, vertex_count/edge_count/face_count는 실제 이론적인 값(예: 구는 꼭짓점 0개)을 별도로 적어도 됩니다.
+- 좌표 범위는 대략 -1.0 ~ 1.0 사이로 정규화하세요.
+- 최소 4개 이상의 점을 제공해야 3D 형태를 만들 수 있습니다.
+- 반드시 유효한 JSON 하나만 출력하세요.`;
+
+  analyzeBtn.addEventListener('click', runAnalysis);
+
+  async function runAnalysis(){
+    const key = apiKeyInput.value.trim();
+    if (!key || !currentBase64) return;
+
+    analyzeBtn.disabled = true;
+    setStatus('busy', '이미지를 읽고 3D 좌표를 추정하는 중...');
+
+    const model = getModelName();
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
+
+    const body = {
+      contents: [{ parts: [ { text: PROMPT }, { inlineData: { mimeType: currentMime, data: currentBase64 } } ] }],
+      generationConfig: { temperature: 0.25, responseMimeType: 'application/json' }
+    };
+
+    try {
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const data = await res.json();
+
+      if (!res.ok) {
+        const msg = (data && data.error && data.error.message) ? data.error.message : ('요청이 거부되었습니다 (HTTP ' + res.status + ')');
+        throw new Error(msg);
+      }
+
+      const candidate = data.candidates && data.candidates[0];
+      const textPart = candidate && candidate.content && candidate.content.parts && candidate.content.parts.find(p => typeof p.text === 'string');
+      if (!textPart) throw new Error('모델 응답에서 분석 결과를 찾지 못했습니다.');
+
+      let parsed;
+      try { parsed = JSON.parse(textPart.text); }
+      catch (e) {
+        const match = textPart.text.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+        else throw new Error('결과를 JSON으로 해석하지 못했습니다.');
+      }
+
+      if (!parsed.vertices || parsed.vertices.length < 4) throw new Error('3D로 재구성하기에 좌표가 충분하지 않아요. 도형이 더 잘 보이는 사진으로 다시 시도해보세요.');
+
+      renderResult(parsed, model);
+      setStatus('ok', '3D 재구성이 완료됐어요.');
+    } catch (err) {
+      console.error(err);
+      let friendly = err.message || '알 수 없는 오류가 발생했습니다.';
+      if (/API key not valid|API_KEY_INVALID/i.test(friendly)) friendly = 'API 키가 올바르지 않아요. Google AI Studio에서 키를 다시 확인해 주세요.';
+      if (/quota|RESOURCE_EXHAUSTED/i.test(friendly)) friendly = 'API 사용 한도를 초과했어요. 잠시 후 다시 시도해 주세요.';
+      setStatus('err', friendly);
+    } finally {
+      analyzeBtn.disabled = false;
+    }
+  }
+
+  function fmtNum(n){ if (typeof n !== 'number' || isNaN(n)) return '-'; return Number.isInteger(n) ? n : n.toFixed(2); }
+
+  function renderResult(r, model){
+    boardEmpty.style.display = 'none';
+    boardBody.classList.add('show');
+
+    boardImg.src = previewImg.src;
+    Array.from(photoWrap.querySelectorAll('.marker')).forEach(m => m.remove());
+
+    $('outShapeName').textContent = r.shape_name_ko || '이름 없음';
+    $('outShapeType').textContent = r.shape_type || '';
+
+    const swatchWrap = $('outSwatches');
+    swatchWrap.innerHTML = '';
+    (r.colors || []).forEach(c => {
+      const hex = /^#([0-9a-f]{3}){1,2}$/i.test(c) ? c : (c.match(/#([0-9a-f]{3}){1,2}/i) || [])[0];
+      const el = document.createElement('span');
+      el.className = 'swatch';
+      el.innerHTML = '<i style="background:' + (hex || '#888') + '"></i>' + (hex || c);
+      swatchWrap.appendChild(el);
+    });
+
+    $('cntV').textContent = r.vertex_count ?? (r.vertices ? r.vertices.length : '-');
+    $('cntE').textContent = r.edge_count ?? '-';
+    $('cntF').textContent = r.face_count ?? '-';
+
+    const v = Number(r.vertex_count), e = Number(r.edge_count), f = Number(r.face_count);
+    const eulerEl = $('eulerNote');
+    if (!isNaN(v) && !isNaN(e) && !isNaN(f) && v > 0) {
+      const chi = v - e + f;
+      eulerEl.innerHTML = 'V − E + F = <b>' + chi + '</b>' + (chi === 2 ? ' (볼록다면체 조건 충족)' : '');
+    } else { eulerEl.textContent = ''; }
+
+    const tbody = $('outVerticesBody');
+    tbody.innerHTML = '';
+    (r.vertices || []).forEach(pt => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td class="label">' + (pt.label ?? '-') + '</td><td>' + fmtNum(pt.coord_x) + '</td><td>' + fmtNum(pt.coord_y) + '</td><td>' + fmtNum(pt.coord_z) + '</td>';
+      tbody.appendChild(tr);
+
+      if (typeof pt.image_x === 'number' && typeof pt.image_y === 'number') {
+        const marker = document.createElement('div');
+        marker.className = 'marker';
+        marker.style.left = (pt.image_x * 100) + '%';
+        marker.style.top = (pt.image_y * 100) + '%';
+        marker.innerHTML = '<span class="tag">' + (pt.label ?? '') + '</span><span class="dot"></span>';
+        photoWrap.appendChild(marker);
+      }
+    });
+
+    $('outSurface').textContent = r.surface_area_formula || '정보 없음';
+    $('outVolume').textContent = r.volume_formula || '정보 없음';
+    $('outTip').textContent = r.study_tip || '';
+
+    $('tbName').textContent = r.shape_name_ko || '-';
+    $('tbModel').textContent = model;
+    $('tbDate').textContent = new Date().toLocaleString('ko-KR', { hour12: false });
+    $('tbStatus').textContent = '분석 완료';
+
+    ensureViewer();
+    buildAndShowShape(r.vertices, r.primary_color || (r.colors && r.colors[0]) || '#ffb84d');
+  }
+
+  $('copyVerts').addEventListener('click', () => {
+    const rows = Array.from(document.querySelectorAll('#outVerticesBody tr')).map(tr => Array.from(tr.children).map(td => td.textContent).join('\t'));
+    const text = ['라벨\tx\ty\tz', ...rows].join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = $('copyVerts'); const original = btn.textContent;
+      btn.textContent = '복사됨!'; setTimeout(() => btn.textContent = original, 1400);
+    });
+  });
+
+  // ================= 3D viewer =================
+  let scene, camera, renderer, group, viewerReady = false;
+  let dragging = false, lastX = 0, lastY = 0, rotX = 0.45, rotY = 0.7, dist = 3.4;
+  let autoRotate = true;
+  let currentPts = [], currentLabels = [], labelEls = [];
+
+  function ensureViewer(){
+    if (viewerReady) { resizeViewer(); return; }
+    viewerReady = true;
+
+    scene = new THREE.Scene();
+    const w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
+    camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w, h);
+    viewerWrap.insertBefore(renderer.domElement, labelLayer);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dl = new THREE.DirectionalLight(0xffffff, 0.95); dl.position.set(3, 5, 4); scene.add(dl);
+    const dl2 = new THREE.DirectionalLight(0x7ce0c6, 0.3); dl2.position.set(-4, -2, -3); scene.add(dl2);
+
+    group = new THREE.Group();
+    scene.add(group);
+
+    renderer.domElement.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; });
+    window.addEventListener('pointerup', () => dragging = false);
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      rotY += dx * 0.006; rotX += dy * 0.006;
+      rotX = Math.max(-1.4, Math.min(1.4, rotX));
+      lastX = e.clientX; lastY = e.clientY;
+    });
+    renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      dist += e.deltaY * 0.0028;
+      dist = Math.max(1.6, Math.min(7, dist));
+    }, { passive: false });
+
+    window.addEventListener('resize', resizeViewer);
+    animate();
+  }
+
+  function resizeViewer(){
+    if (!renderer) return;
+    const w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
+    if (w === 0 || h === 0) return;
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  }
+
+  autoRotateBtn.addEventListener('click', () => {
+    autoRotate = !autoRotate;
+    autoRotateBtn.classList.toggle('on', autoRotate);
+    autoRotateBtn.textContent = autoRotate ? '자동회전 켜짐' : '자동회전 꺼짐';
+  });
+  resetViewBtn.addEventListener('click', () => { rotX = 0.45; rotY = 0.7; dist = 3.4; });
+
+  function animate(){
+    requestAnimationFrame(animate);
+    if (!renderer) return;
+    if (autoRotate && !dragging) rotY += 0.0035;
+    if (group) group.rotation.set(rotX, rotY, 0);
+    camera.position.set(0, 0, dist);
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+    updateLabels();
+  }
+
+  function updateLabels(){
+    if (!currentPts.length || !group) return;
+    const rect = viewerWrap.getBoundingClientRect();
+    group.updateMatrixWorld();
+    currentPts.forEach((p, i) => {
+      const el = labelEls[i];
+      if (!el) return;
+      const world = p.clone().applyMatrix4(group.matrixWorld);
+      const proj = world.project(camera);
+      if (proj.z > 1) { el.style.display = 'none'; return; }
+      el.style.display = 'block';
+      el.style.left = ((proj.x * 0.5 + 0.5) * rect.width) + 'px';
+      el.style.top = ((1 - (proj.y * 0.5 + 0.5)) * rect.height) + 'px';
+    });
+  }
+
+  function buildAndShowShape(vertices, colorHex){
+    while (group.children.length) group.remove(group.children[0]);
+    labelLayer.innerHTML = '';
+    labelEls = [];
+
+    const raw = vertices.map(v => new THREE.Vector3(Number(v.coord_x) || 0, Number(v.coord_y) || 0, Number(v.coord_z) || 0));
+    const box = new THREE.Box3().setFromPoints(raw);
+    const size = new THREE.Vector3(); box.getSize(size);
+    const center = new THREE.Vector3(); box.getCenter(center);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const scale = 1.5 / maxDim;
+    raw.forEach(p => p.sub(center).multiplyScalar(scale));
+
+    currentPts = raw;
+    currentLabels = vertices.map(v => v.label || '');
+
+    const plain = raw.map(p => ({ x: p.x, y: p.y, z: p.z }));
+    const tris = buildHullTriangles(plain);
+
+    if (tris.length) {
+      const positions = [];
+      tris.forEach(tri => tri.forEach(p => positions.push(p.x, p.y, p.z)));
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.computeVertexNormals();
+      const mat = new THREE.MeshStandardMaterial({ color: colorHex || '#ffb84d', metalness: 0.08, roughness: 0.6, side: THREE.DoubleSide });
+      group.add(new THREE.Mesh(geo, mat));
+
+      const edgesGeo = new THREE.EdgesGeometry(geo, 8);
+      const edgesMat = new THREE.LineBasicMaterial({ color: 0x081a2b, transparent: true, opacity: 0.55 });
+      group.add(new THREE.LineSegments(edgesGeo, edgesMat));
+    }
+
+    const markerGeo = new THREE.SphereGeometry(0.032, 12, 12);
+    const markerMat = new THREE.MeshBasicMaterial({ color: 0xffb84d });
+    raw.forEach((p, i) => {
+      const m = new THREE.Mesh(markerGeo, markerMat);
+      m.position.copy(p);
+      group.add(m);
+
+      const el = document.createElement('div');
+      el.className = 'v-label';
+      el.textContent = currentLabels[i];
+      labelLayer.appendChild(el);
+      labelEls.push(el);
+    });
+
+    rotX = 0.45; rotY = 0.7; dist = 3.4;
+    resizeViewer();
+  }
+
+  // ---- geometry helpers: brute-force convex hull -> clean planar faces ----
+  function sub(a, b){ return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }; }
+  function cross(a, b){ return { x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x }; }
+  function dot(a, b){ return a.x * b.x + a.y * b.y + a.z * b.z; }
+  function normVec(a){ const l = Math.sqrt(dot(a, a)) || 1; return { x: a.x / l, y: a.y / l, z: a.z / l }; }
+
+  function buildHullTriangles(points){
+    const n = points.length;
+    if (n < 4) return [];
+    const EPS = 1e-4;
+    const centroid = points.reduce((acc, p) => ({ x: acc.x + p.x / n, y: acc.y + p.y / n, z: acc.z + p.z / n }), { x: 0, y: 0, z: 0 });
+
+    const planeMap = new Map();
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        for (let k = j + 1; k < n; k++) {
+          let N = cross(sub(points[j], points[i]), sub(points[k], points[i]));
+          const nl = Math.sqrt(dot(N, N));
+          if (nl < 1e-9) continue;
+          N = { x: N.x / nl, y: N.y / nl, z: N.z / nl };
+          let pos = 0, neg = 0;
+          for (let p = 0; p < n; p++) {
+            const d = dot(N, sub(points[p], points[i]));
+            if (d > EPS) pos++; else if (d < -EPS) neg++;
+            if (pos && neg) break;
+          }
+          if (pos && neg) continue;
+          const cd = dot(N, sub(centroid, points[i]));
+          const normal = cd > 0 ? { x: -N.x, y: -N.y, z: -N.z } : N;
+          const offset = dot(normal, points[i]);
+          const key = [normal.x, normal.y, normal.z, offset].map(v => v.toFixed(3)).join(',');
+          if (!planeMap.has(key)) planeMap.set(key, { normal, offset });
+        }
+      }
+    }
+
+    const triangles = [];
+    planeMap.forEach(({ normal, offset }) => {
+      const idxs = [];
+      for (let p = 0; p < n; p++) { if (Math.abs(dot(normal, points[p]) - offset) < EPS * 4) idxs.push(p); }
+      if (idxs.length < 3) return;
+
+      const arbitrary = Math.abs(normal.x) < 0.9 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+      const u = normVec(cross(arbitrary, normal));
+      const v = cross(normal, u);
+      const origin = points[idxs[0]];
+      const proj = idxs.map(idx => { const d = sub(points[idx], origin); return { x: dot(d, u), y: dot(d, v), idx }; });
+
+      const hull2d = convexHull2D(proj);
+      if (hull2d.length < 3) return;
+
+      const A = points[hull2d[0].idx], B = points[hull2d[1].idx], C = points[hull2d[2].idx];
+      const faceNormal = cross(sub(B, A), sub(C, A));
+      const ordered = dot(faceNormal, normal) < 0 ? hull2d.slice().reverse() : hull2d;
+
+      for (let t = 1; t < ordered.length - 1; t++) {
+        triangles.push([points[ordered[0].idx], points[ordered[t].idx], points[ordered[t + 1].idx]]);
+      }
+    });
+
+    return triangles;
+  }
+
+  function convexHull2D(pts){
+    const n = pts.length;
+    if (n < 3) return pts.slice();
+    let start = 0;
+    for (let i = 1; i < n; i++) { if (pts[i].x < pts[start].x || (pts[i].x === pts[start].x && pts[i].y < pts[start].y)) start = i; }
+    const hull = [];
+    let p = start, guard = 0;
+    do {
+      hull.push(pts[p]);
+      let q = (p + 1) % n;
+      for (let i = 0; i < n; i++) {
+        const c = (pts[i].x - pts[p].x) * (pts[q].y - pts[p].y) - (pts[i].y - pts[p].y) * (pts[q].x - pts[p].x);
+        if (c > 1e-9) q = i;
+      }
+      p = q; guard++;
+    } while (p !== start && guard < n + 2);
+    return hull;
+  }
+
+})();
+</script>
+</body>
+</html>
