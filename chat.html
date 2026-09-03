@@ -34,8 +34,8 @@
           ink: "rgb(var(--c-ink) / <alpha-value>)",
           mint: "#21D67A",
           blue: "#3B9EFF",
-          orange: "rgb(var(--c-orange) / <alpha-value>)",
-          "orange-dark": "rgb(var(--c-orange-dark) / <alpha-value>)",
+          accent: "rgb(var(--c-accent) / <alpha-value>)",
+          "accent-dark": "rgb(var(--c-accent-dark) / <alpha-value>)",
           discord: "#5865F2",
         },
         fontFamily: {
@@ -47,9 +47,11 @@
 </script>
 
 <style>
-  /* 메인 컬러는 진한 오렌지 하나로 통일한다. 민트→블루 그라데이션은
-     사이드바 로고 아이콘 한 곳에만 남겨둔 브랜드 시그니처이고,
-     그 외 UI 요소(아바타, 전송 버튼, 포인트 컬러 등)는 전부 오렌지를 쓴다.
+  /* 메인 컬러는 진한 오렌지(--c-accent) 하나로 통일한다. 민트→블루 그라데이션은
+     여러 곳에 쓰기엔 무겁고 다루기 까다로워서, index.html과 마찬가지로 사이드바
+     로고 아이콘 한 곳에만 남겨둔 브랜드 시그니처로 한정한다. 그 외 UI 요소
+     (히어로 아이콘, 어시스턴트 아바타, 전송 버튼, 포인트 컬러 등)는 전부
+     이 오렌지 액센트를 쓴다.
 
      모든 색은 "R G B" 형태의 CSS 변수로 정의하고 rgb(var(--x) / a) 형태로
      사용한다. html.dark 가 붙으면 아래 값이 통째로 다크 팔레트로 바뀌면서
@@ -62,8 +64,8 @@
     --c-line: 208 203 193;
     --c-mute: 112 108 99;
     --c-ink: 47 44 39;
-    --c-orange: 220 84 40;
-    --c-orange-dark: 188 67 29;
+    --c-accent: 220 84 40;
+    --c-accent-dark: 188 67 29;
     --c-shadow: 40 36 30;
     --c-sheen-alpha: 0.35;
 
@@ -78,8 +80,8 @@
     --c-line: 57 53 47;
     --c-mute: 163 156 143;
     --c-ink: 236 231 222;
-    --c-orange: 237 133 96;
-    --c-orange-dark: 214 103 61;
+    --c-accent: 237 133 96;
+    --c-accent-dark: 214 103 61;
     --c-shadow: 0 0 0;
     --c-sheen-alpha: 0.05;
   }
@@ -92,7 +94,7 @@
   }
 
   a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible {
-    outline: 2px solid rgb(var(--c-orange));
+    outline: 2px solid rgb(var(--c-accent));
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -105,7 +107,7 @@
   /* 로고 텍스트: D- 는 민트, AI 는 블루(그라데이션 색), Web 은 사이트 메인 오렌지 */
   .brand-d { color: var(--c-mint); }
   .brand-ai { color: var(--c-blue); }
-  .brand-web { color: rgb(var(--c-orange)); }
+  .brand-web { color: rgb(var(--c-accent)); }
 
   /* 카드 컴포넌트 (랜딩 페이지 .card 토큰과 동일) */
   .card {
@@ -116,7 +118,7 @@
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .card:hover {
-    border-color: rgb(var(--c-orange) / 0.4);
+    border-color: rgb(var(--c-accent) / 0.4);
     box-shadow: 0 8px 20px -8px rgb(var(--c-shadow) / 0.12);
   }
 
@@ -146,10 +148,12 @@
   .scroll-thin::-webkit-scrollbar-thumb { background: rgb(var(--c-line)); border-radius: 999px; }
   .scroll-thin::-webkit-scrollbar-track { background: transparent; }
 
-  /* 사이드바 슬라이드 (모바일 오버레이) */
+  /* 사이드바 슬라이드 (모바일 오버레이) — zeta.html과 동일하게 transform 방식을 써서
+     너비 값이 바뀌어도(반응형 breakpoint 등) 항상 정확히 화면 밖으로 숨겨지도록 한다.
+     (margin-left 방식은 너비가 다른 곳에서 갱신되면 어긋나서 가장자리가 튀어나올 수 있었음) */
   @media (max-width: 767px) {
-    #sidebar { position: fixed; inset: 0 auto 0 0; z-index: 50; margin-left: -280px; }
-    #sidebar.is-open { margin-left: 0; }
+    #sidebar { position: fixed; inset: 0 auto 0 0; z-index: 50; transform: translateX(-100%); transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), width 0.22s cubic-bezier(0.22, 1, 0.36, 1); }
+    #sidebar.is-open { transform: translateX(0); }
   }
 
   /* 상단 헤더 — 기본은 콘텐츠 위에 떠 있는 투명 상태, 스크롤하면
@@ -174,7 +178,7 @@
   #sidebar {
     width: 280px;
     overflow-x: hidden;
-    transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1), margin-left 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+    transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1), transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
   }
   #sidebar.is-collapsed { width: 76px; }
   #sidebar.is-collapsed .sidebar-label,
@@ -226,8 +230,8 @@
     border-radius: 999px;
   }
   .composer-shell:focus-within {
-    border-color: rgb(var(--c-orange) / 0.5);
-    box-shadow: 0 0 0 3px rgb(var(--c-orange) / 0.12);
+    border-color: rgb(var(--c-accent) / 0.5);
+    box-shadow: 0 0 0 3px rgb(var(--c-accent) / 0.12);
   }
   #composer-input {
     background: transparent;
@@ -274,14 +278,14 @@
   .chip {
     transition: border-color 0.15s ease, background-color 0.15s ease;
   }
-  .chip:hover { border-color: rgb(var(--c-orange) / 0.35); background: rgb(var(--c-orange) / 0.08); }
+  .chip:hover { border-color: rgb(var(--c-accent) / 0.35); background: rgb(var(--c-accent) / 0.08); }
 
   /* 설정 모달의 라이트/다크 세그먼트 버튼 */
   .theme-option {
     transition: background-color 0.15s ease, color 0.15s ease;
   }
   .theme-option.is-active {
-    background: rgb(var(--c-orange));
+    background: rgb(var(--c-accent));
     color: #fff;
   }
 
@@ -383,7 +387,7 @@
   .history-item.is-active {
     background: rgb(var(--c-surface2));
     color: rgb(var(--c-ink)) !important;
-    box-shadow: inset 2px 0 0 rgb(var(--c-orange));
+    box-shadow: inset 2px 0 0 rgb(var(--c-accent));
   }
   .sidebar-item-actions { padding-right: 4px; }
 
@@ -462,7 +466,7 @@
     height: 52px;
     border-radius: 16px;
     margin-bottom: 22px;
-    box-shadow: 0 10px 26px -14px rgb(var(--c-orange) / 0.35);
+    box-shadow: 0 10px 26px -14px rgb(var(--c-accent) / 0.35);
   }
   #empty-state h1 {
     font-size: clamp(28px, 3vw, 36px);
@@ -470,7 +474,7 @@
     letter-spacing: -0.045em;
   }
   #empty-state h1 > span { color: rgb(var(--c-ink)) !important; }
-  #empty-state h1 > i { color: rgb(var(--c-orange)); }
+  #empty-state h1 > i { color: rgb(var(--c-accent)); }
   #empty-state > p {
     max-width: 31rem;
     font-size: 13px;
@@ -486,7 +490,7 @@
   }
   #empty-state .suggestion-chip:hover {
     transform: translateY(-1px);
-    border-color: rgb(var(--c-orange) / 0.28);
+    border-color: rgb(var(--c-accent) / 0.28);
     background: rgb(var(--c-surface));
     box-shadow: 0 10px 24px -18px rgb(var(--c-shadow) / 0.24);
   }
@@ -548,17 +552,17 @@
       0 1px 3px rgb(var(--c-shadow) / 0.06);
   }
   .composer-shell:focus-within {
-    border-color: rgb(var(--c-orange) / 0.42);
+    border-color: rgb(var(--c-accent) / 0.42);
     box-shadow:
       0 14px 34px -21px rgb(var(--c-shadow) / 0.36),
-      0 0 0 3px rgb(var(--c-orange) / 0.08);
+      0 0 0 3px rgb(var(--c-accent) / 0.08);
   }
   #composer-input { font-size: 14px; line-height: 1.65; padding-top: 7px; padding-bottom: 7px; }
   #send-btn {
     width: 40px;
     height: 40px;
     border-radius: 13px;
-    box-shadow: 0 5px 13px -8px rgb(var(--c-orange) / 0.72);
+    box-shadow: 0 5px 13px -8px rgb(var(--c-accent) / 0.72);
   }
   .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 > form > p {
     margin-top: 7px;
@@ -585,7 +589,6 @@
   }
 
   @media (max-width: 767px) {
-    #sidebar { width: 268px; }
     .app-header { height: 56px; padding-inline: 12px; }
     #messages { padding-inline: 12px; padding-top: 22px; padding-bottom: 128px; }
     .flex-1.min-w-0.flex.flex-col.h-full.relative > .shrink-0.px-3.sm\:px-4 { padding: 7px 10px 12px; }
@@ -600,7 +603,7 @@
   .app-header { height: 64px; padding-inline: clamp(12px,2vw,24px); background: transparent; backdrop-filter:none; -webkit-backdrop-filter:none; }
   .app-header.is-scrolled { background: rgb(var(--c-bg) / .82); backdrop-filter: blur(22px) saturate(125%); -webkit-backdrop-filter: blur(22px) saturate(125%); border-bottom-color: rgb(var(--c-line) / .5); }
   #model-dropdown-btn { min-height:40px; padding:7px 13px 7px 11px; background:rgb(var(--c-surface) / .9); border:1px solid rgb(var(--c-line) / .82); box-shadow:0 2px 10px rgb(var(--c-shadow) / .05); }
-  #model-dropdown-btn:hover { background:rgb(var(--c-surface)); border-color:rgb(var(--c-orange) / .25); transform:translateY(-1px); }
+  #model-dropdown-btn:hover { background:rgb(var(--c-surface)); border-color:rgb(var(--c-accent) / .25); transform:translateY(-1px); }
   #model-menu { top:50px; left:0; width:min(340px,calc(100vw - 24px)); max-width:calc(100vw - 24px); border-radius:var(--ui-panel-radius); }
   #model-menu .model-option { border-radius:999px; min-width:0; }
   #new-chat-btn { background:rgb(var(--c-surface2) / .72); border-color:rgb(var(--c-line) / .75); }
@@ -751,12 +754,12 @@
 
       <div id="new-chat-row" class="flex items-center gap-2 mt-3">
         <button id="new-chat-btn"
-          class="flex-1 min-w-0 flex items-center justify-center gap-2 rounded-full h-10 text-[13px] font-semibold text-ink bg-surface2 border border-line hover:border-orange/40 transition-colors">
+          class="flex-1 min-w-0 flex items-center justify-center gap-2 rounded-full h-10 text-[13px] font-semibold text-ink bg-surface2 border border-line hover:border-accent/40 transition-colors">
           <i class="fa-solid fa-plus text-[11px] text-ink shrink-0"></i>
           <span class="sidebar-label whitespace-nowrap">새 대화</span>
         </button>
         <button id="search-toggle-btn"
-          class="sidebar-label shrink-0 w-10 h-10 rounded-full bg-surface2 border border-line flex items-center justify-center text-mute hover:text-ink hover:border-orange/40 transition-colors"
+          class="sidebar-label shrink-0 w-10 h-10 rounded-full bg-surface2 border border-line flex items-center justify-center text-mute hover:text-ink hover:border-accent/40 transition-colors"
           aria-label="대화 검색">
           <i class="fa-solid fa-magnifying-glass text-[12px]"></i>
         </button>
@@ -769,7 +772,7 @@
             type="text"
             id="history-search"
             placeholder="대화 검색"
-            class="w-full bg-surface2 border border-line rounded-full pl-8 pr-3 py-2 text-[13px] text-ink placeholder:text-mute focus:outline-none focus:border-orange/50"
+            class="w-full bg-surface2 border border-line rounded-full pl-8 pr-3 py-2 text-[13px] text-ink placeholder:text-mute focus:outline-none focus:border-accent/50"
           >
         </div>
       </div>
@@ -832,7 +835,7 @@
       </div>
 
       <button id="settings-clear-all-btn"
-        class="w-full flex items-center justify-center gap-2 mt-4 rounded-full py-2.5 text-[13px] font-semibold text-orange-dark border border-line hover:bg-surface2 transition-colors">
+        class="w-full flex items-center justify-center gap-2 mt-4 rounded-full py-2.5 text-[13px] font-semibold text-accent-dark border border-line hover:bg-surface2 transition-colors">
         <i class="fa-solid fa-trash-can text-[12px]"></i>
         모든 대화 삭제
       </button>
@@ -846,12 +849,12 @@
 
     <header class="app-header relative z-20 h-16 shrink-0 flex items-center justify-between px-3 sm:px-4">
       <div class="flex items-center gap-2 relative">
-        <button id="sidebar-toggle" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-orange/40">
+        <button id="sidebar-toggle" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-accent/40">
           <i class="fa-solid fa-bars text-sm"></i>
         </button>
 
         <button id="model-dropdown-btn"
-          class="float-pill flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-surface/90 border border-line backdrop-blur-sm transition-colors hover:border-orange/40">
+          class="float-pill flex items-center gap-1.5 pl-2.5 pr-3 py-1.5 rounded-full bg-surface/90 border border-line backdrop-blur-sm transition-colors hover:border-accent/40">
           <span id="model-name" class="text-[14px] font-semibold text-ink">Gemini 2.5 Flash</span>
           <i class="fa-solid fa-chevron-down text-[10px] text-mute"></i>
         </button>
@@ -859,37 +862,37 @@
         <div id="model-menu"
           class="hidden card float-card absolute top-11 left-0 w-[248px] p-1.5 z-30">
           <button data-model="Gemini 2.5 Flash" data-provider="gemini"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Gemini 2.5 Flash</span>
             </span>
-            <i class="fa-solid fa-check text-orange text-xs opacity-100 model-check"></i>
+            <i class="fa-solid fa-check text-accent text-xs opacity-100 model-check"></i>
           </button>
           <button data-model="Cerebras · GPT OSS 120B" data-provider="cerebras"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Cerebras · GPT OSS 120B</span>
             </span>
-            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
           </button>
           <button data-model="Groq · Llama 3.3 70B" data-provider="groq"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">Groq · Llama 3.3 70B</span>
             </span>
-            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
           </button>
           <button data-model="OpenRouter" data-provider="openrouter"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
             <span class="flex-1">
               <span class="block text-[13px] font-semibold text-ink">OpenRouter</span>
             </span>
-            <i class="fa-solid fa-check text-orange text-xs opacity-0 model-check"></i>
+            <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
           </button>
         </div>
       </div>
 
-      <button id="mobile-new-chat" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-orange/40">
+      <button id="mobile-new-chat" class="float-pill md:hidden w-9 h-9 flex items-center justify-center rounded-full bg-surface/90 border border-line backdrop-blur-sm text-ink transition-colors hover:border-accent/40">
         <i class="fa-regular fa-pen-to-square text-sm"></i>
       </button>
     </header>
@@ -898,35 +901,35 @@
     <main id="chat-scroll" class="flex-1 overflow-y-auto scroll-thin">
 
       <div id="empty-state" class="h-full flex flex-col items-center justify-center px-6 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-orange flex items-center justify-center mb-5">
+        <div class="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mb-5">
           <img src="img/icon.png" alt="D-AI" class="h-8 w-8 rounded" loading="eager">
         </div>
         <h1 class="flex items-center gap-2 text-2xl sm:text-[28px] font-bold tracking-tight">
-          <i class="fa-solid fa-sparkles text-orange text-lg sm:text-xl"></i>
-          <span class="text-orange">무엇을 도와드릴까요?</span>
+          <i class="fa-solid fa-sparkles text-accent text-lg sm:text-xl"></i>
+          <span class="text-accent">무엇을 도와드릴까요?</span>
         </h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8 w-full max-w-lg">
           <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-magnifying-glass text-orange text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-magnifying-glass text-accent text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug">오늘 서울 날씨 어때?</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
-              <i class="fa-regular fa-clock text-orange text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+              <i class="fa-regular fa-clock text-accent text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug">도쿄는 지금 몇 시야?</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-code text-orange text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-code text-accent text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug">파이썬 정렬 코드 짜줘</span>
           </button>
           <button class="suggestion-chip card text-left p-4 flex items-center gap-3">
-            <span class="w-8 h-8 rounded-full bg-orange/10 border border-orange/20 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-pen text-orange text-[12px]"></i>
+            <span class="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-pen text-accent text-[12px]"></i>
             </span>
             <span class="text-[13px] text-ink leading-snug">디스코드 공지 초안 써줘</span>
           </button>
@@ -950,7 +953,7 @@
             type="submit"
             id="send-btn"
             disabled
-            class="invite-btn shrink-0 w-9 h-9 rounded-full bg-orange hover:bg-orange-dark transition-colors flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed"
+            class="invite-btn shrink-0 w-9 h-9 rounded-full bg-accent hover:bg-accent-dark transition-colors flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <i class="fa-solid fa-arrow-up text-sm"></i>
           </button>
@@ -1321,17 +1324,17 @@ const ModelPicker = {
 const SettingsModal = {
   renderModelList() {
     dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
-      <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-orange/5 text-left">
+      <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] text-ink">${meta.label}</span>
         </span>
-        <i class="fa-solid fa-check text-orange text-xs settings-model-check ${key === State.defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
+        <i class="fa-solid fa-check text-accent text-xs settings-model-check ${key === State.defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
       </button>
     `).join("");
   },
 
   renderPersistToggle() {
-    dom.persistToggle.classList.toggle("bg-orange", State.persistEnabled);
+    dom.persistToggle.classList.toggle("bg-accent", State.persistEnabled);
     dom.persistToggle.classList.toggle("bg-line", !State.persistEnabled);
     dom.persistToggleKnob.style.transform = State.persistEnabled ? "translateX(20px)" : "translateX(0)";
     dom.persistToggle.setAttribute("aria-checked", String(State.persistEnabled));
@@ -1446,7 +1449,7 @@ const Messages = {
     row.className = "msg-enter flex gap-3";
     const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
     row.innerHTML = `
-      <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+      <div class="assistant-avatar w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
         <img src="img/icon.png" alt="D-AI" class="w-full h-full object-contain rounded-full p-1" loading="eager">
       </div>
       <div class="flex-1 min-w-0">
@@ -1472,7 +1475,7 @@ const Messages = {
     row.id = id;
     row.className = "msg-enter flex gap-3";
     row.innerHTML = `
-      <div class="assistant-avatar w-7 h-7 rounded-full bg-orange flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
+      <div class="assistant-avatar w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
         <img src="img/icon.png" alt="D-AI" class="w-full h-full object-contain rounded-full p-1" loading="eager">
       </div>
       <div class="flex items-center gap-1.5 h-7">
@@ -1494,7 +1497,7 @@ const Messages = {
     const text = decodeURIComponent(btn.dataset.text);
     const icon = btn.querySelector("i");
     const markCopied = () => {
-      icon.className = "fa-solid fa-check text-[12px] text-orange";
+      icon.className = "fa-solid fa-check text-[12px] text-accent";
       setTimeout(() => { icon.className = "fa-regular fa-copy text-[12px]"; }, 1200);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1524,10 +1527,10 @@ const Messages = {
     const wrap = document.createElement("div");
     wrap.className = "max-w-[80%] flex flex-col gap-2 items-end";
     wrap.innerHTML = `
-      <textarea class="edit-textarea w-full bg-surface2 border border-orange/40 rounded-[20px] px-4 py-2.5 text-[14px] text-ink focus:outline-none" rows="2"></textarea>
+      <textarea class="edit-textarea w-full bg-surface2 border border-accent/40 rounded-[20px] px-4 py-2.5 text-[14px] text-ink focus:outline-none" rows="2"></textarea>
       <div class="flex gap-2">
         <button type="button" class="cancel-edit-btn text-[12px] text-mute hover:text-ink px-3 py-1.5 rounded-full hover:bg-surface2">취소</button>
-        <button type="button" class="save-edit-btn text-[12px] font-semibold text-white bg-orange hover:bg-orange-dark transition-colors px-3 py-1.5 rounded-full">저장하고 다시 전송</button>
+        <button type="button" class="save-edit-btn text-[12px] font-semibold text-white bg-accent hover:bg-accent-dark transition-colors px-3 py-1.5 rounded-full">저장하고 다시 전송</button>
       </div>`;
     bubble.replaceWith(wrap);
 
