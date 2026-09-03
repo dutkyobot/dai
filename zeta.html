@@ -23,6 +23,8 @@
   --blue:    #3B9EFF;
   --red:     #EF4444;
   --amber:   #F5A623;
+  --accent:  #F5A623;
+  --accent-dark:#D98A0B;
   --brand: linear-gradient(135deg, var(--mint) 0%, var(--blue) 100%);
   --radius: 28px;
 }
@@ -217,6 +219,27 @@ textarea.field{ resize:none; line-height:1.6; }
   font-size:12px; font-weight:600; box-shadow:0 16px 32px -8px rgba(0,0,0,.8);
   transform:translateX(150%); transition:transform .3s cubic-bezier(.22,1,.36,1); }
 .toast.show{ transform:translateX(0); }
+
+/* ZETA ↔ CHAT visual unification */
+:root{--accent:#F5A623;--accent-dark:#D98A0B;--ui-content-width:56rem;--ui-panel-radius:24px;}
+:focus-visible{outline-color:var(--accent);}
+.field:focus{border-color:var(--accent);background:var(--surface2);}
+.btn-brand{background:var(--accent);}.btn-brand:hover:not(:disabled){opacity:.88;}
+.composer{padding:8px 18px 16px;border-top:0;background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.84) 28%,#000 64%);}
+.composer-inner{max-width:var(--ui-content-width);}
+.composer-shell{min-height:58px;padding:8px 10px 8px 17px;border-radius:22px;box-shadow:0 12px 34px -20px rgba(0,0,0,.34),0 1px 3px rgba(0,0,0,.06);}
+.composer-shell:focus-within{border-color:rgba(245,166,35,.42);box-shadow:0 14px 34px -21px rgba(0,0,0,.36),0 0 0 3px rgba(245,166,35,.08);}.composer-shell.is-multiline{border-radius:22px;}
+.send-btn{width:40px;height:40px;border-radius:13px;box-shadow:0 5px 13px -8px rgba(245,166,35,.72);}.composer-hint b{color:var(--accent);}
+.msg-row{max-width:100%;}@media(min-width:640px){.msg-row{max-width:100%;}}.stream{padding:30px 26px 150px;gap:28px;}
+.topbar{height:64px;padding:0 clamp(12px,2vw,24px);background:rgba(0,0,0,.78);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom-color:rgba(42,42,46,.58);}.topbar-status.live{color:var(--accent);}
+.bubble{border-radius:18px;}.bubble.char{border-top-left-radius:6px;}.bubble.user{border-top-right-radius:6px;}.tag-act{color:var(--accent);background:rgba(245,166,35,.08);border-left-color:rgba(245,166,35,.5);}.tag-inline{color:var(--accent);background:rgba(245,166,35,.1);}.typing span{background:var(--accent);}
+.sidebar{width:268px;background:var(--surface);border-right-color:rgba(42,42,46,.82);}.sidebar-head{height:64px;padding:0 14px;border-bottom:0;}.sidebar-body{padding:14px 12px;gap:0;}.zeta-history-body{overflow:hidden;}
+.history-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:10px;}.new-chat-btn{height:42px;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid rgba(42,42,46,.8);border-radius:999px;background:var(--surface2);color:var(--ink);font-size:13px;font-weight:700;}.new-chat-btn:hover{background:#252529;border-color:rgba(245,166,35,.28);}.history-search-btn{width:42px;height:42px;border-radius:999px;background:var(--surface2);border:1px solid rgba(42,42,46,.6);}
+.history-search-wrap{display:none;align-items:center;gap:8px;padding:0 12px;height:40px;border:1px solid var(--line);background:rgba(0,0,0,.35);border-radius:999px;margin-bottom:12px;}.history-search-wrap.show{display:flex;}.history-search-wrap i{color:var(--mute);font-size:11px;}.history-search-wrap input{width:100%;border:0;outline:0;background:transparent;font-size:12px;color:var(--ink);}.history-section-title{padding:8px 10px 7px;color:var(--mute);font-size:10px;font-weight:700;letter-spacing:.08em;}.zeta-history-list{flex:1;overflow-y:auto;min-height:0;padding:0 2px;}
+.history-item{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:8px 10px;border-radius:11px;background:transparent;color:var(--mute);transition:.15s;}.history-item:hover{background:var(--surface2);color:var(--ink);}.history-item.is-active{background:var(--surface2);color:var(--ink);box-shadow:inset 2px 0 0 var(--accent);}.history-item .history-title{flex:1;min-width:0;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;}.history-item .history-icon{width:16px;color:var(--mute);font-size:11px;}.history-item .history-actions{display:flex;opacity:0;transition:opacity .15s;}.history-item:hover .history-actions,.history-item:focus-within .history-actions{opacity:1;}.history-item .history-actions button{width:24px;height:24px;border-radius:8px;color:var(--mute);}.history-item .history-actions button:hover{background:rgba(255,255,255,.06);color:var(--ink);}
+.zeta-sidebar-foot{padding:10px 12px 14px;border-top:1px solid var(--line);gap:0;}.profile-btn{width:100%;display:flex;align-items:center;gap:10px;padding:7px 9px;border:1px solid transparent;border-radius:999px;background:transparent;text-align:left;}.profile-btn:hover{background:var(--surface2);border-color:rgba(42,42,46,.7);}.profile-avatar{width:30px;height:30px;border-radius:10px;font-size:12px;}.profile-meta{display:flex;flex-direction:column;min-width:0;flex:1;}.profile-meta strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.profile-meta small{font-size:9.5px;color:var(--mute);margin-top:1px;}.profile-btn>i{color:var(--mute);font-size:12px;}
+.settings-modal-box{max-width:560px;padding:0;overflow:hidden;}.settings-modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);}.settings-scroll{max-height:64vh;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:16px;}.settings-profile-preview{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--surface2);}.settings-profile-preview strong{font-size:14px;}.settings-profile-preview p{margin:3px 0 0;font-size:10px;color:var(--mute);}.settings-eyebrow{font-size:9px;color:var(--mute);margin-bottom:2px;}.settings-actions{display:flex;gap:8px;padding:14px 20px;border-top:1px solid var(--line);}.settings-actions .btn{flex:1;padding:10px 8px;font-size:11px;}
+@media(max-width:767px){.sidebar{width:min(268px,86vw);}.sidebar-head{padding-inline:12px;}.stream{padding:22px 12px 128px;}.composer{padding:7px 10px 12px;}.composer-shell{min-height:54px;padding-left:14px;}.settings-scroll{max-height:70vh;padding:16px;}.settings-actions{padding:12px 16px;flex-wrap:wrap;}.settings-actions .btn{min-width:calc(50% - 4px);}.settings-actions .btn-danger{min-width:100%;}}
 </style>
 </head>
 <body>
@@ -235,84 +258,25 @@ textarea.field{ resize:none; line-height:1.6; }
           <a href="index.html" class="brand-sub" style="text-decoration:none;">Powered by D-AI</a>
         </div>
       </div>
-      <button class="icon-btn" id="btn-close-sidebar" aria-label="설정 닫기" style="display:none;"><i class="fas fa-xmark"></i></button>
+      <button class="icon-btn" id="btn-close-sidebar" aria-label="사이드바 닫기"><i class="fas fa-xmark"></i></button>
     </div>
-
-    <div class="sidebar-body">
-      <section>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <div class="avatar avatar-lg" id="avatar-preview">이</div>
-          <div style="flex:1;min-width:0;">
-            <label class="label" for="char-name">캐릭터 이름</label>
-            <input type="text" id="char-name" class="field" placeholder="예: 소꿉친구 은우">
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <label class="label" for="char-personality"><i class="fas fa-masks-theater" style="font-size:10px;"></i>캐릭터 성격</label>
-        <textarea id="char-personality" class="field" rows="5" placeholder="예) 겉으로는 퉁명스럽고 부끄러워하지만 속으로는 나를 좋아하는 소꿉친구. 당황하면 말을 더듬는다."></textarea>
-      </section>
-
-      <section>
-        <label class="label" for="char-greeting"><i class="fas fa-comment-dots" style="font-size:10px;"></i>첫 대사</label>
-        <textarea id="char-greeting" class="field" rows="3" placeholder="대화의 시작 대사를 입력해보세요."></textarea>
-      </section>
-
-      <section>
-        <label class="label" for="user-name"><i class="fas fa-user" style="font-size:10px;"></i>내 이름</label>
-        <input type="text" id="user-name" class="field" placeholder="플레이어">
-      </section>
-
-      <div class="divider"></div>
-
-      <section>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
-          <label class="label" for="api-key" style="margin:0;"><i class="fas fa-key" style="font-size:10px;"></i>개인 Gemini API 키</label>
-          <button class="icon-btn" id="btn-help" style="width:24px;height:24px;" aria-label="API 키 발급 방법"><i class="fas fa-circle-question" style="font-size:12px;"></i></button>
-        </div>
-        <div style="position:relative;">
-          <input type="password" id="api-key" class="field" style="padding-right:38px;" placeholder="AIzaSy...">
-          <button class="icon-btn" id="btn-toggle-key" style="position:absolute;right:2px;top:2px;width:32px;height:32px;" aria-label="API 키 표시/숨김">
-            <i class="fas fa-eye" id="key-eye-icon" style="font-size:12px;"></i>
-          </button>
-        </div>
-        <p id="api-key-hint" class="composer-hint" style="display:none;text-align:left;margin-top:6px;color:var(--amber);">
-          <i class="fas fa-triangle-exclamation"></i> 보통 "AIzaSy"로 시작하는 키입니다.
-        </p>
-
-        <label class="label" id="model-picker-label-el" style="margin-top:12px;">모델</label>
-        <div class="model-picker" id="model-picker">
-          <button type="button" id="model-picker-btn" class="model-picker-btn field"
-            aria-haspopup="listbox" aria-expanded="false" aria-labelledby="model-picker-label-el">
-            <span id="model-picker-value">Gemini 2.5 Flash</span>
-            <i class="fas fa-chevron-down" style="font-size:10px;color:var(--mute);"></i>
-          </button>
-          <div class="model-picker-menu card" id="model-picker-menu" role="listbox">
-            <button type="button" class="model-picker-option" data-value="gemini-2.5-flash" role="option">
-              <span class="mp-name">Gemini 2.5 Flash</span>
-              <span class="mp-desc">빠른 응답 · 가벼운 대화에 적합</span>
-              <i class="fas fa-check mp-check"></i>
-            </button>
-            <button type="button" class="model-picker-option" data-value="gemini-2.5-pro" role="option">
-              <span class="mp-name">Gemini 2.5 Pro</span>
-              <span class="mp-desc">높은 품질 · 더 정교한 답변</span>
-              <i class="fas fa-check mp-check"></i>
-            </button>
-          </div>
-        </div>
-
-        <p class="composer-hint" style="text-align:left;margin-top:10px;">API 키는 브라우저에만 저장되며 외부로 전송되지 않습니다.</p>
-      </section>
-    </div>
-
-    <div class="sidebar-foot">
-      <div class="row-2">
-        <button class="btn btn-ghost" id="btn-export" style="padding:11px 0;font-size:11px;"><i class="fas fa-download"></i>내보내기</button>
-        <button class="btn btn-ghost" id="btn-import" style="padding:11px 0;font-size:11px;"><i class="fas fa-upload"></i>불러오기</button>
+    <div class="sidebar-body zeta-history-body">
+      <div class="history-toolbar">
+        <button class="new-chat-btn" id="btn-new-chat"><i class="fas fa-plus"></i><span>새 대화</span></button>
+        <button class="icon-btn history-search-btn" id="btn-history-search" aria-label="대화 검색"><i class="fas fa-magnifying-glass"></i></button>
       </div>
-      <input type="file" id="import-input" accept="application/json" class="sr-only">
-      <button class="btn btn-danger" id="btn-reset" style="padding:11px 0;font-size:11px;width:100%;"><i class="fas fa-arrow-rotate-left"></i>대화 초기화</button>
+      <div class="history-search-wrap" id="history-search-wrap">
+        <i class="fas fa-magnifying-glass"></i><input id="history-search" type="search" placeholder="대화 검색" autocomplete="off">
+      </div>
+      <div class="history-section-title">대화</div>
+      <div id="history-list" class="zeta-history-list"></div>
+    </div>
+    <div class="sidebar-foot zeta-sidebar-foot">
+      <button class="profile-btn" id="btn-profile-settings" aria-label="프로필 및 설정">
+        <span class="avatar profile-avatar" id="profile-avatar">이</span>
+        <span class="profile-meta"><strong id="profile-name">이든</strong><small>프로필 · 설정</small></span>
+        <i class="fas fa-ellipsis"></i>
+      </button>
     </div>
   </aside>
 
@@ -353,6 +317,53 @@ textarea.field{ resize:none; line-height:1.6; }
       </div>
     </footer>
   </main>
+</div>
+
+<!-- ============ 프로필 / 캐릭터 설정 ============ -->
+<div class="modal-back" id="settings-modal">
+  <div class="modal-box card settings-modal-box">
+    <div class="settings-modal-head">
+      <div class="modal-title"><i class="fas fa-sliders" style="color:var(--accent);"></i>프로필 및 캐릭터 설정</div>
+      <button class="icon-btn" id="btn-settings-close" aria-label="닫기"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="settings-scroll">
+      <section class="settings-profile-preview">
+        <div class="avatar avatar-lg" id="avatar-preview">이</div>
+        <div><div class="settings-eyebrow">현재 캐릭터</div><strong id="settings-character-name-preview">이든</strong><p>캐릭터 설정과 API 설정을 이곳에서 관리합니다.</p></div>
+      </section>
+      <section><label class="label" for="char-name">캐릭터 이름</label><input type="text" id="char-name" class="field" placeholder="예: 소꿉친구 은우"></section>
+      <section><label class="label" for="char-personality"><i class="fas fa-masks-theater"></i>캐릭터 성격</label><textarea id="char-personality" class="field" rows="5" placeholder="캐릭터의 성격, 말투, 관계 등을 입력하세요."></textarea></section>
+      <section><label class="label" for="char-greeting"><i class="fas fa-comment-dots"></i>첫 대사</label><textarea id="char-greeting" class="field" rows="3" placeholder="대화의 시작 대사를 입력해보세요."></textarea></section>
+      <section><label class="label" for="user-name"><i class="fas fa-user"></i>내 이름</label><input type="text" id="user-name" class="field" placeholder="플레이어"></section>
+      <div class="divider"></div>
+      <section>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+          <label class="label" for="api-key" style="margin:0;"><i class="fas fa-key"></i>개인 Gemini API 키</label>
+          <button class="icon-btn" id="btn-help" style="width:24px;height:24px;" aria-label="API 키 발급 방법"><i class="fas fa-circle-question" style="font-size:12px;"></i></button>
+        </div>
+        <div style="position:relative;">
+          <input type="password" id="api-key" class="field" style="padding-right:38px;" placeholder="AIzaSy...">
+          <button class="icon-btn" id="btn-toggle-key" style="position:absolute;right:2px;top:2px;width:32px;height:32px;" aria-label="API 키 표시/숨김"><i class="fas fa-eye" id="key-eye-icon" style="font-size:12px;"></i></button>
+        </div>
+        <p id="api-key-hint" class="composer-hint" style="display:none;text-align:left;margin-top:6px;color:var(--amber);"><i class="fas fa-triangle-exclamation"></i> 보통 "AIzaSy"로 시작하는 키입니다.</p>
+        <label class="label" id="model-picker-label-el" style="margin-top:12px;">모델</label>
+        <div class="model-picker" id="model-picker">
+          <button type="button" id="model-picker-btn" class="model-picker-btn field" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="model-picker-label-el"><span id="model-picker-value">Gemini 2.5 Flash</span><i class="fas fa-chevron-down" style="font-size:10px;color:var(--mute);"></i></button>
+          <div class="model-picker-menu card" id="model-picker-menu" role="listbox">
+            <button type="button" class="model-picker-option" data-value="gemini-2.5-flash" role="option"><span class="mp-name">Gemini 2.5 Flash</span><span class="mp-desc">빠른 응답 · 가벼운 대화에 적합</span><i class="fas fa-check mp-check"></i></button>
+            <button type="button" class="model-picker-option" data-value="gemini-2.5-pro" role="option"><span class="mp-name">Gemini 2.5 Pro</span><span class="mp-desc">높은 품질 · 더 정교한 답변</span><i class="fas fa-check mp-check"></i></button>
+          </div>
+        </div>
+        <p class="composer-hint" style="text-align:left;margin-top:10px;">API 키는 브라우저에만 저장됩니다.</p>
+      </section>
+    </div>
+    <div class="settings-actions">
+      <button class="btn btn-ghost" id="btn-export"><i class="fas fa-download"></i>내보내기</button>
+      <button class="btn btn-ghost" id="btn-import"><i class="fas fa-upload"></i>불러오기</button>
+      <button class="btn btn-danger" id="btn-reset"><i class="fas fa-arrow-rotate-left"></i>대화 초기화</button>
+    </div>
+    <input type="file" id="import-input" accept="application/json" class="sr-only">
+  </div>
 </div>
 
 <!-- ============ 도움말 모달 ============ -->
@@ -410,9 +421,33 @@ textarea.field{ resize:none; line-height:1.6; }
     apiKey: '',
     model: 'gemini-2.5-flash',
     messages: [],
+    conversations: [],
+    activeConversationId: null,
     isThinking: false
   };
   let toastTimer = null;
+
+  /* ---------------- Conversation history ---------------- */
+  function conversationTitle(messages){const m=(messages||[]).find(x=>x.sender==='user');const t=m?.text?.trim()||'새 대화';return t.length>28?t.slice(0,28)+'…':t;}
+  function escapeHtml(text){return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+  function syncActiveConversation(){const a=state.conversations?.find(c=>c.id===state.activeConversationId);if(a)a.messages=state.messages;}
+  function ensureConversationState(){
+    if(!Array.isArray(state.conversations))state.conversations=[];
+    if(!state.conversations.length){const messages=Array.isArray(state.messages)&&state.messages.length?state.messages:[{id:uid(),sender:'char',text:state.charGreeting||DEFAULT_GREETING}];const id=state.activeConversationId||uid();state.conversations=[{id,title:conversationTitle(messages),messages}];state.activeConversationId=id;state.messages=messages;}
+    else{if(!state.activeConversationId||!state.conversations.some(c=>c.id===state.activeConversationId))state.activeConversationId=state.conversations[0].id;state.messages=state.conversations.find(c=>c.id===state.activeConversationId)?.messages||[];}
+  }
+  function renderHistory(filter=''){
+    const list=$('history-list');if(!list)return;const q=filter.trim().toLowerCase();list.innerHTML='';
+    const items=(state.conversations||[]).filter(c=>!q||(c.title||'').toLowerCase().includes(q));
+    if(!items.length){list.innerHTML='<div style="padding:20px 10px;text-align:center;color:var(--mute);font-size:11px;">대화가 없습니다.</div>';return;}
+    items.forEach(c=>{const item=document.createElement('div');item.className='history-item'+(c.id===state.activeConversationId?' is-active':'');item.innerHTML=`<i class="fas fa-message history-icon"></i><button class="history-title" type="button">${escapeHtml(c.title||'새 대화')}</button><div class="history-actions"><button type="button" data-history-action="rename" aria-label="이름 변경"><i class="fas fa-pen"></i></button><button type="button" data-history-action="delete" aria-label="삭제"><i class="fas fa-trash-can"></i></button></div>`;item.querySelector('.history-title').onclick=()=>Conversation.switchTo(c.id);item.querySelector('[data-history-action="rename"]').onclick=()=>Conversation.rename(c.id);item.querySelector('[data-history-action="delete"]').onclick=()=>Conversation.remove(c.id);list.appendChild(item);});
+  }
+  const Conversation={
+    newChat(){syncActiveConversation();const id=uid(),messages=[{id:uid(),sender:'char',text:state.charGreeting||DEFAULT_GREETING}];state.conversations.unshift({id,title:'새 대화',messages});state.activeConversationId=id;state.messages=messages;renderMessages();renderHistory();Store.save();$('chat-input')?.focus();if(innerWidth<1024)UI.toggleSidebar(false);},
+    switchTo(id){syncActiveConversation();const c=state.conversations.find(x=>x.id===id);if(!c)return;state.activeConversationId=id;state.messages=c.messages||[];renderMessages();renderHistory();Store.save();if(innerWidth<1024)UI.toggleSidebar(false);},
+    rename(id){const c=state.conversations.find(x=>x.id===id);if(!c)return;const n=prompt('대화 이름',c.title||'새 대화');if(n===null)return;c.title=n.trim().slice(0,40)||'새 대화';renderHistory();Store.save();},
+    async remove(id){if(state.conversations.length<=1){UI.toast('마지막 대화는 삭제할 수 없어요.','error');return;}const c=state.conversations.find(x=>x.id===id);if(!await UI.confirm('대화를 삭제할까요?',`“${c?.title||'새 대화'}”가 삭제됩니다. 이 작업은 되돌릴 수 없어요.`))return;state.conversations=state.conversations.filter(x=>x.id!==id);if(state.activeConversationId===id){state.activeConversationId=state.conversations[0].id;state.messages=state.conversations[0].messages||[];}renderMessages();renderHistory();Store.save();}
+  };
 
   /* ---------------- UI ---------------- */
   const UI = {
@@ -468,6 +503,9 @@ textarea.field{ resize:none; line-height:1.6; }
       const initial = (state.charName || '캐').trim().charAt(0) || '캐';
       $('avatar-preview').textContent = initial;
       $('header-avatar').textContent = initial;
+      $('profile-avatar').textContent = initial;
+      $('profile-name').textContent = state.charName || '이름 없음';
+      $('settings-character-name-preview').textContent = state.charName || '이름 없음';
     },
     updateStatusLine() {
       const line = $('status-line');
@@ -611,6 +649,8 @@ textarea.field{ resize:none; line-height:1.6; }
       input.value = '';
       UI.autoResizeInput();
       state.messages.push({ id: uid(), sender: 'user', text });
+      const activeConversation = state.conversations?.find(c => c.id === state.activeConversationId);
+      if (activeConversation && activeConversation.title === '새 대화') activeConversation.title = conversationTitle(state.messages);
       state.isThinking = true;
       renderMessages(); Store.save(); UI.setSending(true);
 
@@ -648,7 +688,9 @@ textarea.field{ resize:none; line-height:1.6; }
     },
     reset() {
       state.messages = [{ id: uid(), sender: 'char', text: state.charGreeting || DEFAULT_GREETING }];
-      renderMessages(); Store.save(); UI.toast('대화가 초기화되었습니다.');
+      const active = state.conversations?.find(c => c.id === state.activeConversationId);
+      if (active) { active.messages = state.messages; active.title = '새 대화'; }
+      renderMessages(); renderHistory(); Store.save(); UI.toast('대화가 초기화되었습니다.');
     },
     exportChat() {
       const payload = { charName: state.charName, charPersonality: state.charPersonality, charGreeting: state.charGreeting, userName: state.userName, model: state.model, messages: state.messages };
@@ -666,8 +708,9 @@ textarea.field{ resize:none; line-height:1.6; }
         try {
           const parsed = JSON.parse(reader.result);
           state = { ...state, ...parsed, apiKey: state.apiKey };
+          ensureConversationState();
           Settings.bindToInputs();
-          renderMessages(); Store.save();
+          renderMessages(); renderHistory(); Store.save();
           UI.toast('대화를 불러왔어요.');
         } catch (_) { UI.toast('파일을 읽을 수 없어요. 올바른 내보내기 파일인지 확인해주세요.', 'error'); }
       };
@@ -708,6 +751,13 @@ textarea.field{ resize:none; line-height:1.6; }
       });
       document.addEventListener('click', () => ModelPicker.close());
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') ModelPicker.close(); });
+
+      $('btn-new-chat').addEventListener('click', () => Conversation.newChat());
+      $('btn-profile-settings').addEventListener('click', () => UI.openModal('settings-modal'));
+      $('btn-settings-close').addEventListener('click', () => UI.closeModal('settings-modal'));
+      $('settings-modal').addEventListener('click', e => { if (e.target.id === 'settings-modal') UI.closeModal('settings-modal'); });
+      $('btn-history-search').addEventListener('click', () => $('history-search-wrap').classList.toggle('show'));
+      $('history-search').addEventListener('input', e => renderHistory(e.target.value));
 
       $('chat-input').addEventListener('input', UI.autoResizeInput);
       $('chat-input').addEventListener('keydown', (e) => {
@@ -755,16 +805,18 @@ textarea.field{ resize:none; line-height:1.6; }
 
   /* ---------------- Store ---------------- */
   const Store = {
-    save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { console.error('저장 실패', e); } },
+    save() { try { syncActiveConversation(); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); renderHistory(); } catch (e) { console.error('저장 실패', e); } },
     load() { try { const s = localStorage.getItem(STORAGE_KEY); if (s) state = { ...state, ...JSON.parse(s) }; } catch (e) { console.error('불러오기 실패', e); } }
   };
 
   /* ---------------- Init ---------------- */
   document.addEventListener('DOMContentLoaded', () => {
     Store.load();
+    ensureConversationState();
     Settings.bindToInputs();
     Settings.bindEvents();
     state.messages.length === 0 ? Chat.reset() : renderMessages();
+    renderHistory();
     UI.setSending(false);
     $('chat-input').focus();
   });
