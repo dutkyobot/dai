@@ -10,10 +10,13 @@
 <script>
   (function () {
     try {
-      if (localStorage.getItem("dai_theme_v1") === "dark") {
+      if (localStorage.getItem("dai_theme_v1") !== "light") {
         document.documentElement.classList.add("dark");
       }
-    } catch (e) { /* 저장소 접근 불가 환경은 라이트 모드로 진행 */ }
+    } catch (e) {
+      /* 저장소 접근 불가 환경에서도 D-AI 브랜드 기본값인 다크 모드로 진행 */
+      document.documentElement.classList.add("dark");
+    }
   })();
 </script>
 
@@ -47,26 +50,26 @@
 </script>
 
 <style>
-  /* 메인 컬러는 진한 오렌지(--c-accent) 하나로 통일한다. 민트→블루 그라데이션은
-     여러 곳에 쓰기엔 무겁고 다루기 까다로워서, index.html과 마찬가지로 사이드바
-     로고 아이콘 한 곳에만 남겨둔 브랜드 시그니처로 한정한다. 그 외 UI 요소
-     (히어로 아이콘, 어시스턴트 아바타, 전송 버튼, 포인트 컬러 등)는 전부
-     이 오렌지 액센트를 쓴다.
+  /* index.html · zeta.html과 동일한 D-AI 브랜드 팔레트(블랙 배경 + 민트→블루
+     그라데이션 로고, 블루 포인트 컬러)를 그대로 따른다. 메인 액센트는 브랜드
+     블루(--c-accent) 하나로 통일하고, 민트→블루 그라데이션은 다른 두 페이지와
+     마찬가지로 사이드바 로고 아이콘 한 곳에만 남겨둔 시그니처로 한정한다.
 
      모든 색은 "R G B" 형태의 CSS 변수로 정의하고 rgb(var(--x) / a) 형태로
-     사용한다. html.dark 가 붙으면 아래 값이 통째로 다크 팔레트로 바뀌면서
-     Tailwind 유틸리티(bg-bg, text-ink 등)까지 자동으로 테마를 따라간다. */
+     사용한다. html.dark 가 붙으면(기본값) 아래 값이 index/zeta와 동일한 다크
+     팔레트가 되고, Tailwind 유틸리티(bg-bg, text-ink 등)도 자동으로 따라간다. */
   :root {
-    /* 눈부심을 줄인 웜 라이트 팔레트: 순백색 면적과 강한 대비를 낮춘다 */
-    --c-bg: 232 229 222;
-    --c-surface: 244 242 237;
-    --c-surface2: 222 219 211;
-    --c-line: 208 203 193;
-    --c-mute: 112 108 99;
-    --c-ink: 47 44 39;
-    --c-accent: 220 84 40;
-    --c-accent-dark: 188 67 29;
-    --c-shadow: 40 36 30;
+    /* 라이트 모드: 다크 모드가 기본이며, 라이트는 같은 블루 액센트를 쓰는
+       보조 옵션이다 */
+    --c-bg: 246 247 249;
+    --c-surface: 255 255 255;
+    --c-surface2: 237 239 242;
+    --c-line: 224 227 231;
+    --c-mute: 113 118 128;
+    --c-ink: 23 23 26;
+    --c-accent: 34 116 214;
+    --c-accent-dark: 20 92 173;
+    --c-shadow: 15 23 42;
     --c-sheen-alpha: 0.35;
 
     --c-mint: #21D67A;
@@ -74,14 +77,15 @@
   }
 
   html.dark {
-    --c-bg: 23 22 20;
-    --c-surface: 31 29 26;
-    --c-surface2: 39 36 32;
-    --c-line: 57 53 47;
-    --c-mute: 163 156 143;
-    --c-ink: 236 231 222;
-    --c-accent: 237 133 96;
-    --c-accent-dark: 214 103 61;
+    /* index.html / zeta.html의 다크 팔레트와 완전히 동일한 값 */
+    --c-bg: 0 0 0;
+    --c-surface: 24 24 27;
+    --c-surface2: 31 31 35;
+    --c-line: 42 42 46;
+    --c-mute: 155 155 163;
+    --c-ink: 255 255 255;
+    --c-accent: 59 158 255;
+    --c-accent-dark: 43 130 214;
     --c-shadow: 0 0 0;
     --c-sheen-alpha: 0.05;
   }
@@ -1050,9 +1054,9 @@ const Theme = {
   load() {
     try {
       const saved = localStorage.getItem("dai_theme_v1");
-      return saved === "dark" ? "dark" : "light";
+      return saved === "light" ? "light" : "dark";
     } catch (e) {
-      return "light";
+      return "dark";
     }
   },
   set(theme) {
