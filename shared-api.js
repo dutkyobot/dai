@@ -48,12 +48,13 @@
     if (!value) return;
     try { localStorage.setItem(SHARED_MODEL, value); } catch (_) {}
   }
-  async function generateContent({ model = 'gemini-2.5-flash', payload, signal } = {}) {
+  async function generateContent({ model, payload, signal } = {}) {
     const key = getApiKey();
     if (!key) throw new Error('Gemini API 키가 없습니다. D-AI 설정에서 API 키를 입력해 주세요.');
     if (!payload || !Array.isArray(payload.contents)) throw new Error('AI 요청 데이터가 올바르지 않습니다.');
+    const modelId = String(model || getModel()).trim();
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/' +
-      encodeURIComponent(String(model).trim()) + ':generateContent';
+      encodeURIComponent(modelId) + ':generateContent';
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
