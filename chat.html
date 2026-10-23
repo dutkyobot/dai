@@ -51,14 +51,8 @@
 </script>
 
 <style>
-  /* D-AI 브랜드 팔레트(블랙 배경 + 민트→블루
-     그라데이션 로고)를 그대로 따르되, D-AI Web의 메인 액센트는 시그니처 오렌지
-     (--c-accent) 하나로 통일한다. 민트→블루 그라데이션은 다른 두 페이지와
-     마찬가지로 사이드바 로고 아이콘 한 곳에만 남겨둔 시그니처로 한정한다.
-
-     모든 색은 "R G B" 형태의 CSS 변수로 정의하고 rgb(var(--x) / a) 형태로
-     사용한다. html.dark 가 붙으면(기본값) 아래 값이 index/zeta와 동일한 다크
-     팔레트가 되고, Tailwind 유틸리티(bg-bg, text-ink 등)도 자동으로 따라간다. */
+  /* 색상은 dai-theme.css의 공통 토큰을 사용한다. 로고는 민트→블루 그라데이션,
+     인터페이스의 메인 액센트는 기존 시그니처 오렌지다. */
   :root {
     /* 라이트 모드: 다크 모드가 기본이며, 라이트는 같은 블루 액센트를 쓰는
        보조 옵션이다 */
@@ -68,8 +62,8 @@
     --c-line: 224 227 231;
     --c-mute: 113 118 128;
     --c-ink: 23 23 26;
-    --c-accent: 124 58 237;
-    --c-accent-dark: 109 40 217;
+    --c-accent: 219 92 20;
+    --c-accent-dark: 181 74 14;
     --c-shadow: 15 23 42;
     --c-sheen-alpha: 0.35;
 
@@ -85,8 +79,8 @@
     --c-line: 42 42 46;
     --c-mute: 155 155 163;
     --c-ink: 255 255 255;
-    --c-accent: 167 139 250;
-    --c-accent-dark: 139 92 246;
+    --c-accent: 255 138 61;
+    --c-accent-dark: 247 111 26;
     --c-shadow: 0 0 0;
     --c-sheen-alpha: 0.05;
   }
@@ -735,6 +729,7 @@
     .assistant-avatar { width: 22px !important; height: 22px !important; flex-basis: 22px; border-radius: 7px !important; }
   }
 </style>
+<link rel="stylesheet" href="dai-theme.css">
 </head>
 
 <body class="font-sans antialiased overflow-hidden">
