@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>D-AI Web | Dutkyobot</title>
 <link rel="icon" href="img/favicon.png" type="image/png">
+<script src="shared-api.js"></script>
 
 <!-- 저장된 테마를 첫 페인트 전에 적용해서 화면이 잠깐 밝게 번쩍이는 걸 막는다 -->
 <script>
@@ -795,6 +796,10 @@
         <span class="sidebar-label text-[13px] font-medium text-ink flex-1 text-left truncate">게스트</span>
         <i class="sidebar-label fa-solid fa-gear text-mute text-xs"></i>
       </button>
+      <a href="characters.html" class="flex items-center gap-2.5 w-full rounded-full px-2 py-2 mt-1 hover:bg-surface2 transition-colors text-ink text-[12px] font-semibold" style="text-decoration:none">
+        <span class="w-7 h-7 rounded-full bg-surface2 border border-line flex items-center justify-center shrink-0">✦</span>
+        <span class="flex-1 text-left truncate">캐릭터 챗 · 1:1 / 단체</span>
+      </a>
     </div>
   </aside>
 
@@ -809,7 +814,13 @@
       </div>
 
       <div class="mb-5">
-        <div class="text-[11px] font-semibold text-mute uppercase tracking-widest px-1 mb-2">새 대화 기본 모델</div>
+        <div class="text-[11px] font-semibold text-mute uppercase tracking-widest px-1 mb-2">Gemini API 설정</div>
+        <div class="flex gap-2 mb-5">
+          <input id="settings-api-key" type="password" autocomplete="off" placeholder="Gemini API 키 (AIzaSy…)" class="flex-1 min-w-0 bg-surface2 border border-line rounded-full px-3 py-2 text-[12px] text-ink">
+          <button id="settings-save-api" class="rounded-full px-3 py-2 text-[12px] font-semibold bg-accent text-white">저장</button>
+        </div>
+        <p class="text-[10px] text-mute leading-relaxed -mt-3 mb-5">일반 채팅과 캐릭터 챗이 같은 API 키·모델 설정을 사용합니다.</p>
+        <div class="text-[11px] font-semibold text-mute uppercase tracking-widest px-1 mb-2">공통 모델 선택</div>
         <div id="settings-model-list" class="space-y-0.5"></div>
       </div>
 
@@ -865,34 +876,22 @@
 
         <div id="model-menu"
           class="hidden card float-card absolute top-11 left-0 w-[248px] p-1.5 z-30">
-          <button data-model="Gemini 2.5 Flash" data-provider="gemini"
+          <button data-model="Gemini 3.8 Flash" data-provider="gemini"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
-            <span class="flex-1">
-              <span class="block text-[13px] font-semibold text-ink">Gemini 2.5 Flash</span>
-            </span>
+            <span class="flex-1"><span class="block text-[13px] font-semibold text-ink">Gemini 3.8 Flash</span></span>
             <i class="fa-solid fa-check text-accent text-xs opacity-100 model-check"></i>
           </button>
-          <button data-model="Cerebras · GPT OSS 120B" data-provider="cerebras"
+          <button data-model="Gemini 3.1 Flash-Lite" data-provider="geminiLite"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
-            <span class="flex-1">
-              <span class="block text-[13px] font-semibold text-ink">Cerebras · GPT OSS 120B</span>
-            </span>
+            <span class="flex-1"><span class="block text-[13px] font-semibold text-ink">Gemini 3.5 Flash-Lite</span></span>
             <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
           </button>
-          <button data-model="Groq · Llama 3.3 70B" data-provider="groq"
+          <button data-model="Gemini 3.6 Flash" data-provider="gemini36"
             class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
-            <span class="flex-1">
-              <span class="block text-[13px] font-semibold text-ink">Groq · Llama 3.3 70B</span>
-            </span>
+            <span class="flex-1"><span class="block text-[13px] font-semibold text-ink">Gemini 3.6 Flash</span></span>
             <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
           </button>
-          <button data-model="OpenRouter" data-provider="openrouter"
-            class="model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
-            <span class="flex-1">
-              <span class="block text-[13px] font-semibold text-ink">OpenRouter</span>
-            </span>
-            <i class="fa-solid fa-check text-accent text-xs opacity-0 model-check"></i>
-          </button>
+          
         </div>
       </div>
 
@@ -1003,13 +1002,16 @@ const dom = {
   persistToggleKnob: document.getElementById("persist-toggle-knob"),
   settingsClearAllBtn: document.getElementById("settings-clear-all-btn"),
   themeSwitch: document.getElementById("theme-switch"),
+  apiKeyInput: document.getElementById("settings-api-key"),
+  saveApiBtn: document.getElementById("settings-save-api"),
+  apiKeyInput: document.getElementById("settings-api-key"),
+  saveApiBtn: document.getElementById("settings-save-api"),
 };
 
 const PROVIDERS = {
-  gemini:     { label: "Gemini 2.5 Flash",        sub: "기본 모델 · 빠르고 균형 잡힌 응답" },
-  cerebras:   { label: "Cerebras · GPT OSS 120B",  sub: "1순위 대체 · 초저지연 추론" },
-  groq:       { label: "Groq · Llama 3.3 70B",     sub: "2순위 대체 · 가벼운 작업용" },
-  openrouter: { label: "OpenRouter",               sub: "최종 대체 · 다중 무료 모델" },
+  gemini:     { label: "Gemini 3.8 Flash",       sub: "공통 기본 모델", model: "gemini-3.8-flash" },
+  geminiLite: { label: "Gemini 3.5 Flash-Lite",  sub: "빠르고 비용 효율적인 모델", model: "gemini-3.1-flash-lite" },
+  gemini36:   { label: "Gemini 3.6 Flash",       sub: "복합 작업용 모델", model: "gemini-3.6-flash" },
 };
 
 const Utils = {
@@ -1297,9 +1299,12 @@ const Sidebar = {
 
 const ModelPicker = {
   updateHeader(providerKey) {
-    const meta = PROVIDERS[providerKey] || { label: providerKey };
+    const sharedModel = DAIShared.getModel("gemini-3.1-flash-lite");
+    const match = Object.entries(PROVIDERS).find(([, item]) => item.model === sharedModel);
+    const selectedKey = match ? match[0] : (PROVIDERS[providerKey] ? providerKey : "gemini");
+    const meta = PROVIDERS[selectedKey] || { label: providerKey };
     dom.modelNameEl.textContent = meta.label;
-    this._updateHeaderCheckmarks(providerKey);
+    this._updateHeaderCheckmarks(selectedKey);
   },
 
   _updateHeaderCheckmarks(providerKey) {
@@ -1311,6 +1316,9 @@ const ModelPicker = {
   },
 
   select(providerKey) {
+    const meta = PROVIDERS[providerKey];
+    if (!meta) return;
+    DAIShared.setModel(meta.model);
     this.updateHeader(providerKey);
     const conv = State.getCurrentConversation();
     if (conv) {
@@ -1327,12 +1335,14 @@ const ModelPicker = {
 
 const SettingsModal = {
   renderModelList() {
+    const sharedModel = DAIShared.getModel("gemini-3.1-flash-lite");
+    const selectedKey = Object.entries(PROVIDERS).find(([, meta]) => meta.model === sharedModel)?.[0] || State.defaultModelKey;
     dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
       <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] text-ink">${meta.label}</span>
         </span>
-        <i class="fa-solid fa-check text-accent text-xs settings-model-check ${key === State.defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
+        <i class="fa-solid fa-check text-accent text-xs settings-model-check ${key === selectedKey ? "opacity-100" : "opacity-0"}"></i>
       </button>
     `).join("");
   },
@@ -1362,6 +1372,7 @@ const SettingsModal = {
   open() {
     this.renderModelList();
     this.renderPersistToggle();
+    dom.apiKeyInput.value = DAIShared.getApiKey();
     dom.settingsModal.classList.remove("hidden");
   },
   close() {
@@ -1583,21 +1594,23 @@ const Chat = {
      이 함수 밖의 대화 저장/렌더링/재생성/중지/수정 로직은
      전부 이미 완성되어 있어 손댈 필요가 없습니다.
   ============================================================ */
-  callAI(conversation, options = {}) {
-    const { signal } = options;
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        resolve("아직 실제 AI가 연결되지 않았어요. callAI() 함수 안에 API 호출만 넣으면 이 자리에 진짜 답변이 표시됩니다.");
-      }, 900 + Math.random() * 500);
-
-      if (signal) {
-        if (signal.aborted) { clearTimeout(timer); reject(new DOMException("중단됨", "AbortError")); return; }
-        signal.addEventListener("abort", () => {
-          clearTimeout(timer);
-          reject(new DOMException("중단됨", "AbortError"));
-        });
-      }
+  async callAI(conversation, options = {}) {
+    const messages = (conversation.messages || []).filter(m => m.role === "user" || m.role === "assistant");
+    const contents = messages.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: String(m.content || "") }]
+    }));
+    if (!contents.length) throw new Error("보낼 대화 내용이 없습니다.");
+    const result = await DAIShared.generateContent({
+      model: DAIShared.getModel("gemini-3.1-flash-lite"),
+      payload: {
+        systemInstruction: { parts: [{ text: "당신은 D-AI입니다. 사용자의 질문에 정확하고 유용하게 답하세요. 질문과 같은 언어로 응답하고, 필요한 경우 단계별로 설명하세요." }] },
+        contents,
+        generationConfig: { temperature: 0.8, maxOutputTokens: 8192 }
+      },
+      signal: options.signal
     });
+    return result.text;
   },
 
   async runAssistantTurn(conv) {
@@ -1766,6 +1779,7 @@ function bindEvents() {
     if (!opt) return;
     State.defaultModelKey = opt.dataset.provider;
     Storage.saveDefaultModel(State.defaultModelKey);
+    if (PROVIDERS[State.defaultModelKey]) DAIShared.setModel(PROVIDERS[State.defaultModelKey].model);
     SettingsModal.renderModelList();
     if (!State.currentConversationId) ModelPicker.updateHeader(State.defaultModelKey);
   });
@@ -1786,6 +1800,15 @@ function bindEvents() {
     if (e.key === "Escape" && !dom.settingsModal.classList.contains("hidden")) SettingsModal.close();
   });
   dom.settingsClearAllBtn.addEventListener("click", () => SettingsModal.clearAll());
+  dom.saveApiBtn.addEventListener("click", () => {
+    DAIShared.setApiKey(dom.apiKeyInput.value);
+    alert("공통 API 키를 저장했어요.");
+  });
+  dom.saveApiBtn.addEventListener("click", () => {
+    DAIShared.setApiKey(dom.apiKeyInput.value);
+    DAIShared.setModel(DAIShared.getModel("gemini-3.1-flash-lite"));
+    alert("공통 API 키를 저장했어요.");
+  });
 
   dom.input.addEventListener("input", () => Composer.autoResize());
   dom.input.addEventListener("keydown", (e) => {
