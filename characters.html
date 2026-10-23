@@ -8,368 +8,331 @@
 <link rel="icon" href="img/favicon.png" type="image/png">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<script>(function(){try{if(localStorage.getItem('dai_theme_v1')!=='light')document.documentElement.classList.add('dark')}catch(e){document.documentElement.classList.add('dark')}})();</script>
 <script src="shared-api.js"></script>
 <style>
 :root{color-scheme:dark;--bg:#09090b;--surface:#18181b;--surface2:#222226;--line:#303036;--ink:#f8f8fa;--mute:#a1a1aa;--accent:#a78bfa;--mint:#21d67a;--blue:#3b9eff;--danger:#fb7185}
 html:not(.dark){color-scheme:light;--bg:#f5f6f8;--surface:#fff;--surface2:#eff0f3;--line:#dfe1e6;--ink:#18181b;--mute:#737782;--accent:#7c3aed}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Noto Sans KR",sans-serif;letter-spacing:-.01em}
-button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-button:disabled{opacity:.45;cursor:not-allowed}
+button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}
 .app{height:100dvh;display:flex;overflow:hidden}
-.sidebar{width:290px;flex:0 0 290px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
-.sidebar-top{padding:18px 16px 12px;border-bottom:1px solid var(--line)}
-.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-bottom:18px}
-.brand-icon{width:32px;height:32px;border-radius:11px;background:linear-gradient(135deg,var(--mint),var(--blue));color:#07110d;font-weight:900;display:grid;place-items:center}
+.sidebar{width:292px;flex:0 0 292px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.sidebar-top{padding:17px 15px 12px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-bottom:17px}
+.brand-icon{width:31px;height:31px;border-radius:10px;background:linear-gradient(135deg,var(--mint),var(--blue));color:#07110d;font-weight:900;display:grid;place-items:center}
 .brand-name{font-size:15px;font-weight:800;letter-spacing:-.03em}.brand-name em{font-style:normal;color:var(--blue)}
-.mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:999px}
-.mode-btn{border:0;background:transparent;border-radius:999px;padding:10px 5px;font-size:12px;font-weight:700;color:var(--mute)}
+.mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:999px}
+.mode-btn{border:0;background:transparent;border-radius:999px;padding:9px 5px;font-size:12px;font-weight:700;color:var(--mute)}
 .mode-btn.active{background:var(--surface2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
-.side-heading{display:flex;justify-content:space-between;align-items:center;padding:15px 16px 8px;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--mute);text-transform:uppercase}
-.btn{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:9px 13px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+.side-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 15px 8px;font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--mute)}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:8px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
 .btn:hover{border-color:color-mix(in srgb,var(--accent) 50%,var(--line))}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn.primary:hover{filter:brightness(1.08)}
 .btn.quiet{background:transparent}.btn.danger{color:var(--danger)}
-.icon-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:0 0 auto}
-.icon-btn:hover{border-color:var(--accent)}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:0 0 auto}.icon-btn:hover{border-color:var(--accent)}
 #side-list{flex:1;min-height:0;overflow:auto;padding:0 10px 16px}
-.section-label{padding:13px 8px 6px;color:var(--mute);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.list-row{display:flex;align-items:center;gap:8px;padding:8px;border-radius:13px;margin-bottom:3px;border:1px solid transparent}
+.section-label{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 8px 6px;color:var(--mute);font-size:10px;font-weight:800;letter-spacing:.04em}
+.list-row{display:flex;align-items:center;gap:7px;padding:7px;border-radius:12px;margin-bottom:3px;border:1px solid transparent}
 .list-row.active{background:var(--surface2);border-color:var(--line)}.list-row:hover{background:var(--surface2)}
 .list-select{display:flex;align-items:center;gap:9px;flex:1;min-width:0;border:0;background:transparent;text-align:left;padding:0}
-.avatar{flex:0 0 31px;width:31px;height:31px;display:grid;place-items:center;border-radius:11px;font-size:12px;font-weight:800;background:color-mix(in srgb,var(--accent) 75%,var(--blue));color:white}
-.list-copy{min-width:0;display:flex;flex-direction:column;gap:3px}.list-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.list-sub{font-size:10px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-actions{display:flex;gap:2px}.mini-btn{border:0;background:transparent;color:var(--mute);width:26px;height:26px;border-radius:50%;font-size:12px;display:grid;place-items:center}
-.mini-btn:hover{background:var(--line);color:var(--ink)}
-.side-bottom{padding:12px;border-top:1px solid var(--line);display:flex;gap:7px}.side-bottom .btn{flex:1}
+.avatar{flex:0 0 30px;width:30px;height:30px;display:grid;place-items:center;border-radius:10px;font-size:12px;font-weight:800;background:color-mix(in srgb,var(--accent) 75%,var(--blue));color:white}
+.list-copy{min-width:0;display:flex;flex-direction:column;gap:3px}.list-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.list-sub{font-size:10px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-actions{display:flex;gap:1px}.mini-btn{border:0;background:transparent;color:var(--mute);width:25px;height:25px;border-radius:50%;font-size:12px;display:grid;place-items:center}.mini-btn:hover{background:var(--line);color:var(--ink)}
+.nested{margin-left:12px;padding-left:9px;border-left:1px solid var(--line)}
+.side-empty{font-size:11px;color:var(--mute);line-height:1.55;padding:7px 9px}
+.side-bottom{padding:11px;border-top:1px solid var(--line);display:flex;gap:7px}.side-bottom .btn{flex:1}
 .main{min-width:0;flex:1;display:flex;flex-direction:column;height:100%;position:relative}
-.header{height:68px;flex:0 0 68px;padding:0 clamp(12px,2.3vw,26px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:12px;background:color-mix(in srgb,var(--bg) 88%,transparent);z-index:2}
-.header-left{display:flex;align-items:center;gap:10px;min-width:0}.header-title{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.header-sub{font-size:11px;color:var(--mute);margin-top:3px}.header-actions{display:flex;align-items:center;gap:6px}.header-actions .btn{padding:8px 11px}
-#mobile-menu{display:none}
-.messages{flex:1;min-height:0;overflow-y:auto;width:100%;max-width:900px;margin:0 auto;padding:24px clamp(14px,3vw,34px) 28px;display:flex;flex-direction:column;gap:18px}
-.empty{margin:auto;text-align:center;max-width:440px;padding:35px 20px;color:var(--mute)}.empty-mark{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,var(--mint),var(--blue));display:grid;place-items:center;color:#06130c;font-size:20px;font-weight:900;margin:0 auto 18px}
-.empty h1{font-size:23px;letter-spacing:-.04em;color:var(--ink);margin:0 0 10px}.empty p{font-size:13px;line-height:1.7;margin:0}
+.header{height:66px;flex:0 0 66px;padding:0 clamp(12px,2.3vw,25px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:12px;background:color-mix(in srgb,var(--bg) 88%,transparent);z-index:2}
+.header-left{display:flex;align-items:center;gap:10px;min-width:0}.header-title{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header-sub{font-size:11px;color:var(--mute);margin-top:3px}
+.header-actions{display:flex;align-items:center;gap:6px}.header-actions .btn{padding:8px 11px}#mobile-menu{display:none}
+.messages{flex:1;min-height:0;overflow-y:auto;width:100%;max-width:900px;margin:0 auto;padding:23px clamp(14px,3vw,34px) 28px;display:flex;flex-direction:column;gap:17px}
+.empty{margin:auto;text-align:center;max-width:455px;padding:35px 20px;color:var(--mute)}.empty-mark{width:52px;height:52px;border-radius:17px;background:linear-gradient(135deg,var(--mint),var(--blue));display:grid;place-items:center;color:#06130c;font-size:20px;font-weight:900;margin:0 auto 18px}
+.empty h1{font-size:23px;letter-spacing:-.04em;color:var(--ink);margin:0 0 10px}.empty p{font-size:13px;line-height:1.7;margin:0 0 16px}
 .message{display:flex;gap:10px;max-width:88%;align-items:flex-start;animation:rise .18s ease-out}.message.me{align-self:flex-end;flex-direction:row-reverse}.message.ai{align-self:flex-start}
-.message.system{align-self:center;max-width:100%;font-size:11px;color:var(--mute);text-align:center;background:var(--surface2);border:1px solid var(--line);padding:8px 12px;border-radius:12px}
+.message.system{align-self:center;max-width:100%;font-size:11px;color:var(--mute);text-align:center;background:var(--surface2);border:1px solid var(--line);padding:8px 12px;border-radius:12px;line-height:1.6}
 .message .avatar{width:29px;height:29px;flex-basis:29px;border-radius:10px}.msg-col{min-width:0;display:flex;flex-direction:column;gap:5px}
 .msg-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--mute);padding:0 2px}.message.me .msg-meta{justify-content:flex-end}
 .msg-bubble{font-size:14px;line-height:1.72;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid var(--line);background:var(--surface);padding:11px 14px;border-radius:17px}
 .message.me .msg-bubble{background:color-mix(in srgb,var(--accent) 15%,var(--surface));border-color:color-mix(in srgb,var(--accent) 35%,var(--line));border-top-right-radius:5px}.message.ai .msg-bubble{border-top-left-radius:5px}
-.msg-actions{display:flex;gap:3px;opacity:.78}.message.me .msg-actions{justify-content:flex-end}.msg-actions button{border:0;background:transparent;color:var(--mute);border-radius:8px;padding:4px 6px;font-size:10px}.msg-actions button:hover{background:var(--surface2);color:var(--ink)}
+.msg-actions{display:flex;gap:3px;opacity:.85}.message.me .msg-actions{justify-content:flex-end}.msg-actions button{border:0;background:transparent;color:var(--mute);border-radius:8px;padding:4px 6px;font-size:10px}.msg-actions button:hover{background:var(--surface2);color:var(--ink)}
 .action-text{font-style:italic;color:var(--accent)}.mention{color:var(--accent);font-weight:700}
 .typing{display:flex;align-items:center;gap:5px;padding:10px 13px;color:var(--mute);font-size:11px}.typing span{width:5px;height:5px;border-radius:50%;background:var(--mute);animation:bounce 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
 .composer-area{padding:10px 14px max(15px,env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--bg)}.composer-wrap{max-width:850px;margin:0 auto}
-.composer{border:1px solid var(--line);background:var(--surface);border-radius:23px;display:flex;align-items:flex-end;gap:8px;padding:9px 10px 9px 16px;box-shadow:0 8px 30px rgba(0,0,0,.07)}
+.composer{border:1px solid var(--line);background:var(--surface);border-radius:22px;display:flex;align-items:flex-end;gap:8px;padding:9px 10px 9px 15px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
 #message-input{border:0;outline:0;resize:none;min-height:30px;max-height:160px;flex:1;background:transparent;color:var(--ink);font-size:14px;line-height:1.6;padding:5px 0}#message-input::placeholder{color:var(--mute)}
 #send-btn{width:36px;height:36px;border:0;border-radius:50%;background:var(--accent);color:white;font-size:15px;flex:0 0 auto}.composer-note{text-align:center;font-size:10px;color:var(--mute);padding-top:8px}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.48);backdrop-filter:blur(3px);z-index:40;display:none}.overlay.show{display:block}
 .dialog{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px}.dialog.show{display:flex}
-.dialog-card{background:var(--surface);border:1px solid var(--line);border-radius:24px;width:min(590px,100%);max-height:min(86dvh,850px);overflow:auto;padding:22px;box-shadow:0 25px 80px rgba(0,0,0,.28)}
-.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.dialog-head h2{font-size:17px;margin:0}
-.field-group{display:flex;flex-direction:column;gap:7px;margin-bottom:15px}.field-group label{font-size:11px;font-weight:700;color:var(--mute)}
+.dialog-card{background:var(--surface);border:1px solid var(--line);border-radius:23px;width:min(600px,100%);max-height:min(88dvh,860px);overflow:auto;padding:21px;box-shadow:0 25px 80px rgba(0,0,0,.25)}
+.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.dialog-head h2{font-size:17px;margin:0}
+.field-group{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.field-group label{font-size:11px;font-weight:700;color:var(--mute)}
 .field,.field-group input,.field-group textarea,.field-group select{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:11px 12px;font-size:13px;outline:none}
-.field-group textarea{resize:vertical;min-height:92px;line-height:1.6}.field-hint{font-size:10px;color:var(--mute);line-height:1.6;margin:0}
-.dialog-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}.member-card{border:1px solid var(--line);background:var(--bg);border-radius:15px;padding:12px;margin-bottom:10px}
-.member-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.member-card-head input{flex:1;min-width:0}
-.small-title{font-size:11px;font-weight:800;color:var(--mute);letter-spacing:.04em;margin:18px 0 9px}
+.field-group textarea{resize:vertical;min-height:85px;line-height:1.6}.field-hint{font-size:10px;color:var(--mute);line-height:1.6;margin:0}
+.dialog-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.member-card{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:11px;margin-bottom:9px}
+.member-card-head{display:flex;align-items:center;gap:8px;margin-bottom:9px}.member-card-head input{flex:1;min-width:0}
+.small-title{font-size:11px;font-weight:800;color:var(--mute);letter-spacing:.03em;margin:17px 0 9px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,15px);opacity:0;pointer-events:none;background:var(--surface2);border:1px solid var(--line);padding:10px 15px;border-radius:999px;font-size:12px;z-index:90;transition:.2s;max-width:calc(100vw - 28px)}.toast.show{opacity:1;transform:translate(-50%,0)}
 .hidden{display:none!important}
 @keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}@keyframes bounce{0%,70%,100%{opacity:.35;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
-@media(max-width:760px){.sidebar{position:fixed;z-index:45;inset:0 auto 0 0;width:min(310px,88vw);transform:translateX(-105%);transition:transform .22s ease;box-shadow:15px 0 50px rgba(0,0,0,.2)}.sidebar.open{transform:translateX(0)}#mobile-menu{display:grid}.header{height:60px;flex-basis:60px;padding-inline:10px}.header-actions{gap:4px}.header-actions .btn .long-label{display:none}.header-actions .btn{padding:8px 10px}.messages{padding:17px 12px 23px}.message{max-width:96%}.msg-bubble{font-size:13.5px}.composer-area{padding-inline:9px}.dialog-card{padding:17px;border-radius:20px}}
+@media(max-width:760px){.sidebar{position:fixed;z-index:45;inset:0 auto 0 0;width:min(310px,88vw);transform:translateX(-105%);transition:transform .22s ease;box-shadow:15px 0 50px rgba(0,0,0,.2)}.sidebar.open{transform:translateX(0)}#mobile-menu{display:grid}.header{height:60px;flex-basis:60px;padding-inline:10px}.header-actions{gap:4px}.header-actions .btn .long-label{display:none}.header-actions .btn{padding:8px 10px}.messages{padding:17px 12px 23px}.message{max-width:96%}.msg-bubble{font-size:13.5px}.composer-area{padding-inline:9px}.dialog-card{padding:17px;border-radius:19px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-      <a class="brand" href="index.html"><div class="brand-icon">D</div><div class="brand-name">D-<em>AI</em> <span style="color:var(--mute);font-weight:600">Character</span></div></a>
-      <div class="mode-switch"><button class="mode-btn active" data-mode="one">1:1 모드</button><button class="mode-btn" data-mode="group">단체 모드</button></div>
-    </div>
-    <div class="side-heading"><span id="side-title">나의 캐릭터</span><button class="btn" id="side-add">+ 추가</button></div>
-    <div id="side-list"></div>
-    <div class="side-bottom"><a class="btn quiet" href="chat.html" style="text-decoration:none">일반 채팅</a><button class="btn" id="settings-open">⚙ 설정</button></div>
-  </aside>
-  <div class="overlay" id="sidebar-overlay"></div>
-  <main class="main">
-    <header class="header">
-      <div class="header-left"><button class="icon-btn" id="mobile-menu" aria-label="메뉴 열기">☰</button><div style="min-width:0"><div class="header-title" id="header-title">이든</div><div class="header-sub" id="header-sub">1:1 캐릭터 대화</div></div></div>
-      <div class="header-actions">
-        <button class="btn quiet hidden" id="auto-btn" title="AI 자동 대화 켜기/끄기">▶ <span class="long-label">자동 대화</span></button>
-        <button class="btn quiet" id="edit-btn">✎ <span class="long-label">설정</span></button>
-        <button class="btn quiet" id="export-btn" title="현재 대화 내보내기">⇩ <span class="long-label">내보내기</span></button>
-        <button class="btn quiet" id="import-btn" title="내보낸 파일 불러오기">⇧ <span class="long-label">불러오기</span></button>
-        <input id="import-file" type="file" accept="application/json,.json" hidden>
-        <button class="btn quiet" id="reset-btn" title="현재 대화 초기화">↻ <span class="long-label">초기화</span></button>
-        <button class="btn primary" id="new-btn">+ <span id="new-label">새 대화</span></button>
-      </div>
-    </header>
-    <section class="messages" id="messages" aria-live="polite" role="log"></section>
-    <div class="composer-area"><div class="composer-wrap">
-      <form class="composer" id="composer-form"><textarea id="message-input" rows="1" placeholder="메시지 보내기" autocomplete="off"></textarea><button id="send-btn" type="submit" aria-label="보내기">↑</button></form>
-      <div class="composer-note" id="composer-note">Enter 전송 · Shift+Enter 줄바꿈 · API 키는 설정에서 관리</div>
-    </div></div>
-  </main>
+<aside class="sidebar" id="sidebar">
+ <div class="sidebar-top">
+  <a class="brand" href="index.html"><div class="brand-icon">D</div><div class="brand-name">D-<em>AI</em> <span style="color:var(--mute);font-weight:600">Character</span></div></a>
+  <div class="mode-switch"><button class="mode-btn active" data-mode="one">1:1 모드</button><button class="mode-btn" data-mode="group">단체 모드</button></div>
+ </div>
+ <div class="side-heading"><span id="side-title">나의 캐릭터</span><button class="btn" id="side-add">+ 캐릭터</button></div>
+ <div id="side-list"></div>
+ <div class="side-bottom"><a class="btn quiet" href="chat.html" style="text-decoration:none">일반 채팅</a><button class="btn" id="settings-open">⚙ 설정</button></div>
+</aside>
+<div class="overlay" id="sidebar-overlay"></div>
+<main class="main">
+ <header class="header">
+  <div class="header-left"><button class="icon-btn" id="mobile-menu" aria-label="메뉴 열기">☰</button><div style="min-width:0"><div class="header-title" id="header-title">이든</div><div class="header-sub" id="header-sub">1:1 모드</div></div></div>
+  <div class="header-actions">
+   <button class="btn quiet hidden" id="auto-btn" title="AI 자동 대화">▶ <span class="long-label">자동 대화</span></button>
+   <button class="btn quiet" id="edit-btn">✎ <span class="long-label">설정</span></button>
+   <button class="btn quiet" id="export-btn" title="내보내기">⇩ <span class="long-label">내보내기</span></button>
+   <button class="btn quiet" id="import-btn" title="불러오기">⇧ <span class="long-label">불러오기</span></button>
+   <input id="import-file" type="file" accept="application/json,.json" hidden>
+   <button class="btn quiet" id="reset-btn" title="현재 대화 초기화">↻ <span class="long-label">초기화</span></button>
+   <button class="btn primary" id="new-btn">+ <span id="new-label">새 대화</span></button>
+  </div>
+ </header>
+ <section class="messages" id="messages" aria-live="polite" role="log"></section>
+ <div class="composer-area"><div class="composer-wrap">
+  <form class="composer" id="composer-form"><textarea id="message-input" rows="1" placeholder="메시지 보내기" autocomplete="off"></textarea><button id="send-btn" type="submit" aria-label="보내기">↑</button></form>
+  <div class="composer-note" id="composer-note">Enter 전송 · Shift+Enter 줄바꿈</div>
+ </div></div>
+</main>
 </div>
 <div class="dialog" id="settings-dialog" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-  <div class="dialog-card">
-    <div class="dialog-head"><h2 id="settings-title">공통 설정</h2><button class="icon-btn" data-close="settings-dialog" aria-label="닫기">✕</button></div>
-    <div class="field-group"><label for="api-key">Gemini API 키</label><input id="api-key" type="password" autocomplete="off" placeholder="AIzaSy…"><p class="field-hint">일반 채팅·1:1 모드·단체 모드가 이 키를 함께 사용합니다. 정적 웹사이트이므로 키는 현재 브라우저 저장소에 저장됩니다.</p></div>
-    <div class="field-group"><label for="api-model">공통 모델 ID</label><input id="api-model" list="model-options" value="gemini-3.1-flash-lite" spellcheck="false"><datalist id="model-options"><option value="gemini-3.1-flash-lite"><option value="gemini-3.6-flash"><option value="gemini-3.5-flash-lite"></datalist><p class="field-hint">기본은 Gemini 3.1 Flash-Lite로, 빠르고 비용 효율적인 대화에 맞췄어요. 사용 가능 모델과 호출 한도는 Google AI Studio 프로젝트 설정을 따릅니다.</p></div>
-    <div class="field-group"><label>화면 테마</label><div class="mode-switch"><button class="mode-btn" id="theme-light" type="button">☀ 라이트</button><button class="mode-btn active" id="theme-dark" type="button">☾ 다크</button></div></div>
-    <div class="dialog-footer"><button class="btn" data-close="settings-dialog">닫기</button><button class="btn primary" id="save-settings">설정 저장</button></div>
-  </div>
+ <div class="dialog-card">
+  <div class="dialog-head"><h2 id="settings-title">공통 설정</h2><button class="icon-btn" data-close="settings-dialog" aria-label="닫기">✕</button></div>
+  <div class="field-group"><label for="api-key">Gemini API 키</label><input id="api-key" type="password" autocomplete="off" placeholder="AIzaSy…"><p class="field-hint">일반 채팅·1:1 모드·단체 모드가 이 키를 공유합니다. 정적 사이트에서는 브라우저 저장소의 키를 완전히 숨길 수 없어요.</p></div>
+  <div class="field-group"><label for="api-model">공통 모델 ID</label><input id="api-model" list="model-options" value="gemini-3.1-flash-lite" spellcheck="false"><datalist id="model-options"><option value="gemini-3.1-flash-lite"><option value="gemini-3.6-flash"><option value="gemini-3.5-flash-lite"></datalist><p class="field-hint">기본 모델은 Gemini 3.1 Flash-Lite예요. 사용 가능한 모델과 한도는 Google AI Studio 설정에 따라 달라져요.</p></div>
+  <div class="field-group"><label>화면 테마</label><div class="mode-switch"><button class="mode-btn" id="theme-light" type="button">☀ 라이트</button><button class="mode-btn active" id="theme-dark" type="button">☾ 다크</button></div></div>
+  <div class="dialog-footer"><button class="btn" data-close="settings-dialog">닫기</button><button class="btn primary" id="save-settings">설정 저장</button></div>
+ </div>
 </div>
 <div class="dialog" id="editor-dialog" role="dialog" aria-modal="true" aria-labelledby="editor-title">
-  <div class="dialog-card"><div class="dialog-head"><h2 id="editor-title">편집</h2><button class="icon-btn" data-close="editor-dialog" aria-label="닫기">✕</button></div>
-    <form id="editor-form"><div id="editor-content"></div><div class="dialog-footer"><button type="button" class="btn" data-close="editor-dialog">취소</button><button type="submit" class="btn primary">저장</button></div></form>
-  </div>
+ <div class="dialog-card"><div class="dialog-head"><h2 id="editor-title">편집</h2><button class="icon-btn" data-close="editor-dialog" aria-label="닫기">✕</button></div>
+  <form id="editor-form"><div id="editor-content"></div><div class="dialog-footer"><button type="button" class="btn" data-close="editor-dialog">취소</button><button type="submit" class="btn primary">저장</button></div></form>
+ </div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
-(() => {
+(function(){
 'use strict';
-const $ = (s, root=document) => root.querySelector(s);
-const $$ = (s, root=document) => [...root.querySelectorAll(s)];
-const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id-'+Date.now()+'-'+Math.random().toString(16).slice(2));
-const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-const clone = value => JSON.parse(JSON.stringify(value));
-const fmt = value => { const d=new Date(value||Date.now()); return d.toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}); };
-const DEFAULT_CHARACTERS = [{id:'character-eden',name:'이든',personality:'옆자리에 앉은 회사 동기로, 겉으로는 능청스럽고 장난기 가득한 태도로 실없는 농담을 던지지만 속으로는 상대의 컨디션과 기분을 세심하게 살피는 다정한 성격이다. 상대가 지쳐 보이면 괜히 우스갯소리로 분위기를 풀어주려 하고, 정작 걱정하는 티는 최대한 안 내려고 딴청을 피우는 버릇이 있다.',greeting:'*커피 두 잔을 들고 자리로 다가와 하나를 쓱 내민다* 어, 딱 맞춰 왔네. *씩 웃으며 옆자리에 걸터앉는다* 얼굴이 반쪽인데? 무슨 일 있었어, 나한테 다 말해봐.',userName:'플레이어'}];
-const DEFAULT_MEMBERS = [
- {id:'member-alpha',sourceCharacterId:null,name:'알파',personality:'모임 총무 포지션. 얘기가 흩어지면 다시 모으고, 다른 애들한테 질문을 잘 던진다.',hue:215},
- {id:'member-luna',sourceCharacterId:null,name:'루나',personality:'호기심이 많고 엉뚱한 생각을 자주 한다. 새벽 감성이 있다.',hue:275},
- {id:'member-jay',sourceCharacterId:null,name:'제이',personality:'개발자. 근거 없는 말에는 바로 태클을 걸지만 은근히 사람을 잘 챙긴다.',hue:38},
- {id:'member-baby',sourceCharacterId:null,name:'베이비',personality:'막내. 눈치 안 보고 생각나는 대로 던진다.',hue:150}
-];
-const STORE_KEY='dai_character_workspace_v1';
-const freshRoom = () => ({id:'room-default',name:'기본 단체방',worldSetting:'현대의 친근한 온라인 친구 모임. 멤버들은 각자의 성격과 말투를 유지하며 자연스럽게 대화한다. 현실적인 채팅처럼 짧게 말하고, 서로의 말을 기억하며 대화한다.',members:clone(DEFAULT_MEMBERS),log:[],dms:{},autoEnabled:false,autoInterval:25,maxAuto:6,createdAt:Date.now()});
-function loadWorkspace(){
- try{const raw=localStorage.getItem(STORE_KEY);if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.characters)&&Array.isArray(s.rooms))return {...s,version:1};}}
- catch(e){console.warn('작업공간을 불러오지 못했습니다.',e);}
- return {version:1,mode:'one',characters:clone(DEFAULT_CHARACTERS),rooms:[freshRoom()],activeCharacterId:DEFAULT_CHARACTERS[0].id,activeRoomId:'room-default',activeConversationByCharacter:{},conversationsByCharacter:{},activeRoomView:{}};
+const $=function(s,r){return (r||document).querySelector(s);};
+const $$=function(s,r){return Array.from((r||document).querySelectorAll(s));};
+const uid=function(){return (crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2));};
+const esc=function(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});};
+const clone=function(v){return JSON.parse(JSON.stringify(v));};
+const fmt=function(v){return new Date(v||Date.now()).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});};
+const DEFAULT_CHARACTERS=[{id:'character-eden',name:'이든',personality:'옆자리에 앉은 회사 동기로, 겉으로는 능청스럽고 장난기 가득한 태도로 농담을 던지지만 속으로는 상대의 컨디션과 기분을 세심하게 살피는 다정한 성격이다.',greeting:'*커피 두 잔을 들고 다가와 하나를 쓱 내민다* 어, 딱 맞춰 왔네. 무슨 일 있었어? 나한테 다 말해봐.',userName:'플레이어'}];
+const DEFAULT_MEMBERS=[{id:'m-alpha',name:'알파',personality:'모임 총무. 이야기가 흩어지면 정리하고 다른 멤버에게 질문을 던진다.',hue:215},{id:'m-luna',name:'루나',personality:'호기심이 많고 엉뚱한 생각을 자주 한다. 새벽 감성이 있다.',hue:275},{id:'m-jay',name:'제이',personality:'개발자. 근거 없는 말에는 태클을 걸지만 은근히 사람을 잘 챙긴다.',hue:38},{id:'m-baby',name:'베이비',personality:'막내. 눈치 안 보고 생각나는 대로 던진다.',hue:150}];
+const STORE='dai_character_workspace_v2';
+function freshRoom(name){return {id:uid(),name:name||'일반 채팅방',log:[],dms:{},autoEnabled:false,autoInterval:25,maxAuto:6,createdAt:Date.now()};}
+function freshWorld(name,withDefaults){return {id:uid(),name:name||'새 세계관',setting:'',members:withDefaults?clone(DEFAULT_MEMBERS):[],rooms:[freshRoom()],createdAt:Date.now()};}
+function loadState(){
+ try{const raw=localStorage.getItem(STORE);if(raw){const v=JSON.parse(raw);if(v&&Array.isArray(v.characters)&&Array.isArray(v.worlds))return v;}}catch(e){}
+ const world=freshWorld('기본 세계관',false);
+ return {version:2,mode:'one',characters:clone(DEFAULT_CHARACTERS),worlds:[world],activeCharacterId:'character-eden',activeWorldId:world.id,activeRoomByWorld:{[world.id]:world.rooms[0].id},activeViewByRoom:{},conversationsByCharacter:{},activeConversationByCharacter:{}};
 }
-let W=loadWorkspace(), activeController=null, generationToken=0, generating=false, editorDraft=null, toastTimer=null, autoCountByRoom={};
-function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify(W));}catch(e){toast('저장 공간이 부족해요. 대화를 내보내고 일부 오래된 기록을 정리해 주세요.');}}
-function toast(message){const t=$('#toast');t.textContent=message;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600);}
-function currentCharacter(){return W.characters.find(c=>c.id===W.activeCharacterId)||W.characters[0]||null;}
-function currentRoom(){return W.rooms.find(r=>r.id===W.activeRoomId)||W.rooms[0]||null;}
-function conversationsFor(characterId){if(!W.conversationsByCharacter[characterId])W.conversationsByCharacter[characterId]=[];return W.conversationsByCharacter[characterId];}
-function currentConversation(){const c=currentCharacter();if(!c)return null;const id=W.activeConversationByCharacter[c.id];return conversationsFor(c.id).find(x=>x.id===id)||null;}
-function ensureConversation(){const c=currentCharacter();if(!c)return null;let conv=currentConversation();if(conv)return conv;conv={id:uid(),characterId:c.id,title:'새 대화',model:DAIShared.getModel(),createdAt:Date.now(),updatedAt:Date.now(),messages:[]};if(c.greeting)conv.messages.push({id:uid(),role:'assistant',text:c.greeting,time:Date.now()});conversationsFor(c.id).unshift(conv);W.activeConversationByCharacter[c.id]=conv.id;save();return conv;}
-function activeGroupView(){const r=currentRoom();if(!r)return 'group';return W.activeRoomView[r.id]||'group';}
-function setGroupView(value){const r=currentRoom();if(!r)return;W.activeRoomView[r.id]=value;save();}
-function cancelGeneration(){generationToken++;if(activeController){try{activeController.abort();}catch(e){}activeController=null;}generating=false;setBusy(false);}
-function setBusy(on){generating=on;$('#send-btn').disabled=false;$('#message-input').disabled=on;$('#send-btn').textContent=on?'■':'↑';}
-function highlightMarkup(text,room=null){let out=esc(text).replace(/\[\*([^*\]]+)\*\]/g,'<span class="action-text">$1</span>').replace(/\*([^\*\n]+)\*/g,'<span class="action-text">$1</span>').replace(/\n/g,'<br>');if(room)room.members.forEach(m=>{const re=new RegExp('@'+m.name.replace(/[.*+?^\${}()|[\]\\]/g,'\\$&'),'g');out=out.replace(re,'<span class="mention">@'+esc(m.name)+'</span>');});return out;}
+let S=loadState(),busy=false,token=0,controller=null,draft=null,toastTimer=null,autoCounts={};
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){toast('저장 공간이 부족해요. 대화를 내보내고 오래된 기록을 정리해 주세요.');}}
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.classList.remove('show');},2600);}
+function currentCharacter(){return S.characters.find(function(c){return c.id===S.activeCharacterId;})||null;}
+function currentWorld(){return S.worlds.find(function(w){return w.id===S.activeWorldId;})||null;}
+function currentRoom(){const w=currentWorld();if(!w)return null;return w.rooms.find(function(r){return r.id===S.activeRoomByWorld[w.id];})||w.rooms[0]||null;}
+function roomView(){const r=currentRoom();return r?S.activeViewByRoom[r.id]||'group':'group';}
+function getConversations(id){if(!S.conversationsByCharacter[id])S.conversationsByCharacter[id]=[];return S.conversationsByCharacter[id];}
+function currentConversation(){const c=currentCharacter();if(!c)return null;return getConversations(c.id).find(function(v){return v.id===S.activeConversationByCharacter[c.id];})||null;}
+function ensureConversation(){const c=currentCharacter();if(!c)return null;let v=currentConversation();if(v)return v;v={id:uid(),characterId:c.id,title:'새 대화',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};if(c.greeting)v.messages.push({id:uid(),role:'assistant',text:c.greeting,time:Date.now()});getConversations(c.id).unshift(v);S.activeConversationByCharacter[c.id]=v.id;save();return v;}
+function activeLog(room,view){return view==='group'?room.log:(room.dms[view]||(room.dms[view]=[]));}
+function cancelGeneration(){token++;if(controller){try{controller.abort();}catch(e){}controller=null;}busy=false;setBusy(false);}
+function setBusy(on){busy=on;$('#message-input').disabled=on;$('#send-btn').textContent=on?'■':'↑';$('#send-btn').setAttribute('aria-label',on?'생성 중지':'보내기');}
 function openDialog(id){$('#'+id).classList.add('show');}
 function closeDialog(id){$('#'+id).classList.remove('show');}
 function applyTheme(theme){document.documentElement.classList.toggle('dark',theme==='dark');try{localStorage.setItem('dai_theme_v1',theme);}catch(e){}$('#theme-light').classList.toggle('active',theme==='light');$('#theme-dark').classList.toggle('active',theme==='dark');}
 function openSettings(){$('#api-key').value=DAIShared.getApiKey();$('#api-model').value=DAIShared.getModel('gemini-3.1-flash-lite');const dark=document.documentElement.classList.contains('dark');$('#theme-light').classList.toggle('active',!dark);$('#theme-dark').classList.toggle('active',dark);openDialog('settings-dialog');}
-function saveSettings(){DAIShared.setApiKey($('#api-key').value);DAIShared.setModel($('#api-model').value.trim()||'gemini-3.1-flash-lite');save();closeDialog('settings-dialog');toast('공통 API 설정을 저장했어요.');}
-function switchMode(mode){if(W.mode===mode)return;cancelGeneration();W.mode=mode;save();renderAll();toggleSidebar(false);}
+function saveSettings(){DAIShared.setApiKey($('#api-key').value);DAIShared.setModel($('#api-model').value.trim()||'gemini-3.1-flash-lite');closeDialog('settings-dialog');save();toast('공통 API 설정을 저장했어요.');}
+function switchMode(mode){if(S.mode===mode)return;cancelGeneration();S.mode=mode;save();renderAll();toggleSidebar(false);}
 function toggleSidebar(force){const open=force===undefined?!$('#sidebar').classList.contains('open'):force;$('#sidebar').classList.toggle('open',open);$('#sidebar-overlay').classList.toggle('show',open);}
-function selectCharacter(id){if(!W.characters.some(c=>c.id===id))return;cancelGeneration();W.activeCharacterId=id;ensureConversation();save();renderAll();toggleSidebar(false);}
-function selectConversation(id){const c=currentCharacter();if(!c)return;if(!conversationsFor(c.id).some(x=>x.id===id))return;cancelGeneration();W.activeConversationByCharacter[c.id]=id;save();renderAll();toggleSidebar(false);}
-function selectRoom(id){if(!W.rooms.some(r=>r.id===id))return;cancelGeneration();W.activeRoomId=id;save();renderAll();toggleSidebar(false);}
-function createConversation(){const c=currentCharacter();if(!c)return;cancelGeneration();const conv={id:uid(),characterId:c.id,title:'새 대화',model:DAIShared.getModel(),createdAt:Date.now(),updatedAt:Date.now(),messages:[]};if(c.greeting)conv.messages.push({id:uid(),role:'assistant',text:c.greeting,time:Date.now()});conversationsFor(c.id).unshift(conv);W.activeConversationByCharacter[c.id]=conv.id;save();renderAll();$('#message-input').focus();}
-function createRoom(){const room={id:uid(),name:'새 단체방',worldSetting:'',members:[],log:[],dms:{},autoEnabled:false,autoInterval:25,maxAuto:6,createdAt:Date.now()};W.rooms.unshift(room);W.activeRoomId=room.id;W.activeRoomView[room.id]='group';save();openRoomEditor(room.id,true);renderAll();}
-function openCharacterEditor(id=null){
- const editing=!!id;const char=id?W.characters.find(c=>c.id===id):null;
- editorDraft={type:'character',id,editing,character:char?clone(char):{id:uid(),name:'새 캐릭터',personality:'',greeting:'',userName:'플레이어'}};
- $('#editor-title').textContent=editing?'캐릭터 편집':'나의 캐릭터 추가';
- $('#editor-content').innerHTML='<div class="field-group"><label for="char-name">캐릭터 이름</label><input id="char-name" maxlength="80" required value="'+esc(editorDraft.character.name)+'"></div><div class="field-group"><label for="char-personality">성격·배경 설정</label><textarea id="char-personality" rows="6" placeholder="말투, 성격, 관계, 배경 등">'+esc(editorDraft.character.personality)+'</textarea></div><div class="field-group"><label for="char-greeting">첫 인사</label><textarea id="char-greeting" rows="3" placeholder="새 대화를 시작할 때 보여줄 첫 대사">'+esc(editorDraft.character.greeting)+'</textarea></div><div class="field-group"><label for="char-user-name">내 이름</label><input id="char-user-name" maxlength="80" value="'+esc(editorDraft.character.userName||'플레이어')+'"></div>';
- openDialog('editor-dialog');
+function makeConversation(){const c=currentCharacter();if(!c)return;const v={id:uid(),characterId:c.id,title:'새 대화',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};if(c.greeting)v.messages.push({id:uid(),role:'assistant',text:c.greeting,time:Date.now()});getConversations(c.id).unshift(v);S.activeConversationByCharacter[c.id]=v.id;save();renderAll();}
+function selectCharacter(id){if(!S.characters.some(function(c){return c.id===id;}))return;cancelGeneration();S.activeCharacterId=id;ensureConversation();save();renderAll();toggleSidebar(false);}
+function selectWorld(id){if(!S.worlds.some(function(w){return w.id===id;}))return;cancelGeneration();S.activeWorldId=id;const w=currentWorld();if(w&&!S.activeRoomByWorld[w.id]&&w.rooms[0])S.activeRoomByWorld[w.id]=w.rooms[0].id;save();renderAll();toggleSidebar(false);}
+function selectRoom(id){const w=currentWorld();if(!w||!w.rooms.some(function(r){return r.id===id;}))return;cancelGeneration();S.activeRoomByWorld[w.id]=id;save();renderAll();toggleSidebar(false);}
+function selectView(value){const r=currentRoom();if(!r)return;cancelGeneration();S.activeViewByRoom[r.id]=value;save();renderAll();toggleSidebar(false);}
+function selectConversation(id){const c=currentCharacter();if(!c)return;if(!getConversations(c.id).some(function(v){return v.id===id;}))return;cancelGeneration();S.activeConversationByCharacter[c.id]=id;save();renderAll();toggleSidebar(false);}
+function newRoom(world){const r=freshRoom('새 채팅방');world.rooms.unshift(r);S.activeRoomByWorld[world.id]=r.id;S.activeViewByRoom[r.id]='group';save();openRoomEditor(r.id,true);renderAll();}
+function newWorld(){const w=freshWorld('새 세계관',false);S.worlds.unshift(w);S.activeWorldId=w.id;const r=w.rooms[0];S.activeRoomByWorld[w.id]=r.id;S.activeViewByRoom[r.id]='group';save();openWorldEditor(w.id,true);renderAll();}
+function openCharacterEditor(id){const c=id?S.characters.find(function(v){return v.id===id;}):null;draft={type:'character',isNew:!c,character:c?clone(c):{id:uid(),name:'새 캐릭터',personality:'',greeting:'',userName:'플레이어'}};$('#editor-title').textContent=c?'캐릭터 편집':'나의 캐릭터 추가';$('#editor-content').innerHTML='<div class="field-group"><label for="edit-name">캐릭터 이름</label><input id="edit-name" maxlength="80" required value="'+esc(draft.character.name)+'"></div><div class="field-group"><label for="edit-personality">성격·배경</label><textarea id="edit-personality" rows="5">'+esc(draft.character.personality)+'</textarea></div><div class="field-group"><label for="edit-greeting">첫 인사</label><textarea id="edit-greeting" rows="3">'+esc(draft.character.greeting)+'</textarea></div><div class="field-group"><label for="edit-user-name">내 이름</label><input id="edit-user-name" maxlength="80" value="'+esc(draft.character.userName||'플레이어')+'"></div>';openDialog('editor-dialog');}
+function openWorldEditor(id,isNew){const w=S.worlds.find(function(v){return v.id===id;});if(!w)return;draft={type:'world',id:id,isNew:!!isNew,world:clone(w)};$('#editor-title').textContent=isNew?'세계관 만들기':'세계관 설정';renderWorldEditor();openDialog('editor-dialog');}
+function renderWorldEditor(){
+ const w=draft.world;
+ const memberCards=w.members.map(function(m,i){return '<div class="member-card"><div class="member-card-head"><div class="avatar">'+esc((m.name||'?').charAt(0))+'</div><input class="field" data-member-name="'+i+'" value="'+esc(m.name)+'" aria-label="멤버 이름"><button class="btn danger" type="button" data-remove-member="'+i+'">삭제</button></div><div class="field-group" style="margin:0"><label>이 세계관에서의 성격·역할</label><textarea data-member-personality="'+i+'" rows="3">'+esc(m.personality||'')+'</textarea></div></div>';}).join('');
+ const chars=S.characters.map(function(c){return '<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>';}).join('');
+ $('#editor-content').innerHTML='<div class="field-group"><label for="world-name">세계관 이름</label><input id="world-name" maxlength="90" required value="'+esc(w.name)+'"></div><div class="field-group"><label for="world-setting">세계관·배경 설정</label><textarea id="world-setting" rows="5" placeholder="시대, 장소, 인물 관계, 세계의 규칙 등">'+esc(w.setting)+'</textarea><p class="field-hint">세계관 설정과 멤버는 이 세계관의 모든 채팅방에서 공통으로 사용돼요. 각 채팅방의 대화 기록은 별개예요.</p></div><div class="small-title">이 세계관의 AI 멤버</div><div id="world-members">'+(memberCards||'<p class="field-hint">멤버가 아직 없어요. 아래에서 나의 캐릭터를 추가해 주세요.</p>')+'</div><div style="display:flex;gap:8px;margin-top:9px"><select class="field" id="character-to-add" style="flex:1"><option value="">나의 캐릭터에서 선택</option>'+chars+'</select><button type="button" class="btn" id="add-world-member">+ 멤버 추가</button></div><p class="field-hint" style="margin-top:7px">캐릭터는 복사본으로 추가돼요. 이 세계관에서 멤버 설정을 고쳐도 원본 캐릭터에는 영향이 없어요.</p>';
 }
-function openRoomEditor(id,isNew=false){const room=W.rooms.find(r=>r.id===id);if(!room)return;editorDraft={type:'room',id,isNew,room:clone(room)};$('#editor-title').textContent=isNew?'단체방 만들기':'단체방 설정';renderRoomEditor();openDialog('editor-dialog');}
-function renderRoomEditor(){
- const room=editorDraft.room;
- const options=W.characters.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
- const members=room.members.map((m,i)=>'<div class="member-card" data-member-card="'+i+'"><div class="member-card-head"><div class="avatar">'+esc((m.name||'?').charAt(0))+'</div><input class="field" data-member-name="'+i+'" value="'+esc(m.name)+'" aria-label="멤버 이름"><button type="button" class="btn danger" data-remove-member="'+i+'">삭제</button></div><div class="field-group" style="margin-bottom:0"><label>이 단체방에서의 성격·역할</label><textarea data-member-persona="'+i+'" rows="3">'+esc(m.personality||'')+'</textarea></div></div>').join('');
- $('#editor-content').innerHTML='<div class="field-group"><label for="room-name-input">단체방 이름</label><input id="room-name-input" maxlength="80" required value="'+esc(room.name)+'"></div><div class="field-group"><label for="world-setting-input">세계관·상황 설정</label><textarea id="world-setting-input" rows="5" placeholder="이 방에서만 적용되는 배경, 관계, 분위기 등">'+esc(room.worldSetting||'')+'</textarea><p class="field-hint">이 설정과 대화 기록은 이 단체방에만 적용돼요. 다른 방이나 1:1 캐릭터 대화와 섞이지 않습니다.</p></div><div class="small-title">멤버</div><div id="room-members-editor">'+(members||'<p class="field-hint">아직 멤버가 없어요. 아래에서 나의 캐릭터를 복사해 추가해 주세요.</p>')+'</div><div style="display:flex;gap:8px;align-items:center;margin-top:10px"><select class="field" id="add-character-select" style="flex:1"><option value="">나의 캐릭터에서 추가…</option>'+options+'</select><button class="btn" id="add-character-to-room" type="button">+ 멤버 추가</button></div><p class="field-hint" style="margin-top:8px">추가한 캐릭터는 이 방에 복사본으로 들어갑니다. 방 안에서 이름이나 성격을 편집해도 원본 캐릭터는 바뀌지 않아요.</p><div class="small-title">자동 대화</div><div class="field-group"><label><input id="room-auto-input" type="checkbox" '+(room.autoEnabled?'checked':'')+' style="width:auto;margin-right:7px">내가 말하지 않아도 AI 멤버끼리 대화하기</label></div><div class="field-group"><label for="room-auto-interval">자동 대화 간격 (초)</label><input id="room-auto-interval" type="number" min="10" max="300" value="'+esc(room.autoInterval||25)+'"></div><div class="field-group"><label for="room-auto-max">연속 자동 대화 횟수 제한</label><input id="room-auto-max" type="number" min="1" max="30" value="'+esc(room.maxAuto||6)+'"></div>';
+function addWorldMember(){const id=$('#character-to-add').value;const c=S.characters.find(function(v){return v.id===id;});if(!c){toast('추가할 캐릭터를 선택해 주세요.');return;}const w=draft.world;w.members.push({id:uid(),sourceCharacterId:c.id,name:c.name,personality:c.personality||'',hue:[215,275,38,150,340,190,95,15][w.members.length%8]});renderWorldEditor();}
+function openRoomEditor(id,isNew){const w=currentWorld();const r=w&&w.rooms.find(function(v){return v.id===id;});if(!r)return;draft={type:'room',worldId:w.id,id:id,isNew:!!isNew,room:clone(r)};$('#editor-title').textContent=isNew?'채팅방 만들기':'채팅방 설정';$('#editor-content').innerHTML='<div class="field-group"><label for="room-name">채팅방 이름</label><input id="room-name" maxlength="90" required value="'+esc(r.name)+'"></div><p class="field-hint">현재 세계관: <strong>'+esc(w.name)+'</strong><br>이 채팅방은 세계관 설정과 멤버를 공유하지만, 대화 및 DM 기록은 다른 채팅방과 별개로 저장돼요.</p><div class="small-title">자동 대화 설정</div><div class="field-group"><label><input id="room-auto" type="checkbox" '+(r.autoEnabled?'checked':'')+' style="width:auto;margin-right:7px">자동 대화 켜기 (AI 멤버끼리 대화)</label></div><div class="field-group"><label for="room-interval">자동 대화 간격 (초)</label><input id="room-interval" type="number" min="10" max="300" value="'+Number(r.autoInterval||25)+'"></div><div class="field-group"><label for="room-max">자동 대화 제한 횟수</label><input id="room-max" type="number" min="1" max="30" value="'+Number(r.maxAuto||6)+'"></div>';openDialog('editor-dialog');}
+function saveEditor(e){e.preventDefault();if(!draft)return;
+ if(draft.type==='character'){const c=draft.character;c.name=$('#edit-name').value.trim();c.personality=$('#edit-personality').value.trim();c.greeting=$('#edit-greeting').value.trim();c.userName=$('#edit-user-name').value.trim()||'플레이어';if(!c.name){toast('캐릭터 이름을 입력해 주세요.');return;}const idx=S.characters.findIndex(function(v){return v.id===c.id;});if(idx>=0)S.characters[idx]=c;else{S.characters.unshift(c);S.activeCharacterId=c.id;}save();closeDialog('editor-dialog');draft=null;renderAll();toast('캐릭터를 저장했어요.');return;}
+ if(draft.type==='world'){const w=draft.world;w.name=$('#world-name').value.trim()||'이름 없는 세계관';w.setting=$('#world-setting').value.trim();w.members=w.members.map(function(m,i){const name=$('#editor-content [data-member-name="'+i+'"]');const persona=$('#editor-content [data-member-personality="'+i+'"]');return Object.assign({},m,{name:name?name.value.trim()||'이름 없는 멤버':'이름 없는 멤버',personality:persona?persona.value.trim():''});});const idx=S.worlds.findIndex(function(v){return v.id===w.id;});if(idx>=0)S.worlds[idx]=w;else S.worlds.unshift(w);S.activeWorldId=w.id;save();closeDialog('editor-dialog');draft=null;renderAll();toast('세계관을 저장했어요.');return;}
+ const r=draft.room,w=S.worlds.find(function(v){return v.id===draft.worldId;});if(!w)return;r.name=$('#room-name').value.trim()||'이름 없는 채팅방';r.autoEnabled=$('#room-auto').checked;r.autoInterval=Math.max(10,Math.min(300,Number($('#room-interval').value)||25));r.maxAuto=Math.max(1,Math.min(30,Number($('#room-max').value)||6));const idx=w.rooms.findIndex(function(v){return v.id===r.id;});if(idx>=0)w.rooms[idx]=r;else w.rooms.unshift(r);S.activeRoomByWorld[w.id]=r.id;save();closeDialog('editor-dialog');draft=null;renderAll();toast('채팅방을 저장했어요.');
 }
-function addCharacterToRoom(){const id=$('#add-character-select')?.value;const char=W.characters.find(c=>c.id===id);if(!char)return toast('먼저 추가할 캐릭터를 선택해 주세요.');const used=[215,275,38,150,340,190,95,15];const hue=used[editorDraft.room.members.length%used.length];editorDraft.room.members.push({id:uid(),sourceCharacterId:char.id,name:char.name,personality:char.personality||'',hue});renderRoomEditor();}
-function saveEditor(event){
- event.preventDefault();if(!editorDraft)return;
- if(editorDraft.type==='character'){
-  const c=editorDraft.character;c.name=$('#char-name').value.trim();c.personality=$('#char-personality').value.trim();c.greeting=$('#char-greeting').value.trim();c.userName=$('#char-user-name').value.trim()||'플레이어';if(!c.name)return toast('캐릭터 이름을 입력해 주세요.');
-  if(editorDraft.editing){const idx=W.characters.findIndex(x=>x.id===editorDraft.id);if(idx>=0)W.characters[idx]=c;}else{W.characters.unshift(c);W.activeCharacterId=c.id;W.activeConversationByCharacter[c.id]=null;}
-  save();closeDialog('editor-dialog');editorDraft=null;renderAll();toast('캐릭터를 저장했어요.');return;
- }
- const room=editorDraft.room;room.name=$('#room-name-input').value.trim()||'이름 없는 단체방';room.worldSetting=$('#world-setting-input').value.trim();
- room.members=room.members.map((m,i)=>({...m,name:$('#editor-content [data-member-name="'+i+'"]').value.trim()||'이름 없는 멤버',personality:$('#editor-content [data-member-persona="'+i+'"]').value.trim()}));
- room.autoEnabled=$('#room-auto-input').checked;room.autoInterval=Math.max(10,Math.min(300,Number($('#room-auto-interval').value)||25));room.maxAuto=Math.max(1,Math.min(30,Number($('#room-auto-max').value)||6));
- if(editorDraft.isNew&&!room.members.length){toast('단체방에는 멤버를 한 명 이상 추가해 주세요.');return;}
- const idx=W.rooms.findIndex(r=>r.id===room.id);if(idx>=0)W.rooms[idx]=room;else W.rooms.unshift(room);W.activeRoomId=room.id;save();closeDialog('editor-dialog');editorDraft=null;renderAll();toast('단체방을 저장했어요.');
-}
-function deleteCharacter(id){const c=W.characters.find(x=>x.id===id);if(!c)return;if(!confirm('「'+c.name+'」 캐릭터와 이 캐릭터의 1:1 대화 기록을 삭제할까요? 단체방에 복사해 둔 멤버는 유지됩니다.'))return;W.characters=W.characters.filter(x=>x.id!==id);delete W.conversationsByCharacter[id];delete W.activeConversationByCharacter[id];if(W.activeCharacterId===id)W.activeCharacterId=W.characters[0]?.id||null;if(!W.characters.length){const c0=clone(DEFAULT_CHARACTERS[0]);c0.id=uid();W.characters.push(c0);W.activeCharacterId=c0.id;}ensureConversation();save();renderAll();}
-function deleteRoom(id){const room=W.rooms.find(r=>r.id===id);if(!room)return;if(!confirm('「'+room.name+'」 단체방과 그 방의 단톡·DM 기록을 모두 삭제할까요?'))return;W.rooms=W.rooms.filter(r=>r.id!==id);if(!W.rooms.length)W.rooms.push(freshRoom());if(W.activeRoomId===id)W.activeRoomId=W.rooms[0].id;save();renderAll();}
+function deleteCharacter(id){const c=S.characters.find(function(v){return v.id===id;});if(!c)return;if(!confirm('「'+c.name+'」와 이 캐릭터의 1:1 대화를 삭제할까요? 세계관에 추가한 복사본은 유지돼요.'))return;S.characters=S.characters.filter(function(v){return v.id!==id;});delete S.conversationsByCharacter[id];delete S.activeConversationByCharacter[id];if(!S.characters.length){const c0=clone(DEFAULT_CHARACTERS[0]);c0.id=uid();S.characters.push(c0);}if(S.activeCharacterId===id)S.activeCharacterId=S.characters[0].id;save();renderAll();}
+function deleteWorld(id){const w=S.worlds.find(function(v){return v.id===id;});if(!w)return;if(!confirm('「'+w.name+'」 세계관과 그 안의 모든 채팅방·대화 기록을 삭제할까요?'))return;S.worlds=S.worlds.filter(function(v){return v.id!==id;});if(!S.worlds.length)S.worlds.push(freshWorld('기본 세계관',false));if(S.activeWorldId===id)S.activeWorldId=S.worlds[0].id;if(!S.activeRoomByWorld[S.activeWorldId]&&S.worlds[0].rooms[0])S.activeRoomByWorld[S.activeWorldId]=S.worlds[0].rooms[0].id;save();renderAll();}
+function deleteRoom(id){const w=currentWorld();if(!w)return;const r=w.rooms.find(function(v){return v.id===id;});if(!r)return;if(!confirm('「'+r.name+'」 채팅방과 이 방의 단톡·DM 기록을 삭제할까요?'))return;w.rooms=w.rooms.filter(function(v){return v.id!==id;});if(!w.rooms.length)w.rooms.push(freshRoom());if(S.activeRoomByWorld[w.id]===id)S.activeRoomByWorld[w.id]=w.rooms[0].id;save();renderAll();}
+function deleteConversation(id){const c=currentCharacter();if(!c)return;if(!confirm('이 대화를 삭제할까요?'))return;const list=getConversations(c.id);S.conversationsByCharacter[c.id]=list.filter(function(v){return v.id!==id;});if(S.activeConversationByCharacter[c.id]===id)delete S.activeConversationByCharacter[c.id];ensureConversation();save();renderAll();}
 function renderSidebar(){
- $$('.mode-btn[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===W.mode));const box=$('#side-list');box.innerHTML='';
- if(W.mode==='one'){
-  $('#side-title').textContent='나의 캐릭터';$('#side-add').textContent='+ 캐릭터';$('#new-label').textContent='새 대화';$('#edit-btn').textContent='✎ 캐릭터';$('#auto-btn').classList.add('hidden');
-  const section=document.createElement('div');section.className='section-label';section.textContent='캐릭터 보관함';box.appendChild(section);
-  W.characters.forEach(c=>{const row=document.createElement('div');row.className='list-row'+(c.id===W.activeCharacterId?' active':'');row.innerHTML='<button class="list-select" data-select-character="'+esc(c.id)+'"><span class="avatar">'+esc((c.name||'?').charAt(0))+'</span><span class="list-copy"><span class="list-name">'+esc(c.name)+'</span><span class="list-sub">'+esc((c.personality||'설정 없음').slice(0,48))+'</span></span></button><span class="row-actions"><button class="mini-btn" data-edit-character="'+esc(c.id)+'" title="편집">✎</button><button class="mini-btn" data-delete-character="'+esc(c.id)+'" title="삭제">×</button></span>';box.appendChild(row);});
-  const c=currentCharacter();const label=document.createElement('div');label.className='section-label';label.textContent=(c?.name||'캐릭터')+' · 대화 목록';box.appendChild(label);
-  if(c){const convs=[...conversationsFor(c.id)].sort((a,b)=>b.updatedAt-a.updatedAt);if(!convs.length){const empty=document.createElement('div');empty.className='list-sub';empty.style.cssText='padding:9px';empty.textContent='아직 대화가 없어요';box.appendChild(empty);}convs.forEach(conv=>{const row=document.createElement('div');row.className='list-row'+(conv.id===W.activeConversationByCharacter[c.id]?' active':'');const last=[...conv.messages].reverse().find(m=>m.role==='user'||m.role==='assistant');row.innerHTML='<button class="list-select" data-select-conversation="'+esc(conv.id)+'"><span class="avatar" style="background:var(--surface2);color:var(--mute)">☰</span><span class="list-copy"><span class="list-name">'+esc(conv.title||'새 대화')+'</span><span class="list-sub">'+esc((last?.text||'대화 시작').slice(0,48))+'</span></span></button><span class="row-actions"><button class="mini-btn" data-rename-conversation="'+esc(conv.id)+'" title="이름 변경">✎</button><button class="mini-btn" data-delete-conversation="'+esc(conv.id)+'" title="삭제">×</button></span>';box.appendChild(row);});}
- }else{
-  $('#side-title').textContent='나의 단체방';$('#side-add').textContent='+ 단체방';$('#new-label').textContent='새 단체방';$('#edit-btn').textContent='✎ 방 설정';
-  const section=document.createElement('div');section.className='section-label';section.textContent='단체방 · 각 방의 세계관과 기억은 독립';box.appendChild(section);
-  W.rooms.forEach(r=>{const row=document.createElement('div');row.className='list-row'+(r.id===W.activeRoomId?' active':'');const last=r.log.filter(x=>x.who==='me').slice(-1)[0];row.innerHTML='<button class="list-select" data-select-room="'+esc(r.id)+'"><span class="avatar" style="background:linear-gradient(135deg,var(--mint),var(--blue));color:#07110d">AI</span><span class="list-copy"><span class="list-name">'+esc(r.name)+'</span><span class="list-sub">'+r.members.length+'명 · '+esc((last?.text||'새 단체 대화').slice(0,48))+'</span></span></button><span class="row-actions"><button class="mini-btn" data-edit-room="'+esc(r.id)+'" title="방 설정">✎</button><button class="mini-btn" data-delete-room="'+esc(r.id)+'" title="삭제">×</button></span>';box.appendChild(row);});
-  const r=currentRoom();if(r){const label=document.createElement('div');label.className='section-label';label.textContent='현재 방의 개인 DM';box.appendChild(label);const grp=document.createElement('div');grp.className='list-row'+(activeGroupView()==='group'?' active':'');grp.innerHTML='<button class="list-select" data-group-view="group"><span class="avatar">#</span><span class="list-copy"><span class="list-name">단톡방</span><span class="list-sub">'+r.log.length+'개 메시지</span></span></button>';box.appendChild(grp);r.members.forEach(m=>{const dm=r.dms[m.id]||[];const row=document.createElement('div');row.className='list-row'+(activeGroupView()===m.id?' active':'');row.innerHTML='<button class="list-select" data-group-view="'+esc(m.id)+'"><span class="avatar" style="background:hsl('+Number(m.hue||220)+' 65% 50%)">'+esc((m.name||'?').charAt(0))+'</span><span class="list-copy"><span class="list-name">'+esc(m.name)+'</span><span class="list-sub">개인 DM · '+dm.length+'개 메시지</span></span></button>';box.appendChild(row);});}
+ $$('.mode-btn[data-mode]').forEach(function(b){b.classList.toggle('active',b.dataset.mode===S.mode);});
+ const box=$('#side-list');box.innerHTML='';
+ if(S.mode==='one'){
+  $('#side-title').textContent='나의 캐릭터';$('#side-add').textContent='+ 캐릭터';$('#new-label').textContent='새 대화';$('#auto-btn').classList.add('hidden');
+  const label=document.createElement('div');label.className='section-label';label.textContent='저장한 캐릭터';box.appendChild(label);
+  S.characters.forEach(function(c){const row=document.createElement('div');row.className='list-row'+(c.id===S.activeCharacterId?' active':'');row.innerHTML='<button class="list-select" data-select-character="'+esc(c.id)+'"><span class="avatar">'+esc(c.name.charAt(0))+'</span><span class="list-copy"><span class="list-name">'+esc(c.name)+'</span><span class="list-sub">'+esc((c.personality||'설정 없음').slice(0,45))+'</span></span></button><span class="row-actions"><button class="mini-btn" data-edit-character="'+esc(c.id)+'" title="편집">✎</button><button class="mini-btn" data-delete-character="'+esc(c.id)+'" title="삭제">×</button></span>';box.appendChild(row);});
+  const c=currentCharacter();const convLabel=document.createElement('div');convLabel.className='section-label';convLabel.textContent=(c?c.name:'캐릭터')+' · 대화';box.appendChild(convLabel);
+  if(c){const list=getConversations(c.id);if(!list.length){const e=document.createElement('div');e.className='side-empty';e.textContent='대화가 없어요. 새 대화를 시작해 보세요.';box.appendChild(e);}list.slice().sort(function(a,b){return b.updatedAt-a.updatedAt;}).forEach(function(v){const row=document.createElement('div');row.className='list-row'+(v.id===S.activeConversationByCharacter[c.id]?' active':'');const last=v.messages.slice().reverse().find(function(m){return m.role==='user';});row.innerHTML='<button class="list-select" data-select-conv="'+esc(v.id)+'"><span class="avatar" style="background:var(--surface2);color:var(--mute)">☰</span><span class="list-copy"><span class="list-name">'+esc(v.title||'새 대화')+'</span><span class="list-sub">'+esc((last?last.text:'대화 시작').slice(0,44))+'</span></span></button><span class="row-actions"><button class="mini-btn" data-rename-conv="'+esc(v.id)+'" title="이름 변경">✎</button><button class="mini-btn" data-delete-conv="'+esc(v.id)+'" title="삭제">×</button></span>';box.appendChild(row);});}
+  return;
  }
+ $('#side-title').textContent='나의 세계관';$('#side-add').textContent='+ 세계관';$('#new-label').textContent='새 채팅방';$('#auto-btn').classList.toggle('hidden',roomView()!=='group');
+ const worldLabel=document.createElement('div');worldLabel.className='section-label';worldLabel.textContent='세계관 목록';box.appendChild(worldLabel);
+ S.worlds.forEach(function(w){const row=document.createElement('div');row.className='list-row'+(w.id===S.activeWorldId?' active':'');row.innerHTML='<button class="list-select" data-select-world="'+esc(w.id)+'"><span class="avatar" style="background:linear-gradient(135deg,var(--mint),var(--blue));color:#07110d">W</span><span class="list-copy"><span class="list-name">'+esc(w.name)+'</span><span class="list-sub">'+w.members.length+'명 · '+w.rooms.length+'개 채팅방</span></span></button><span class="row-actions"><button class="mini-btn" data-edit-world="'+esc(w.id)+'" title="세계관 설정">✎</button><button class="mini-btn" data-delete-world="'+esc(w.id)+'" title="세계관 삭제">×</button></span>';box.appendChild(row);});
+ const w=currentWorld();if(!w)return;
+ const roomLabel=document.createElement('div');roomLabel.className='section-label';roomLabel.innerHTML='<span>채팅방 · '+esc(w.name)+'</span><button class="mini-btn" data-new-room title="채팅방 추가">＋</button>';box.appendChild(roomLabel);
+ const roomGroup=document.createElement('div');roomGroup.className='nested';box.appendChild(roomGroup);
+ if(!w.rooms.length){roomGroup.innerHTML='<div class="side-empty">이 세계관에 채팅방이 없어요.</div>';}
+ w.rooms.forEach(function(r){const row=document.createElement('div');row.className='list-row'+(r.id===S.activeRoomByWorld[w.id]?' active':'');row.innerHTML='<button class="list-select" data-select-room="'+esc(r.id)+'"><span class="avatar" style="background:var(--surface2);color:var(--ink)">#</span><span class="list-copy"><span class="list-name">'+esc(r.name)+'</span><span class="list-sub">'+r.log.length+'개 메시지</span></span></button><span class="row-actions"><button class="mini-btn" data-edit-room="'+esc(r.id)+'" title="채팅방 설정">✎</button><button class="mini-btn" data-delete-room="'+esc(r.id)+'" title="채팅방 삭제">×</button></span>';roomGroup.appendChild(row);});
+ const r=currentRoom();if(!r)return;
+ const viewsLabel=document.createElement('div');viewsLabel.className='section-label';viewsLabel.textContent='현재 채팅방의 대화';box.appendChild(viewsLabel);
+ const mainRow=document.createElement('div');mainRow.className='list-row'+(roomView()==='group'?' active':'');mainRow.innerHTML='<button class="list-select" data-select-view="group"><span class="avatar" style="background:var(--surface2);color:var(--ink)">#</span><span class="list-copy"><span class="list-name">전체 대화</span><span class="list-sub">이 채팅방의 그룹 메시지</span></span></button>';box.appendChild(mainRow);
+ w.members.forEach(function(m){const dm=r.dms[m.id]||[];const row=document.createElement('div');row.className='list-row'+(roomView()===m.id?' active':'');row.innerHTML='<button class="list-select" data-select-view="'+esc(m.id)+'"><span class="avatar" style="background:hsl('+Number(m.hue||220)+' 65% 50%)">'+esc(m.name.charAt(0))+'</span><span class="list-copy"><span class="list-name">'+esc(m.name)+'</span><span class="list-sub">개인 DM · '+dm.length+'개 메시지</span></span></button>';box.appendChild(row);});
 }
 function renderHeader(){
- const t=$('#header-title'),sub=$('#header-sub'),newBtn=$('#new-btn'),editBtn=$('#edit-btn'),auto=$('#auto-btn'),view=activeGroupView();
- if(W.mode==='one'){const c=currentCharacter(),conv=ensureConversation();t.textContent=c?.name||'나의 캐릭터';sub.textContent='1:1 모드 · '+(conv?.title||'새 대화');newBtn.classList.remove('hidden');$('#new-label').textContent='새 대화';editBtn.textContent='✎ 캐릭터';auto.classList.add('hidden');$('#composer-note').textContent='Enter 전송 · Shift+Enter 줄바꿈 · 이 캐릭터만의 대화 기록';}
- else{const r=currentRoom();const m=view==='group'?null:r?.members.find(x=>x.id===view);t.textContent=m?m.name:(r?.name||'단체방');sub.textContent=m?'단체 모드의 개인 DM · '+(r?.name||''):'단체 모드 · '+(r?.worldSetting||'세계관 설정 없음').slice(0,65);newBtn.classList.remove('hidden');$('#new-label').textContent='새 단체방';editBtn.textContent='✎ 방 설정';auto.classList.toggle('hidden',view!=='group');auto.textContent=(r?.autoEnabled?'Ⅱ':'▶')+' 자동';auto.title=r?.autoEnabled?'자동 대화 켜짐':'자동 대화 꺼짐';$('#composer-note').textContent=m?'이 DM과 단톡방 배경 기억은 이 방 안에서만 이어져요. 다른 방·1:1 모드와는 분리됩니다.':'@이름으로 멤버를 부를 수 있어요 · 자동 대화는 필요할 때 켜세요.';}
+ const title=$('#header-title'),sub=$('#header-sub'),view=roomView();
+ if(S.mode==='one'){const c=currentCharacter(),v=ensureConversation();title.textContent=c?c.name:'나의 캐릭터';sub.textContent='1:1 모드 · '+(v?v.title:'새 대화');$('#new-label').textContent='새 대화';$('#edit-btn').textContent='✎ 캐릭터';$('#auto-btn').classList.add('hidden');$('#composer-note').textContent='Enter 전송 · Shift+Enter 줄바꿈 · 캐릭터별 대화는 서로 분리돼요.';}
+ else{const w=currentWorld(),r=currentRoom(),m=w&&w.members.find(function(x){return x.id===view;});title.textContent=m?m.name:(r?r.name:'채팅방');sub.textContent=(w?w.name:'세계관')+' · '+(m?'개인 DM':(w?w.members.length:0)+'명 · 전체 대화');$('#new-label').textContent='새 채팅방';$('#edit-btn').textContent='✎ 세계관';$('#auto-btn').classList.toggle('hidden',view!=='group'||!r);if(r){$('#auto-btn').textContent=(r.autoEnabled?'Ⅱ':'▶')+' 자동';$('#auto-btn').classList.toggle('primary',r.autoEnabled);}$('#composer-note').textContent=m?'이 DM은 현재 채팅방에만 저장돼요. 다른 방과 1:1 캐릭터 대화와는 분리돼요.':'@이름으로 멤버를 부르면 해당 멤버가 답해요. 다른 채팅방의 대화 기록은 섞이지 않아요.';}
 }
+function escapeForRegex(v){return String(v).replace(/[.*+?^$()|[\]\\]/g,'\\$&');}
+function formatMarkup(text,w){let html=esc(text).replace(/\[\*([^*\]]+)\*\]/g,'<span class="action-text">$1</span>').replace(/\*([^\*\n]+)\*/g,'<span class="action-text">$1</span>').replace(/\n/g,'<br>');if(w)w.members.forEach(function(m){html=html.replace(new RegExp('@'+escapeForRegex(m.name),'g'),'<span class="mention">@'+esc(m.name)+'</span>');});return html;}
 function renderMessages(){
- const box=$('#messages');box.innerHTML='';let messages=[],room=null;
- if(W.mode==='one'){const conv=ensureConversation();messages=(conv?.messages||[]).map(m=>({...m,who:m.role==='user'?'me':m.role==='system'?'sys':'assistant',name:m.role==='user'?(currentCharacter()?.userName||'나'):(currentCharacter()?.name||'캐릭터')}));}
- else{room=currentRoom();if(!room){box.innerHTML='<div class="empty">단체방을 만들어 주세요.</div>';return;}const view=activeGroupView();messages=(view==='group'?room.log:(room.dms[view]||[])).map(m=>({...m,who:m.who==='me'?'me':m.who==='sys'?'sys':'assistant',name:m.who==='me'?'나':room.members.find(x=>x.id===m.who)?.name||m.name||'멤버'}));}
- if(!messages.length){box.innerHTML='<div class="empty"><div class="empty-mark">'+(W.mode==='one'?'✦':'AI')+'</div><h1>'+(W.mode==='one'?'캐릭터와 대화를 시작해 보세요':'이 단체방에서 이야기를 시작해 보세요')+'</h1><p>'+(W.mode==='one'?'캐릭터의 성격과 첫 인사는 캐릭터 설정에서 바꿀 수 있어요.':'이 방의 세계관과 멤버는 방 설정에서 편집할 수 있어요. 다른 방과 기억은 완전히 분리됩니다.')+'</p></div>';return;}
- messages.forEach((m,i)=>{const row=document.createElement('article');const sys=m.who==='sys'||m.role==='system';if(sys){row.className='message system';row.textContent=m.text;box.appendChild(row);return;}const mine=m.who==='me';row.className='message '+(mine?'me':'ai');const initial=(m.name||'?').trim().charAt(0)||'?';let actions='<div class="msg-actions"><button data-copy-message="'+esc(m.id)+'">복사</button><button data-delete-message="'+esc(m.id)+'">삭제</button>'+(!mine&&i===messages.length-1?'<button data-regenerate-message="'+esc(m.id)+'">다시 생성</button>':'')+'</div>';row.innerHTML='<div class="avatar">'+esc(initial)+'</div><div class="msg-col"><div class="msg-meta"><strong>'+esc(m.name||'AI')+'</strong><span>'+esc(fmt(m.time||m.createdAt))+'</span></div><div class="msg-bubble">'+highlightMarkup(m.text||m.content||'',W.mode==='group'?room:null)+'</div>'+actions+'</div>';box.appendChild(row);});
- if(generating){const row=document.createElement('div');row.className='message ai';row.innerHTML='<div class="avatar">✦</div><div class="msg-col"><div class="typing"><span></span><span></span><span></span> 답변 생성 중</div></div>';box.appendChild(row);}box.scrollTop=box.scrollHeight;
+ const box=$('#messages');box.innerHTML='';let log=[],w=null,r=null,view='group';
+ if(S.mode==='one'){const v=ensureConversation();log=(v?v.messages:[]).map(function(m){return Object.assign({},m,{who:m.role==='user'?'me':m.role==='system'?'sys':'ai',name:m.role==='user'?(currentCharacter().userName||'나'):currentCharacter().name});});}
+ else{w=currentWorld();r=currentRoom();view=roomView();if(r)log=activeLog(r,view).map(function(m){return Object.assign({},m,{who:m.who==='me'?'me':m.who==='sys'?'sys':'ai',name:m.who==='me'?'나':w.members.find(function(x){return x.id===m.who;})?.name||m.name||'멤버'});});}
+ if(!log.length){const text=S.mode==='one'?'캐릭터와 대화를 시작해 보세요.':'이 채팅방에서 대화를 시작해 보세요.';box.innerHTML='<div class="empty"><div class="empty-mark">'+(S.mode==='one'?'✦':'#')+'</div><h1>'+text+'</h1><p>'+(S.mode==='one'?'캐릭터의 성격과 첫 인사는 캐릭터 설정에서 바꿀 수 있어요.':'세계관과 멤버는 왼쪽의 세계관 설정에서 관리하고, 방을 추가하면 같은 세계관 안에서 별도 대화를 만들 수 있어요.')+'</p>'+(S.mode==='group'&&!w.members.length?'<button class="btn primary" data-empty-edit-world>세계관에 AI 멤버 추가</button>':'')+'</div>';return;}
+ log.forEach(function(m,i){const row=document.createElement('article');if(m.who==='sys'||m.role==='system'){row.className='message system';row.textContent=m.text;box.appendChild(row);return;}const mine=m.who==='me';row.className='message '+(mine?'me':'ai');let actions='<div class="msg-actions"><button data-copy="'+esc(m.id)+'">복사</button><button data-delete="'+esc(m.id)+'">삭제</button>'+(!mine&&i===log.length-1?'<button data-regen="'+esc(m.id)+'">다시 생성</button>':'')+'</div>';row.innerHTML='<div class="avatar">'+esc((m.name||'?').charAt(0))+'</div><div class="msg-col"><div class="msg-meta"><strong>'+esc(m.name||'AI')+'</strong><span>'+esc(fmt(m.time||m.createdAt))+'</span></div><div class="msg-bubble">'+formatMarkup(m.text||'',S.mode==='group'?w:null)+'</div>'+actions+'</div>';box.appendChild(row);});
+ if(busy){const row=document.createElement('div');row.className='message ai';row.innerHTML='<div class="avatar">✦</div><div class="msg-col"><div class="typing"><span></span><span></span><span></span> 답변 생성 중</div></div>';box.appendChild(row);}box.scrollTop=box.scrollHeight;
 }
-function renderAll(){renderSidebar();renderHeader();renderMessages();$$('.mode-btn[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===W.mode));}
-function currentMessageLog(room,view){return view==='group'?room.log:(room.dms[view]||(room.dms[view]=[]));}
-function appendCurrentLog(room,view,entry){const log=currentMessageLog(room,view);entry.id=entry.id||uid();entry.time=entry.time||Date.now();log.push(entry);if(log.length>250)log.splice(0,log.length-250);save();}
-async function oneToOneReply(conv,token,signal){
- const character=W.characters.find(c=>c.id===conv.characterId)||currentCharacter();if(!character)return;
- const system='너는 가상 캐릭터와 대화하는 역할극 AI야. 캐릭터 이름: '+character.name+'. 성격과 배경: '+character.personality+'. 대화 상대의 이름: '+(character.userName||'플레이어')+'.\n\n자연스러운 메신저 대화처럼 캐릭터의 말투와 성격을 일관되게 유지해. 행동이나 표정은 *행동 묘사* 형식으로 표현할 수 있어. 지나치게 장황하지 않게 대화 흐름에 맞춰 답해.';
- const history=conv.messages.filter(m=>m.role==='user'||m.role==='assistant').slice(-24).map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.text}]}));
- const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.1-flash-lite'),payload:{systemInstruction:{parts:[{text:system}]},contents:history,generationConfig:{temperature:1,maxOutputTokens:2048}},signal});
- if(token!==generationToken)return;
- conv.messages.push({id:uid(),role:'assistant',text:answer.text,time:Date.now()});conv.updatedAt=Date.now();if(conv.title==='새 대화'){const first=conv.messages.find(m=>m.role==='user');if(first)conv.title=first.text.slice(0,36)+(first.text.length>36?'…':'');}save();
+function renderAll(){renderSidebar();renderHeader();renderMessages();$$('.mode-btn[data-mode]').forEach(function(b){b.classList.toggle('active',b.dataset.mode===S.mode);});}
+function addMessage(log,msg){msg.id=msg.id||uid();msg.time=msg.time||Date.now();log.push(msg);if(log.length>300)log.splice(0,log.length-300);save();}
+async function askAI(system,contents,signal,maxTokens){return DAIShared.generateContent({model:DAIShared.getModel('gemini-3.1-flash-lite'),payload:{systemInstruction:{parts:[{text:system}]},contents:contents,generationConfig:{temperature:1,maxOutputTokens:maxTokens||2048}},signal:signal});}
+async function replyCharacter(conv,myToken,signal){
+ const c=S.characters.find(function(x){return x.id===conv.characterId;})||currentCharacter();const history=conv.messages.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-28).map(function(m){return {role:m.role==='assistant'?'model':'user',parts:[{text:m.text}]};});
+ const system='너는 가상 캐릭터 대화용 AI야. 이름: '+c.name+'. 성격과 배경: '+c.personality+'. 대화 상대 이름: '+(c.userName||'플레이어')+'.\\n\\n캐릭터의 말투와 성격을 일관되게 유지해. 행동이나 표정은 *행동 묘사*로 표현할 수 있어. 실시간 메신저처럼 상황에 맞게 자연스럽게 답해.';
+ const result=await askAI(system,history,signal,2048);if(myToken!==token)return;
+ conv.messages.push({id:uid(),role:'assistant',text:result.text,time:Date.now()});conv.updatedAt=Date.now();const first=conv.messages.find(function(m){return m.role==='user';});if(conv.title==='새 대화'&&first)conv.title=first.text.slice(0,36)+(first.text.length>36?'…':'');save();
 }
-function logTranscript(entries,room){return entries.filter(x=>x.who!=='sys').slice(-24).map(x=>{const m=x.who==='me'?'나':room.members.find(y=>y.id===x.who)?.name||x.name||'멤버';return m+': '+x.text;}).join('\n')||'(아직 대화 없음)';}
-async function groupReply(room,member,view,token,signal){
- const others=room.members.filter(m=>m.id!==member.id).map(m=>m.name+' ('+m.personality+')').join('\n')||'없음';const groupHistory=logTranscript(room.log,room);const dm=room.dms[member.id]||[];
- const system='너는 단체 모드 역할극 안에서 '+member.name+'이라는 캐릭터야.\n이 단체방의 세계관·상황: '+(room.worldSetting||'별도 세계관 설정 없이 자연스럽게 대화한다.')+'\n너의 성격: '+member.personality+'\n다른 멤버: '+others+'\n캐릭터 고유의 말투를 유지하고, 메신저에 보낼 다음 메시지만 작성해. 이름표나 서문을 붙이지 말고 자연스럽게 대답해. 단톡방에서 발언할 필요가 없으면 [PASS]만 반환해.';
- const prompt=view==='group'?'[이 단체방의 최근 대화]\n'+groupHistory+'\n\n'+member.name+'의 차례다. 메시지 하나를 작성해.':'[이 단체방의 세계관]\n'+(room.worldSetting||'별도 설정 없음')+'\n\n[같은 방의 단톡방 기록 — 배경으로만 참고]\n'+groupHistory+'\n\n[나와 '+member.name+'의 개인 DM]\n'+logTranscript(dm,room)+'\n\n'+member.name+'으로서 다음 DM을 작성해.';
- const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.1-flash-lite'),payload:{systemInstruction:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:1,maxOutputTokens:1800}},signal});
- if(token!==generationToken)return null;
- const escapedName=member.name.replace(/[.*+?^\${}()|[\]\\]/g,'\\$&');let text=answer.text.replace(new RegExp('^\\s*["“]?'+escapedName+'["”]?\\s*[:：]\\s*'),'').trim();return /^\[?PASS\]?$/i.test(text)?'':text;
+function transcript(log,w){return log.filter(function(m){return m.who!=='sys';}).slice(-28).map(function(m){return (m.who==='me'?'나':w.members.find(function(x){return x.id===m.who;})?.name||m.name||'멤버')+': '+m.text;}).join('\n')||'(아직 대화 없음)';}
+async function replyMember(w,r,view,member,myToken,signal){
+ const otherMembers=w.members.filter(function(m){return m.id!==member.id;}).map(function(m){return m.name+' — '+m.personality;}).join('\n')||'없음';
+ const dm=r.dms[member.id]||[];
+ const groupHistory=transcript(r.log,w),dmHistory=transcript(dm,w);
+ const system='너는 D-AI 단체 모드의 가상 캐릭터 "'+member.name+'"이야. 세계관: '+(w.setting||'별도 설정 없이 자연스럽게 대화한다.')+'\\n너의 성격: '+member.personality+'\\n같은 세계관의 다른 AI 멤버: '+otherMembers+'\\n\\n다른 세계관과 다른 채팅방의 구체적인 사건이나 대화는 기억하거나 알고 있다고 가정하지 마. 현재 선택된 대화 맥락만 참고하고, 메신저에 보낼 다음 메시지 내용만 작성해. 필요 없는 이름표나 서문은 붙이지 마.';
+ const prompt=view==='group'?'[현재 채팅방의 전체 대화]\\n'+groupHistory+'\\n\\n[같은 채팅방에서 이 멤버와 나눈 개인 DM — 별도 맥락 참고]\\n'+dmHistory+'\\n\\n'+member.name+'의 차례다. 이 채팅방에서 자연스럽게 답할 메시지 하나를 작성해. 말할 필요가 없으면 [PASS]만 반환해.':'[현재 채팅방의 전체 대화 — 배경 참고]\\n'+groupHistory+'\\n\\n[나와 '+member.name+'의 개인 DM 기록]\\n'+dmHistory+'\\n\\n이 DM 안에서 이어질 다음 메시지만 작성해.';
+ const result=await askAI(system,[{role:'user',parts:[{text:prompt}]}],signal,1800);if(myToken!==token)return null;
+ let text=result.text.replace(new RegExp('^\\s*["“]?'+escapeForRegex(member.name)+'["”]?\\s*[:：]\\s*'),'').trim();return /^\[?PASS\]?$/i.test(text)?'':text;
 }
-async function generateGroupTurn(roomId,view,memberId){
- const room=W.rooms.find(r=>r.id===roomId);if(!room)return;const member=room.members.find(m=>m.id===memberId);if(!member)return;
- const token=++generationToken;activeController=new AbortController();const signal=activeController.signal;generating=true;renderMessages();setBusy(true);
- try{const text=await groupReply(room,member,view,token,signal);if(token!==generationToken||!text)return;const latest=W.rooms.find(r=>r.id===roomId);if(!latest)return;appendCurrentLog(latest,view==='group'?'group':memberId,{who:member.id,name:member.name,text});renderAll();}
- catch(e){if(e?.name!=='AbortError'&&token===generationToken){const latest=W.rooms.find(r=>r.id===roomId);if(latest){appendCurrentLog(latest,view,{who:'sys',text:'오류: '+e.message});renderMessages();}}}
- finally{if(token===generationToken){activeController=null;generating=false;setBusy(false);renderHeader();renderMessages();renderSidebar();}}
+async function requestMember(worldId,roomId,view,memberId){
+ const w=S.worlds.find(function(x){return x.id===worldId;});const r=w&&w.rooms.find(function(x){return x.id===roomId;});const m=w&&w.members.find(function(x){return x.id===memberId;});if(!w||!r||!m)return;
+ const myToken=++token;controller=new AbortController();const signal=controller.signal;busy=true;setBusy(true);renderMessages();
+ try{const text=await replyMember(w,r,view,m,myToken,signal);if(myToken!==token||!text)return;addMessage(activeLog(r,view),{who:m.id,name:m.name,text:text});}
+ catch(e){if(e&&e.name!=='AbortError'&&myToken===token)addMessage(activeLog(r,view),{who:'sys',text:'AI 오류: '+e.message});}
+ finally{if(myToken===token){controller=null;busy=false;setBusy(false);renderAll();}}
 }
-async function sendOneToOne(text){
- const conv=ensureConversation();if(!conv)return;conv.messages.push({id:uid(),role:'user',text,time:Date.now()});conv.updatedAt=Date.now();save();renderSidebar();renderMessages();
- const token=++generationToken;activeController=new AbortController();const signal=activeController.signal;generating=true;setBusy(true);renderMessages();
- try{await oneToOneReply(conv,token,signal);if(token===generationToken){save();renderSidebar();}}
- catch(e){if(e?.name!=='AbortError'&&token===generationToken){conv.messages.push({id:uid(),role:'system',text:'AI 응답 오류: '+e.message,time:Date.now()});save();}}
- finally{if(token===generationToken){activeController=null;generating=false;setBusy(false);renderHeader();renderMessages();renderSidebar();}}
+async function sendOne(text){
+ const c=currentCharacter(),v=ensureConversation();if(!c||!v)return;v.messages.push({id:uid(),role:'user',text:text,time:Date.now()});v.updatedAt=Date.now();save();renderAll();
+ const myToken=++token;controller=new AbortController();busy=true;setBusy(true);renderMessages();
+ try{await replyCharacter(v,myToken,controller.signal);}
+ catch(e){if(e&&e.name!=='AbortError'&&myToken===token)v.messages.push({id:uid(),role:'system',text:'AI 오류: '+e.message,time:Date.now()});}
+ finally{if(myToken===token){controller=null;busy=false;setBusy(false);save();renderAll();}}
 }
 async function sendGroup(text){
- const room=currentRoom();if(!room)return;autoCountByRoom[room.id]=0;const view=activeGroupView();appendCurrentLog(room,view,{who:'me',name:'나',text});save();renderAll();
- if(view!=='group'){await generateGroupTurn(room.id,view,view);return;}
- if(!room.members.length){toast('먼저 방 설정에서 멤버를 추가해 주세요.');return;}
- const mentioned=room.members.filter(m=>text.includes('@'+m.name));let selected=mentioned;
- if(!selected.length){const count=Math.min(room.members.length,Math.random()<.72?1:2);selected=[...room.members].sort(()=>Math.random()-.5).slice(0,count);}
- for(const member of selected){if(!W.rooms.some(r=>r.id===room.id))break;await generateGroupTurn(room.id,'group',member.id);}
+ const w=currentWorld(),r=currentRoom();if(!w||!r)return;const view=roomView();autoCounts[r.id]=0;addMessage(activeLog(r,view),{who:'me',name:'나',text:text});renderAll();
+ if(view!=='group'){await requestMember(w.id,r.id,view,view);return;}
+ if(!w.members.length){toast('세계관 설정에서 AI 멤버를 추가해 주세요.');return;}
+ const mentioned=w.members.filter(function(m){return text.includes('@'+m.name);});
+ const selected=mentioned.length?mentioned.slice():w.members.slice().sort(function(){return Math.random()-.5;}).slice(0,Math.min(w.members.length,Math.random()<.7?1:2));
+ for(let i=0;i<selected.length;i++){if(!S.worlds.some(function(x){return x.id===w.id;}))break;await requestMember(w.id,r.id,'group',selected[i].id);}
 }
-function submitMessage(event){event.preventDefault();if(generating)return;const input=$('#message-input');const text=input.value.trim();if(!text)return;if(!DAIShared.getApiKey()){openSettings();toast('먼저 공통 설정에 Gemini API 키를 입력해 주세요.');return;}input.value='';input.style.height='auto';if(W.mode==='one')sendOneToOne(text);else sendGroup(text);}
-function handleNew(){if(W.mode==='one')createConversation();else createRoom();}
-function exportCurrent(){let data,name;if(W.mode==='one'){const c=currentCharacter(),conv=currentConversation();data={type:'dai-one-to-one',character:c,conversation:conv};name=(c?.name||'character')+'-대화.json';}else{data={type:'dai-group-room',room:currentRoom()};name=(currentRoom()?.name||'group')+'-단체방.json';}const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('현재 데이터를 내보냈어요.');}
-function resetCurrentHistory(){
- if(generating)cancelGeneration();
- if(W.mode==='one'){
-  const c=currentCharacter(),conv=currentConversation();if(!c||!conv)return;
-  if(!confirm('현재 1:1 대화를 초기화할까요? 캐릭터 설정과 다른 대화는 유지됩니다.'))return;
-  conv.messages=c.greeting?[{id:uid(),role:'assistant',text:c.greeting,time:Date.now()}]:[];
-  conv.title='새 대화';conv.updatedAt=Date.now();
- }else{
-  const room=currentRoom();if(!room)return;
-  const view=activeGroupView();
-  if(!confirm('현재 단톡방/DM 기록만 초기화할까요? 다른 단체방과 세계관 설정은 유지됩니다.'))return;
-  if(view==='group')room.log=[];else room.dms[view]=[];
-  autoCountByRoom[room.id]=0;
- }
- save();renderAll();toast('현재 대화를 초기화했어요.');
+function submit(e){e.preventDefault();if(busy)return;const input=$('#message-input'),text=input.value.trim();if(!text)return;if(!DAIShared.getApiKey()){openSettings();toast('공통 설정에서 Gemini API 키를 입력해 주세요.');return;}input.value='';input.style.height='auto';if(S.mode==='one')sendOne(text);else sendGroup(text);}
+function exportCurrent(){
+ let data,name;if(S.mode==='one'){data={type:'dai-character-chat-v2',character:currentCharacter(),conversation:currentConversation()};name=(currentCharacter()?.name||'캐릭터')+'-대화.json';}
+ else{const w=currentWorld(),r=currentRoom();data={type:'dai-world-v2',world:w,room:r,view:roomView()};name=(w?.name||'세계관')+'-'+(r?.name||'채팅방')+'.json';}
+ const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.href=url;a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('현재 데이터를 내보냈어요.');
 }
-function importFile(file){
- if(!file)return;
- const reader=new FileReader();
- reader.onload=()=>{
-  try{
-   const data=JSON.parse(String(reader.result||''));
-   if(data.type==='dai-one-to-one'&&data.character){
-    const character={...clone(data.character),id:uid()};
-    W.characters.unshift(character);W.activeCharacterId=character.id;W.mode='one';
-    W.conversationsByCharacter[character.id]=[];
-    if(data.conversation){
-     const conv={...clone(data.conversation),id:uid(),characterId:character.id,createdAt:Date.now(),updatedAt:Date.now()};
-     W.conversationsByCharacter[character.id].push(conv);W.activeConversationByCharacter[character.id]=conv.id;
-    }else W.activeConversationByCharacter[character.id]=null;
-    ensureConversation();
-   }else if(data.type==='dai-group-room'&&data.room){
-    const room=clone(data.room), idMap={};
-    (room.members||[]).forEach(m=>{const old=m.id;m.id=uid();idMap[old]=m.id;});
-    room.id=uid();room.name=(room.name||'가져온 단체방')+' (가져옴)';room.createdAt=Date.now();
-    room.log=(room.log||[]).map(m=>({...m,who:idMap[m.who]||m.who}));
-    const dms={};Object.entries(room.dms||{}).forEach(([oldId,entries])=>{dms[idMap[oldId]||oldId]=(entries||[]).map(m=>({...m,who:idMap[m.who]||m.who}));});room.dms=dms;
-    W.rooms.unshift(room);W.activeRoomId=room.id;W.activeRoomView[room.id]='group';W.mode='group';
-   }else throw new Error('지원하지 않는 내보내기 파일 형식입니다.');
-   save();closeDialog('editor-dialog');renderAll();toggleSidebar(false);toast('파일을 불러왔어요.');
-  }catch(e){toast('불러오기에 실패했어요: '+(e.message||'파일을 확인해 주세요.'));}
- };
- reader.onerror=()=>toast('파일을 읽을 수 없어요.');
- reader.readAsText(file);
-}
-function openCurrentEdit(){if(W.mode==='one'){const c=currentCharacter();if(c)openCharacterEditor(c.id);}else{const r=currentRoom();if(r)openRoomEditor(r.id,false);}}
-$('#side-list').addEventListener('click',e=>{
- const target=e.target.closest('button');if(!target)return;
- if(target.dataset.selectCharacter){selectCharacter(target.dataset.selectCharacter);return;}if(target.dataset.editCharacter){openCharacterEditor(target.dataset.editCharacter);return;}if(target.dataset.deleteCharacter){deleteCharacter(target.dataset.deleteCharacter);return;}if(target.dataset.selectConversation){selectConversation(target.dataset.selectConversation);return;}
- if(target.dataset.renameConversation){const c=currentCharacter(),conv=conversationsFor(c.id).find(x=>x.id===target.dataset.renameConversation);if(conv){const n=prompt('대화 이름',conv.title);if(n&&n.trim()){conv.title=n.trim().slice(0,80);save();renderAll();}}return;}
- if(target.dataset.deleteConversation){const c=currentCharacter();if(!confirm('이 대화를 삭제할까요?'))return;W.conversationsByCharacter[c.id]=conversationsFor(c.id).filter(x=>x.id!==target.dataset.deleteConversation);if(W.activeConversationByCharacter[c.id]===target.dataset.deleteConversation)W.activeConversationByCharacter[c.id]=null;ensureConversation();save();renderAll();return;}
- if(target.dataset.selectRoom){selectRoom(target.dataset.selectRoom);return;}if(target.dataset.editRoom){openRoomEditor(target.dataset.editRoom,false);return;}if(target.dataset.deleteRoom){deleteRoom(target.dataset.deleteRoom);return;}if(target.dataset.groupView){cancelGeneration();setGroupView(target.dataset.groupView);renderAll();toggleSidebar(false);}
-});
-$('#messages').addEventListener('click',e=>{
+function importFile(file){if(!file)return;const reader=new FileReader();reader.onload=function(){try{const d=JSON.parse(String(reader.result||''));if(d.type==='dai-character-chat-v2'&&d.character){const c=Object.assign({},d.character,{id:uid()});S.characters.unshift(c);S.activeCharacterId=c.id;S.mode='one';if(d.conversation){const v=Object.assign({},d.conversation,{id:uid(),characterId:c.id,createdAt:Date.now(),updatedAt:Date.now()});S.conversationsByCharacter[c.id]=[v];S.activeConversationByCharacter[c.id]=v.id;}else S.conversationsByCharacter[c.id]=[];ensureConversation();}
+ else if(d.type==='dai-world-v2'&&d.world){const w=clone(d.world),idMap={};w.id=uid();w.name=(w.name||'가져온 세계관')+' (가져옴)';w.members=(w.members||[]).map(function(m){const old=m.id;m.id=uid();idMap[old]=m.id;return m;});w.rooms=(w.rooms||[]).map(function(r){r.id=uid();r.log=(r.log||[]).map(function(m){return Object.assign({},m,{who:idMap[m.who]||m.who});});const nd={};Object.keys(r.dms||{}).forEach(function(old){nd[idMap[old]||old]=(r.dms[old]||[]).map(function(m){return Object.assign({},m,{who:idMap[m.who]||m.who});});});r.dms=nd;return r;});S.worlds.unshift(w);S.activeWorldId=w.id;S.activeRoomByWorld[w.id]=w.rooms[0]?.id;S.mode='group';}
+ else throw new Error('이 통합 페이지에서 내보낸 JSON 파일만 불러올 수 있어요.');save();closeDialog('editor-dialog');renderAll();toast('파일을 불러왔어요.');}
+ catch(e){toast('불러오기에 실패했어요: '+e.message);}};reader.onerror=function(){toast('파일을 읽을 수 없어요.');};reader.readAsText(file);}
+function resetCurrent(){if(busy)cancelGeneration();if(S.mode==='one'){const c=currentCharacter(),v=currentConversation();if(!c||!v)return;if(!confirm('현재 1:1 대화를 초기화할까요?'))return;v.messages=c.greeting?[{id:uid(),role:'assistant',text:c.greeting,time:Date.now()}]:[];v.title='새 대화';v.updatedAt=Date.now();}
+ else{const r=currentRoom();if(!r)return;const view=roomView();if(!confirm(view==='group'?'현재 채팅방의 전체 대화를 지울까요?':'현재 채팅방에서 이 멤버와 나눈 DM을 지울까요?'))return;if(view==='group')r.log=[];else r.dms[view]=[];autoCounts[r.id]=0;}save();renderAll();}
+function editCurrent(){if(S.mode==='one')openCharacterEditor(currentCharacter()?.id);else openWorldEditor(currentWorld()?.id,false);}
+function renameConversation(id){const c=currentCharacter();const v=getConversations(c.id).find(function(x){return x.id===id;});if(!v)return;const name=prompt('대화 이름 변경',v.title);if(name&&name.trim()){v.title=name.trim().slice(0,90);save();renderAll();}}
+function handleSidebar(e){
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.copyMessage){const log=W.mode==='one'?currentConversation()?.messages:currentMessageLog(currentRoom(),activeGroupView());const m=log?.find(x=>x.id===b.dataset.copyMessage);if(m&&navigator.clipboard?.writeText)navigator.clipboard.writeText(m.text).then(()=>toast('복사했어요.')).catch(()=>toast('복사에 실패했어요.'));return;}
- if(b.dataset.deleteMessage){if(!confirm('이 메시지를 삭제할까요?'))return;if(W.mode==='one'){const conv=currentConversation();if(conv)conv.messages=conv.messages.filter(m=>m.id!==b.dataset.deleteMessage);}else{const log=currentMessageLog(currentRoom(),activeGroupView());const idx=log.findIndex(m=>m.id===b.dataset.deleteMessage);if(idx>=0)log.splice(idx,1);}save();renderAll();return;}
- if(b.dataset.regenerateMessage){regenerateMessage(b.dataset.regenerateMessage);return;}
-});
-async function regenerateMessage(id){
- if(generating)return;
- if(W.mode==='one'){const conv=currentConversation();if(!conv)return;const idx=conv.messages.findIndex(m=>m.id===id);if(idx<0)return;conv.messages.splice(idx,1);save();renderMessages();const token=++generationToken;activeController=new AbortController();const signal=activeController.signal;generating=true;setBusy(true);renderMessages();try{await oneToOneReply(conv,token,signal);if(token===generationToken)save();}catch(e){if(e?.name!=='AbortError'&&token===generationToken)conv.messages.push({id:uid(),role:'system',text:'AI 응답 오류: '+e.message,time:Date.now()});}finally{if(token===generationToken){activeController=null;generating=false;setBusy(false);renderAll();}}}
- else{const room=currentRoom();if(!room)return;const view=activeGroupView(),log=currentMessageLog(room,view),idx=log.findIndex(m=>m.id===id);if(idx<0)return;const memberId=log[idx].who;if(memberId==='me'||memberId==='sys')return;log.splice(idx,1);save();renderMessages();await generateGroupTurn(room.id,view,memberId);}
+ if(b.dataset.selectCharacter)return selectCharacter(b.dataset.selectCharacter);
+ if(b.dataset.editCharacter)return openCharacterEditor(b.dataset.editCharacter);
+ if(b.dataset.deleteCharacter)return deleteCharacter(b.dataset.deleteCharacter);
+ if(b.dataset.selectConv)return selectConversation(b.dataset.selectConv);
+ if(b.dataset.renameConv)return renameConversation(b.dataset.renameConv);
+ if(b.dataset.deleteConv)return deleteConversation(b.dataset.deleteConv);
+ if(b.dataset.selectWorld)return selectWorld(b.dataset.selectWorld);
+ if(b.dataset.editWorld)return openWorldEditor(b.dataset.editWorld,false);
+ if(b.dataset.deleteWorld)return deleteWorld(b.dataset.deleteWorld);
+ if(b.dataset.newRoom){const w=currentWorld();if(w)newRoom(w);return;}
+ if(b.dataset.selectRoom)return selectRoom(b.dataset.selectRoom);
+ if(b.dataset.editRoom)return openRoomEditor(b.dataset.editRoom,false);
+ if(b.dataset.deleteRoom)return deleteRoom(b.dataset.deleteRoom);
+ if(b.dataset.selectView!==undefined)return selectView(b.dataset.selectView);
 }
-$('#editor-content').addEventListener('click',e=>{const remove=e.target.closest('[data-remove-member]');if(remove){editorDraft.room.members.splice(Number(remove.dataset.removeMember),1);renderRoomEditor();return;}if(e.target.closest('#add-character-to-room')){const id=$('#add-character-select')?.value;const char=W.characters.find(c=>c.id===id);if(!char)return toast('먼저 추가할 캐릭터를 선택해 주세요.');const hues=[215,275,38,150,340,190,95,15];editorDraft.room.members.push({id:uid(),sourceCharacterId:char.id,name:char.name,personality:char.personality||'',hue:hues[editorDraft.room.members.length%hues.length]});renderRoomEditor();}});
+$('#side-list').addEventListener('click',handleSidebar);
+$('#messages').addEventListener('click',function(e){const b=e.target.closest('button');if(!b)return;if(b.dataset.emptyEditWorld!==undefined){openWorldEditor(currentWorld().id,false);return;}
+ if(b.dataset.copy){let log=S.mode==='one'?currentConversation()?.messages:activeLog(currentRoom(),roomView());const m=log&&log.find(function(x){return x.id===b.dataset.copy;});if(m&&navigator.clipboard?.writeText)navigator.clipboard.writeText(m.text).then(function(){toast('복사했어요.');}).catch(function(){toast('복사하지 못했어요.');});return;}
+ if(b.dataset.delete){if(!confirm('이 메시지를 삭제할까요?'))return;let log=S.mode==='one'?currentConversation()?.messages:activeLog(currentRoom(),roomView());if(log){const i=log.findIndex(function(x){return x.id===b.dataset.delete;});if(i>=0)log.splice(i,1);}save();renderAll();return;}
+ if(b.dataset.regen)regenerate(b.dataset.regen);
+});
+async function regenerate(id){if(busy)return;if(S.mode==='one'){const v=currentConversation();if(!v)return;const i=v.messages.findIndex(function(m){return m.id===id;});if(i<0)return;v.messages.splice(i,1);save();const myToken=++token;controller=new AbortController();busy=true;setBusy(true);renderMessages();try{await replyCharacter(v,myToken,controller.signal);}catch(e){if(e&&e.name!=='AbortError'&&myToken===token)v.messages.push({id:uid(),role:'system',text:'AI 오류: '+e.message,time:Date.now()});}finally{if(myToken===token){controller=null;busy=false;setBusy(false);save();renderAll();}}}
+ else{const w=currentWorld(),r=currentRoom(),view=roomView();if(!w||!r)return;const log=activeLog(r,view),i=log.findIndex(function(m){return m.id===id;});if(i<0||log[i].who==='me'||log[i].who==='sys')return;const memberId=log[i].who;log.splice(i,1);save();renderMessages();await requestMember(w.id,r.id,view,memberId);}}
+$('#editor-content').addEventListener('click',function(e){if(e.target.closest('#add-world-member')){addWorldMember();return;}const b=e.target.closest('[data-remove-member]');if(b&&draft&&draft.type==='world'){draft.world.members.splice(Number(b.dataset.removeMember),1);renderWorldEditor();}});
 $('#editor-form').addEventListener('submit',saveEditor);
-$$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeDialog(b.dataset.close)));
-$$('.dialog').forEach(d=>d.addEventListener('mousedown',e=>{if(e.target===d)closeDialog(d.id);}));
-$$('.mode-btn[data-mode]').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
-$('#side-add').addEventListener('click',()=>W.mode==='one'?openCharacterEditor():createRoom());
-$('#new-btn').addEventListener('click',handleNew);$('#edit-btn').addEventListener('click',openCurrentEdit);$('#export-btn').addEventListener('click',exportCurrent);
-$('#import-btn').addEventListener('click',()=>$('#import-file').click());
-$('#import-file').addEventListener('change',e=>{importFile(e.target.files?.[0]);e.target.value='';});
-$('#reset-btn').addEventListener('click',resetCurrentHistory);
-$('#settings-open').addEventListener('click',openSettings);$('#save-settings').addEventListener('click',saveSettings);
-$('#theme-light').addEventListener('click',()=>applyTheme('light'));$('#theme-dark').addEventListener('click',()=>applyTheme('dark'));
-$('#auto-btn').addEventListener('click',()=>{const r=currentRoom();if(!r||W.mode!=='group')return;r.autoEnabled=!r.autoEnabled;autoCountByRoom[r.id]=0;save();renderHeader();renderSidebar();});
-$('#send-btn').addEventListener('click',e=>{if(generating){e.preventDefault();e.stopPropagation();cancelGeneration();toast('답변 생성을 중지했어요.');}});
-$('#composer-form').addEventListener('submit',submitMessage);
-$('#message-input').addEventListener('input',e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,160)+'px';});
-$('#message-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();$('#composer-form').requestSubmit();}});
-$('#mobile-menu').addEventListener('click',()=>toggleSidebar());$('#sidebar-overlay').addEventListener('click',()=>toggleSidebar(false));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){$$('.dialog.show').forEach(d=>closeDialog(d.id));toggleSidebar(false);}});
-window.addEventListener('beforeunload',()=>{if(activeController)activeController.abort();});
-setInterval(async()=>{
- if(W.mode!=='group'||generating||!DAIShared.getApiKey())return;const room=currentRoom();if(!room||!room.autoEnabled||activeGroupView()!=='group'||room.members.length===0)return;const last=room.log[room.log.length-1],lastTime=last?.time||room.createdAt||Date.now();if(Date.now()-lastTime<room.autoInterval*1000)return;const count=autoCountByRoom[room.id]||0;if(count>=room.maxAuto)return;autoCountByRoom[room.id]=count+1;const previous=room.log.filter(m=>m.who!=='me').slice(-1)[0]?.who;const pool=room.members.filter(m=>m.id!==previous);const candidates=pool.length?pool:room.members;const member=candidates[Math.floor(Math.random()*candidates.length)];if(member)await generateGroupTurn(room.id,'group',member.id);
-},1500);
-if(!W.characters.length)W.characters=clone(DEFAULT_CHARACTERS);if(!W.rooms.length)W.rooms=[freshRoom()];if(!W.characters.some(c=>c.id===W.activeCharacterId))W.activeCharacterId=W.characters[0].id;if(!W.rooms.some(r=>r.id===W.activeRoomId))W.activeRoomId=W.rooms[0].id;if(!W.activeRoomView)W.activeRoomView={};if(!W.conversationsByCharacter)W.conversationsByCharacter={};if(!W.activeConversationByCharacter)W.activeConversationByCharacter={};
-try{if(localStorage.getItem('dai_theme_v1')!=='light')document.documentElement.classList.add('dark');else document.documentElement.classList.remove('dark');}catch(e){document.documentElement.classList.add('dark');}
-if(W.mode==='one')ensureConversation();save();renderAll();setBusy(false);
-})();
-</script>
+$$('[data-close]').forEach(function(b){b.addEventListener('click',function(){closeDialog(b.dataset.close);draft=null;});});
+$$('.dialog').forEach(function(d){d.addEventListener('mousedown',function(e){if(e.target===d){closeDialog(d.id);draft=null;}});});
+$$('.mode-btn[data-mode]').forEach(function(b){b.addEventListener('click',function(){switchMode(b.dataset.mode);});});
+$('#side-add').addEventListener('click',function(){if(S.mode==='one')openCharacterEditor();else newWorld();});
+$('#new-btn').addEventListener('click',function(){if(S.mode==='one')makeConversation();else{const w=currentWorld();if(w)newRoom(w);}});
+$('#edit-btn').addEventListener('click',editCurrent);$('#export-btn').addEventListener('click',exportCurrent);
+$('#import-btn').addEventListener('click',function(){$('#import-file').click();});$('#import-file').addEventListener('change',function(e){importFile(e.target.files?.[0]);e.target.value='';});
+$('#reset-btn').addEventListener('click',resetCurrent);$('#settings-open').addEventListener('click',openSettings);$('#save-settings').addEventListener('click',saveSettings);
+$('#theme-light').addEventListener('click',function(){applyTheme('light');});$('#theme-dark').addEventListener('click',function(){applyTheme('dark');});
+$('#auto-btn').addEventListener('click',function(){const r=currentRoom();if(!r||roomView()!=='group')return;r.autoEnabled=!r.autoEnabled;autoCounts[r.id]=0;save();renderHeader();renderSidebar();toast(r.autoEnabled?'자동 대화를 켰어요.':'자동 대화를 껐어요.');});
+$('#send-btn').addEventListener('click',function(e){if(busy){e.preventDefault();e.stopPropagation();cancelGeneration();renderAll();toast('응답 생성을 중지했어요.');}});
+$('#composer-form').addEventListener('submit',submit);
+$('#message-input').addEventListener('input',function(e){e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,160)+'px';});
+$('#message-input').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&e.keyCode!==229){e.preventDefault();$('#composer-form').requestSubmit();}});
+$('#mobile-menu').addEventListener('click',function(){toggleSidebar();});$('#sidebar-overlay').addEventListener('click',function(){toggleSidebar(false);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){$$('.dialog.show').forEach(function(d){closeDialog(d.id);});toggleSidebar(false);draft=null;}});
+window.addEventListener('beforeunload',function(){if(controller)controller.abort();});
+setInterval(async function(){if(S.mode!=='group'||busy||!DAIShared.getApiKey())return;const w=currentWorld(),r=currentRoom();if(!w||!r||!r.autoEnabled||roomView()!=='group'||!w.members.length)return;const last=r.log[r.log.length-1],lastTime=last?.time||r.createdAt||Date.now();if(Date.now()-lastTime<r.autoInterval*1000)return;const n=autoCounts[r.id]||0;if(n>=r.maxAuto)return;autoCounts[r.id]=n+1;const previous=r.log.filter(function(m){return m.who!=='me';}).slice(-1)[0]?.who;const pool=w.members.filter(function(m){return m.id!==previous;});const candidates=pool.length?pool:w.members;const m=candidates[Math.floor(Math.random()*candidates.length)];if(m)await requestMember(w.id,r.id,'group',m.id);},1500);
+if(!S.characters.length)S.characters=clone(DEFAULT_CHARACTERS);if(!S.worlds.length)S.worlds.push(freshWorld('기본 세계관',false));if(!S.conversationsByCharacter)S.conversationsByCharacter={};if(!S.activeConversationByCharacter)S.activeConversationByCharacter={};if(!S.activeRoomByWorld)S.activeRoomByWorld={};if(!S.activeViewByRoom)S.activeViewByRoom={};if(!S.characters.some(function(c){return c.id===S.activeCharacterId;}))S.activeCharacterId=S.characters[0].id;if(!S.worlds.some(function(w){return w.id===S.activeWorldId;}))S.activeWorldId=S.worlds[0].id;S.worlds.forEach(function(w){if(!Array.isArray(w.rooms))w.rooms=[];if(!w.rooms.length)w.rooms.push(freshRoom());if(!S.activeRoomByWorld[w.id]||!w.rooms.some(function(r){return r.id===S.activeRoomByWorld[w.id];}))S.activeRoomByWorld[w.id]=w.rooms[0].id;});
+if(S.mode==='one')ensureConversation();save();renderAll();setBusy(false);
+})();</script>
 </body>
 </html>
