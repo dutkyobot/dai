@@ -114,7 +114,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   <div class="dialog-card">
     <div class="dialog-head"><h2 id="settings-title">공통 설정</h2><button class="icon-btn" data-close="settings-dialog" aria-label="닫기">✕</button></div>
     <div class="field-group"><label for="api-key">Gemini API 키</label><input id="api-key" type="password" autocomplete="off" placeholder="AIzaSy…"><p class="field-hint">일반 채팅·1:1 모드·단체 모드가 이 키를 함께 사용합니다. 정적 웹사이트이므로 키는 현재 브라우저 저장소에 저장됩니다.</p></div>
-    <div class="field-group"><label for="api-model">공통 모델 ID</label><input id="api-model" list="model-options" value="gemini-3.8-flash" spellcheck="false"><datalist id="model-options"><option value="gemini-3.8-flash"><option value="gemini-3.6-flash"><option value="gemini-3.5-flash-lite"></datalist><p class="field-hint">기본은 Gemini 3.8 Flash. 호출 한도나 사용 가능 모델은 Google AI Studio의 프로젝트 설정을 따릅니다.</p></div>
+    <div class="field-group"><label for="api-model">공통 모델 ID</label><input id="api-model" list="model-options" value="gemini-3.1-flash-lite" spellcheck="false"><datalist id="model-options"><option value="gemini-3.1-flash-lite"><option value="gemini-3.6-flash"><option value="gemini-3.5-flash-lite"></datalist><p class="field-hint">기본은 Gemini 3.8 Flash. 호출 한도나 사용 가능 모델은 Google AI Studio의 프로젝트 설정을 따릅니다.</p></div>
     <div class="field-group"><label>화면 테마</label><div class="mode-switch"><button class="mode-btn" id="theme-light" type="button">☀ 라이트</button><button class="mode-btn active" id="theme-dark" type="button">☾ 다크</button></div></div>
     <div class="dialog-footer"><button class="btn" data-close="settings-dialog">닫기</button><button class="btn primary" id="save-settings">설정 저장</button></div>
   </div>
@@ -164,8 +164,8 @@ function highlightMarkup(text,room=null){let out=esc(text).replace(/\[\*([^*\]]+
 function openDialog(id){$('#'+id).classList.add('show');}
 function closeDialog(id){$('#'+id).classList.remove('show');}
 function applyTheme(theme){document.documentElement.classList.toggle('dark',theme==='dark');try{localStorage.setItem('dai_theme_v1',theme);}catch(e){}$('#theme-light').classList.toggle('active',theme==='light');$('#theme-dark').classList.toggle('active',theme==='dark');}
-function openSettings(){$('#api-key').value=DAIShared.getApiKey();$('#api-model').value=DAIShared.getModel('gemini-3.8-flash');const dark=document.documentElement.classList.contains('dark');$('#theme-light').classList.toggle('active',!dark);$('#theme-dark').classList.toggle('active',dark);openDialog('settings-dialog');}
-function saveSettings(){DAIShared.setApiKey($('#api-key').value);DAIShared.setModel($('#api-model').value.trim()||'gemini-3.8-flash');save();closeDialog('settings-dialog');toast('공통 API 설정을 저장했어요.');}
+function openSettings(){$('#api-key').value=DAIShared.getApiKey();$('#api-model').value=DAIShared.getModel('gemini-3.1-flash-lite');const dark=document.documentElement.classList.contains('dark');$('#theme-light').classList.toggle('active',!dark);$('#theme-dark').classList.toggle('active',dark);openDialog('settings-dialog');}
+function saveSettings(){DAIShared.setApiKey($('#api-key').value);DAIShared.setModel($('#api-model').value.trim()||'gemini-3.1-flash-lite');save();closeDialog('settings-dialog');toast('공통 API 설정을 저장했어요.');}
 function switchMode(mode){if(W.mode===mode)return;cancelGeneration();W.mode=mode;save();renderAll();toggleSidebar(false);}
 function toggleSidebar(force){const open=force===undefined?!$('#sidebar').classList.contains('open'):force;$('#sidebar').classList.toggle('open',open);$('#sidebar-overlay').classList.toggle('show',open);}
 function selectCharacter(id){if(!W.characters.some(c=>c.id===id))return;cancelGeneration();W.activeCharacterId=id;ensureConversation();save();renderAll();toggleSidebar(false);}
@@ -238,7 +238,7 @@ async function oneToOneReply(conv,token,signal){
  const character=W.characters.find(c=>c.id===conv.characterId)||currentCharacter();if(!character)return;
  const system='너는 가상 캐릭터와 대화하는 역할극 AI야. 캐릭터 이름: '+character.name+'. 성격과 배경: '+character.personality+'. 대화 상대의 이름: '+(character.userName||'플레이어')+'.\n\n자연스러운 메신저 대화처럼 캐릭터의 말투와 성격을 일관되게 유지해. 행동이나 표정은 *행동 묘사* 형식으로 표현할 수 있어. 지나치게 장황하지 않게 대화 흐름에 맞춰 답해.';
  const history=conv.messages.filter(m=>m.role==='user'||m.role==='assistant').slice(-24).map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.text}]}));
- const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.8-flash'),payload:{systemInstruction:{parts:[{text:system}]},contents:history,generationConfig:{temperature:1,maxOutputTokens:2048}},signal});
+ const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.1-flash-lite'),payload:{systemInstruction:{parts:[{text:system}]},contents:history,generationConfig:{temperature:1,maxOutputTokens:2048}},signal});
  if(token!==generationToken)return;
  conv.messages.push({id:uid(),role:'assistant',text:answer.text,time:Date.now()});conv.updatedAt=Date.now();if(conv.title==='새 대화'){const first=conv.messages.find(m=>m.role==='user');if(first)conv.title=first.text.slice(0,36)+(first.text.length>36?'…':'');}save();
 }
@@ -247,7 +247,7 @@ async function groupReply(room,member,view,token,signal){
  const others=room.members.filter(m=>m.id!==member.id).map(m=>m.name+' ('+m.personality+')').join('\n')||'없음';const groupHistory=logTranscript(room.log,room);const dm=room.dms[member.id]||[];
  const system='너는 단체 모드 역할극 안에서 '+member.name+'이라는 캐릭터야.\n이 단체방의 세계관·상황: '+(room.worldSetting||'별도 세계관 설정 없이 자연스럽게 대화한다.')+'\n너의 성격: '+member.personality+'\n다른 멤버: '+others+'\n캐릭터 고유의 말투를 유지하고, 메신저에 보낼 다음 메시지만 작성해. 이름표나 서문을 붙이지 말고 자연스럽게 대답해. 단톡방에서 발언할 필요가 없으면 [PASS]만 반환해.';
  const prompt=view==='group'?'[이 단체방의 최근 대화]\n'+groupHistory+'\n\n'+member.name+'의 차례다. 메시지 하나를 작성해.':'[이 단체방의 세계관]\n'+(room.worldSetting||'별도 설정 없음')+'\n\n[같은 방의 단톡방 기록 — 배경으로만 참고]\n'+groupHistory+'\n\n[나와 '+member.name+'의 개인 DM]\n'+logTranscript(dm,room)+'\n\n'+member.name+'으로서 다음 DM을 작성해.';
- const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.8-flash'),payload:{systemInstruction:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:1,maxOutputTokens:1800}},signal});
+ const answer=await DAIShared.generateContent({model:DAIShared.getModel('gemini-3.1-flash-lite'),payload:{systemInstruction:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:1,maxOutputTokens:1800}},signal});
  if(token!==generationToken)return null;
  const escapedName=member.name.replace(/[.*+?^\${}()|[\]\\]/g,'\\$&');let text=answer.text.replace(new RegExp('^\\s*["“]?'+escapedName+'["”]?\\s*[:：]\\s*'),'').trim();return /^\[?PASS\]?$/i.test(text)?'':text;
 }
