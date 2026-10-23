@@ -1333,7 +1333,7 @@ const SettingsModal = {
   renderModelList() {
     const sharedModel = DAIShared.getModel("gemini-3.8-flash");
     const selectedKey = Object.entries(PROVIDERS).find(([, meta]) => meta.model === sharedModel)?.[0] || State.defaultModelKey;
-    dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => 
+    dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
       <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] text-ink">${meta.label}</span>
