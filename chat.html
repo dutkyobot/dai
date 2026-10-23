@@ -1000,6 +1000,8 @@ const dom = {
   themeSwitch: document.getElementById("theme-switch"),
   apiKeyInput: document.getElementById("settings-api-key"),
   saveApiBtn: document.getElementById("settings-save-api"),
+  apiKeyInput: document.getElementById("settings-api-key"),
+  saveApiBtn: document.getElementById("settings-save-api"),
 };
 
 const PROVIDERS = {
@@ -1293,9 +1295,12 @@ const Sidebar = {
 
 const ModelPicker = {
   updateHeader(providerKey) {
-    const meta = PROVIDERS[providerKey] || { label: providerKey };
+    const sharedModel = DAIShared.getModel("gemini-3.8-flash");
+    const match = Object.entries(PROVIDERS).find(([, item]) => item.model === sharedModel);
+    const selectedKey = match ? match[0] : (PROVIDERS[providerKey] ? providerKey : "gemini");
+    const meta = PROVIDERS[selectedKey] || { label: providerKey };
     dom.modelNameEl.textContent = meta.label;
-    this._updateHeaderCheckmarks(providerKey);
+    this._updateHeaderCheckmarks(selectedKey);
   },
 
   _updateHeaderCheckmarks(providerKey) {
@@ -1307,6 +1312,9 @@ const ModelPicker = {
   },
 
   select(providerKey) {
+    const meta = PROVIDERS[providerKey];
+    if (!meta) return;
+    DAIShared.setModel(meta.model);
     this.updateHeader(providerKey);
     const conv = State.getCurrentConversation();
     if (conv) {
@@ -1323,12 +1331,14 @@ const ModelPicker = {
 
 const SettingsModal = {
   renderModelList() {
-    dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => `
+    const sharedModel = DAIShared.getModel("gemini-3.8-flash");
+    const selectedKey = Object.entries(PROVIDERS).find(([, meta]) => meta.model === sharedModel)?.[0] || State.defaultModelKey;
+    dom.settingsModelListEl.innerHTML = Object.entries(PROVIDERS).map(([key, meta]) => 
       <button data-provider="${key}" class="settings-model-option w-full flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-accent/5 text-left">
         <span class="flex-1 min-w-0">
           <span class="block text-[13px] text-ink">${meta.label}</span>
         </span>
-        <i class="fa-solid fa-check text-accent text-xs settings-model-check ${key === State.defaultModelKey ? "opacity-100" : "opacity-0"}"></i>
+        <i class="fa-solid fa-check text-accent text-xs settings-model-check ${key === selectedKey ? "opacity-100" : "opacity-0"}"></i>
       </button>
     `).join("");
   },
@@ -1358,6 +1368,7 @@ const SettingsModal = {
   open() {
     this.renderModelList();
     this.renderPersistToggle();
+    dom.apiKeyInput.value = DAIShared.getApiKey();
     dom.settingsModal.classList.remove("hidden");
   },
   close() {
@@ -1764,6 +1775,7 @@ function bindEvents() {
     if (!opt) return;
     State.defaultModelKey = opt.dataset.provider;
     Storage.saveDefaultModel(State.defaultModelKey);
+    if (PROVIDERS[State.defaultModelKey]) DAIShared.setModel(PROVIDERS[State.defaultModelKey].model);
     SettingsModal.renderModelList();
     if (!State.currentConversationId) ModelPicker.updateHeader(State.defaultModelKey);
   });
@@ -1784,6 +1796,10 @@ function bindEvents() {
     if (e.key === "Escape" && !dom.settingsModal.classList.contains("hidden")) SettingsModal.close();
   });
   dom.settingsClearAllBtn.addEventListener("click", () => SettingsModal.clearAll());
+  dom.saveApiBtn.addEventListener("click", () => {
+    DAIShared.setApiKey(dom.apiKeyInput.value);
+    alert("공통 API 키를 저장했어요.");
+  });
   dom.saveApiBtn.addEventListener("click", () => {
     DAIShared.setApiKey(dom.apiKeyInput.value);
     DAIShared.setModel(DAIShared.getModel("gemini-3.8-flash"));
