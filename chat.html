@@ -1807,7 +1807,7 @@ function bindEvents() {
   dom.saveApiBtn.addEventListener("click", () => {
     DAIShared.setApiKey(dom.apiKeyInput.value);
     DAIShared.setModel(DAIShared.getModel("gemini-3.8-flash"));
-    UI.toast ? UI.toast("공통 API 키를 저장했어요.") : alert("공통 API 키를 저장했어요.");
+    alert("공통 API 키를 저장했어요.");
   });
 
   dom.input.addEventListener("input", () => Composer.autoResize());
