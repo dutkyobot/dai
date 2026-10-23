@@ -11,8 +11,8 @@
 <script>(function(){try{if(localStorage.getItem('dai_theme_v1')!=='light')document.documentElement.classList.add('dark')}catch(e){document.documentElement.classList.add('dark')}})();</script>
 <script src="shared-api.js"></script>
 <style>
-:root{color-scheme:dark;--bg:#09090b;--surface:#18181b;--surface2:#222226;--line:#303036;--ink:#f8f8fa;--mute:#a1a1aa;--accent:#a78bfa;--mint:#21d67a;--blue:#3b9eff;--danger:#fb7185}
-html:not(.dark){color-scheme:light;--bg:#f5f6f8;--surface:#fff;--surface2:#eff0f3;--line:#dfe1e6;--ink:#18181b;--mute:#737782;--accent:#7c3aed}
+:root{color-scheme:dark;--bg:var(--dai-bg);--surface:var(--dai-surface);--surface2:var(--dai-surface2);--line:var(--dai-line);--ink:var(--dai-ink);--mute:var(--dai-mute);--accent:var(--dai-accent);--mint:#21d67a;--blue:#3b9eff;--danger:#fb7185}
+html:not(.dark){color-scheme:light;--bg:var(--dai-bg);--surface:var(--dai-surface);--surface2:var(--dai-surface2);--line:var(--dai-line);--ink:var(--dai-ink);--mute:var(--dai-mute);--accent:var(--dai-accent)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Noto Sans KR",sans-serif;letter-spacing:-.01em}
 button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}
@@ -20,7 +20,8 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 .sidebar{width:292px;flex:0 0 292px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
 .sidebar-top{padding:17px 15px 12px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-bottom:17px}
-.brand-icon{width:31px;height:31px;border-radius:10px;background:linear-gradient(135deg,var(--mint),var(--blue));color:#07110d;font-weight:900;display:grid;place-items:center}
+.brand-icon{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--mint),var(--blue));display:grid;place-items:center;flex:0 0 auto}
+.brand-icon img{width:16px;height:16px;object-fit:cover;border-radius:4px}
 .brand-name{font-size:15px;font-weight:800;letter-spacing:-.03em}.brand-name em{font-style:normal;color:var(--blue)}
 .mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:999px}
 .mode-btn{border:0;background:transparent;border-radius:999px;padding:9px 5px;font-size:12px;font-weight:700;color:var(--mute)}
@@ -78,12 +79,13 @@ button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}bu
 @media(max-width:760px){.sidebar{position:fixed;z-index:45;inset:0 auto 0 0;width:min(310px,88vw);transform:translateX(-105%);transition:transform .22s ease;box-shadow:15px 0 50px rgba(0,0,0,.2)}.sidebar.open{transform:translateX(0)}#mobile-menu{display:grid}.header{height:60px;flex-basis:60px;padding-inline:10px}.header-actions{gap:4px}.header-actions .btn .long-label{display:none}.header-actions .btn{padding:8px 10px}.messages{padding:17px 12px 23px}.message{max-width:96%}.msg-bubble{font-size:13.5px}.composer-area{padding-inline:9px}.dialog-card{padding:17px;border-radius:19px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style>
+<link rel="stylesheet" href="dai-theme.css">
 </head>
 <body>
 <div class="app">
 <aside class="sidebar" id="sidebar">
  <div class="sidebar-top">
-  <a class="brand" href="index.html"><div class="brand-icon">D</div><div class="brand-name">D-<em>AI</em> <span style="color:var(--mute);font-weight:600">Character</span></div></a>
+  <a class="brand" href="index.html"><div class="brand-icon"><img src="img/icon.png" alt="D-AI" onerror="this.style.display='none'"></div><div class="brand-name"><span class="brand-d">D-</span><em>AI</em> <span style="color:var(--mute);font-weight:600">Character</span></div></a>
   <div class="mode-switch"><button class="mode-btn active" data-mode="one">1:1 모드</button><button class="mode-btn" data-mode="group">단체 모드</button></div>
  </div>
  <div class="side-heading"><span id="side-title">나의 캐릭터</span><button class="btn" id="side-add">+ 캐릭터</button></div>
