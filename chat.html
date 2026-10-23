@@ -1322,7 +1322,7 @@ const ModelPicker = {
     this.updateHeader(providerKey);
     const conv = State.getCurrentConversation();
     if (conv) {
-      conv.model = providerKey;
+      conv.model = meta.model;
       conv.updatedAt = Date.now();
       State.persist();
     } else {
@@ -1462,7 +1462,7 @@ const Messages = {
   _buildAssistantRow(convId, m, isLast) {
     const row = document.createElement("div");
     row.className = "msg-enter flex gap-3";
-    const providerLabel = (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
+    const providerLabel = (Object.values(PROVIDERS).find(p => p.model === m.model)?.label) || (PROVIDERS[m.model] && PROVIDERS[m.model].label) || m.model || "";
     row.innerHTML = `
       <div class="assistant-avatar w-7 h-7 rounded-full bg-accent flex items-center justify-center shrink-0 mt-0.5 overflow-hidden">
         <img src="img/icon.png" alt="D-AI" class="w-full h-full object-contain rounded-full p-1" loading="eager">
@@ -1570,7 +1570,7 @@ const Chat = {
     return {
       id: Utils.uid(),
       title: "새 대화",
-      model: State.defaultModelKey,
+      model: DAIShared.getModel("gemini-3.1-flash-lite"),
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -1622,7 +1622,7 @@ const Chat = {
     try {
       const replyText = await this.callAI(conv, { signal: controller.signal });
       Messages.removeRow(typingId);
-      conv.messages.push({ id: Utils.uid(), role: "assistant", content: replyText, model: conv.model, createdAt: Date.now() });
+      conv.messages.push({ id: Utils.uid(), role: "assistant", content: replyText, model: DAIShared.getModel("gemini-3.1-flash-lite"), createdAt: Date.now() });
       conv.updatedAt = Date.now();
       State.persist();
       Messages.render(conv);
