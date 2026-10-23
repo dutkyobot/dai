@@ -40,7 +40,7 @@
     cleanLegacyCopies();
     return key;
   }
-  function getModel(fallback = 'gemini-2.5-flash') {
+  function getModel(fallback = 'gemini-3.1-flash-lite') {
     try { return localStorage.getItem(SHARED_MODEL) || fallback; } catch (_) { return fallback; }
   }
   function setModel(model) {
