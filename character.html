@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>D-AI Character · 캐릭터 챗</title>
+<meta name="description" content="나만의 캐릭터와 1:1로, 또는 세계관별 단체채팅에서 AI들과 함께 대화하세요. 내 Gemini API 키로 동작해요.">
+<meta property="og:title" content="D-AI Character"><meta property="og:description" content="1:1 캐릭터 챗 + 세계관별 AI 단체채팅"><meta property="og:type" content="website">
+<script>try{var t=localStorage.getItem("dai_theme_v1")||localStorage.getItem("zeta_theme_v1");if(t!=="light")document.documentElement.classList.add("dark")}catch(e){document.documentElement.classList.add("dark")}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="shared.css">
+<style>.header-right .model-menu{left:auto;right:0}.sidebar-head .seg{margin-top:12px}.ci-main .av{width:30px;height:30px;font-size:12px;border-radius:10px}textarea.tall{min-height:84px}.auto-on{color:var(--c-mint)}</style>
+</head>
+<body>
+<div class="app">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-head">
+      <div class="logo-row">
+        <div class="logo"><div class="brand-badge">D</div><div class="brand-text"><div class="brand-title"><span class="b-a">D-AI</span> <span class="b-b">Character</span></div><div class="brand-sub">캐릭터 챗</div></div></div>
+        <button id="btn-close-sidebar" class="icon-btn sidebar-close-btn" aria-label="사이드바 닫기"></button>
+      </div>
+      <div class="seg" id="mode-seg"><button data-m="one">1:1 모드</button><button data-m="group">단체 모드</button></div>
+    </div>
+    <div id="sidebar-body" class="sidebar-body"></div>
+    <div class="sidebar-foot">
+      <div class="page-links"><a href="chat.html">일반 AI</a><a href="character.html" class="is-current">캐릭터 챗</a></div>
+      <button id="btn-settings" class="profile-btn"><span class="me-av">설</span><span class="nm">설정</span></button>
+    </div>
+  </aside>
+  <div id="sb-overlay" class="sb-overlay"></div>
+  <main class="main">
+    <header id="header" class="app-header">
+      <div class="header-left"><button id="btn-open-sidebar" class="round-btn" aria-label="메뉴"></button><div class="room-pill" id="room-pill"></div></div>
+      <div class="header-right"><button id="btn-auto" class="round-btn hidden" aria-label="자동 대화"></button><div id="model-host"></div></div>
+    </header>
+    <div id="stream" class="stream"></div>
+    <div class="composer-wrap"><div class="composer-inner">
+      <div id="typing"><span class="dots"><i></i><i></i><i></i></span><span id="typing-text"></span></div>
+      <div id="mention-chips" class="chips"></div>
+      <form id="form" class="composer-shell"><textarea id="input" class="field" rows="1" placeholder="메시지를 입력하세요" aria-label="메시지 입력"></textarea><button class="btn btn-brand send-btn" type="submit" aria-label="전송"></button></form>
+      <p class="composer-hint">Enter 전송 · Shift+Enter 줄바꿈 · <b>*행동*</b> 으로 지문을 쓸 수 있어요</p>
+    </div></div>
+  </main>
+</div>
+<script src="shared.js"></script>
+<script>
+(function(){
+const D=DAI,$=s=>document.querySelector(s),KEY='dai_char_v1',uid=D.uid;
+const ZWIN=10,GWIN=30;
+
+/* ---------- 데이터 · 마이그레이션 ---------- */
+function migrate(){
+  const s={mode:'one',userName:'나',curChar:null,curRoom:null,chars:[],rooms:[]};
+  const p=D.store.get('zeta_persona_v1',null),zc=D.store.get('zeta_conversations_v1',[]);
+  if(p&&(p.charName||(Array.isArray(zc)&&zc.length))){
+    const ch={id:uid(),name:p.charName||'캐릭터',personality:p.charPersonality||'',greeting:p.charGreeting||'',hue:275,convs:[],curConv:null};
+    (Array.isArray(zc)?zc:[]).forEach(c=>ch.convs.push({id:c.id||uid(),title:c.title||'대화',createdAt:c.createdAt||Date.now(),updatedAt:c.updatedAt||Date.now(),
+      messages:(c.messages||[]).map(m=>({id:m.id||uid(),sender:m.sender==='user'?'user':'char',text:m.text||'',t:c.updatedAt||Date.now()}))}));
+    const cc=D.store.raw('zeta_current_conversation_v1');
+    ch.curConv=(ch.convs.find(c=>c.id===cc)||ch.convs[0]||{}).id||null;
+    s.chars.push(ch);s.curChar=ch.id;if(p.userName)s.userName=p.userName;
+  }
+  const g=D.store.get('aigroupchat.v2',null);
+  if(g&&Array.isArray(g.members)&&g.members.length){
+    const r={id:uid(),name:'기본 세계관',lore:'',view:'group',auto:!!g.auto,interval:g.interval||25,maxAuto:g.maxAuto||5,
+      members:g.members.map((m,i)=>({id:m.id||uid(),name:m.name||'멤버',persona:m.persona||'',hue:m.hue==null?D.hues[i%8]:m.hue})),
+      log:(g.log||[]).filter(e=>e.who!=='sys').map(e=>({id:uid(),who:e.who,text:e.text||'',t:e.t||Date.now()})),dms:{}};
+    for(const k in (g.dms||{}))r.dms[k]=(g.dms[k]||[]).filter(e=>e.who!=='sys').map(e=>({id:uid(),who:e.who==='user'?'user':'char',text:e.text||'',t:e.t||Date.now()}));
+    s.rooms.push(r);s.curRoom=r.id;
+  }
+  return s;
+}
+let S=D.store.get(KEY,null);
+if(!S||!Array.isArray(S.chars)||!Array.isArray(S.rooms)){S=migrate();D.store.set(KEY,S)}
+const save=()=>{S.rooms.forEach(r=>{r.log=r.log.slice(-300);for(const k in r.dms)r.dms[k]=r.dms[k].slice(-200)});D.store.set(KEY,S)};
+const curChar=()=>S.chars.find(c=>c.id===S.curChar)||null;
+const curConv=()=>{const c=curChar();return c&&c.convs.find(v=>v.id===c.curConv)||null};
+const curRoom=()=>S.rooms.find(r=>r.id===S.curRoom)||null;
+const mem=(r,id)=>r.members.find(m=>m.id===id);
+const pending=new Set();let tok=0,pauseUntil=0,autoCount=0,lastAct=Date.now();
+const keyC=c=>'c:'+c.id,keyG=r=>'g:'+r.id,keyD=(r,m)=>'d:'+r.id+':'+m;
+
+/* ---------- 정적 UI ---------- */
+$('#btn-close-sidebar').innerHTML=D.icon('x');$('#btn-open-sidebar').innerHTML=D.icon('menu');$('.send-btn').innerHTML=D.icon('send');
+const sb=D.bindSidebar();D.bindHeaderScroll($('#stream'),$('#header'));D.mountModelPicker($('#model-host'));
+function dataIO(host){
+  host.innerHTML='<div class="settings-section"><div class="settings-section-title">캐릭터 챗</div>'+
+   '<div><label class="label" for="st-user">내 이름 (캐릭터가 부르는 이름)</label><input id="st-user" class="field" maxlength="20"></div>'+
+   '<div class="row-2"><button class="btn btn-ghost btn-sm" id="st-exp">'+D.icon('download')+' 내보내기</button><button class="btn btn-ghost btn-sm" id="st-imp">'+D.icon('upload')+' 불러오기</button></div>'+
+   '<p class="hint">내보내기 파일에는 API 키가 들어가지 않아요. 불러오면 현재 캐릭터·세계관이 교체돼요.</p></div>';
+  $('#st-exp').onclick=()=>D.download('d-ai-character.json',{type:'dai_char',version:1,data:{userName:S.userName,chars:S.chars,rooms:S.rooms}});
+  $('#st-imp').onclick=()=>D.pickJSON(async j=>{
+    const d=j&&j.data;if(!d||!Array.isArray(d.chars)||!Array.isArray(d.rooms))return D.toast('이 사이트의 내보내기 파일이 아니에요.','error');
+    if(!await D.confirm('불러올까요?','현재 캐릭터와 세계관이 파일 내용으로 교체돼요.',{danger:true,okText:'불러오기'}))return;
+    pending.clear();tok++;S={mode:S.mode,userName:d.userName||'나',curChar:(d.chars[0]||{}).id||null,curRoom:(d.rooms[0]||{}).id||null,chars:d.chars,rooms:d.rooms};
+    S.chars.forEach(c=>{c.convs=c.convs||[]});S.rooms.forEach(r=>{r.members=r.members||[];r.log=r.log||[];r.dms=r.dms||{};r.view='group'});
+    save();render();D.toast('불러왔어요.');
+  });
+}
+const st=D.mountSettings({extra:dataIO,onOpen:()=>{$('#st-user').value=S.userName},onSave:()=>{const v=$('#st-user').value.trim();if(v){S.userName=v;save()}}});
+$('#btn-settings').onclick=()=>{st.open();sb.close()};
+$('#mode-seg').addEventListener('click',e=>{const m=e.target.dataset&&e.target.dataset.m;if(m&&m!==S.mode){S.mode=m;tok++;save();render();}});
+
+/* ---------- 편집 모달 ---------- */
+function swatches(host,get,set){host.innerHTML='';D.hues.forEach(h=>{const b=D.el('button','swatch'+(get()===h?' is-active':''));b.type='button';b.style.background=D.hueColor(h);b.onclick=()=>{set(h);swatches(host,get,set)};host.appendChild(b)})}
+function editChar(ch,after){
+  const isNew=!ch;const d=ch?{...ch}:{id:uid(),name:'',personality:'',greeting:'',hue:D.hues[S.chars.length%8],convs:[],curConv:null};
+  const m=D.modal({});m.el.innerHTML='<div class="modal-head"><h2>'+(isNew?'새 캐릭터':'캐릭터 편집')+'</h2><button class="icon-btn" data-x>'+D.icon('x')+'</button></div>'+
+   '<div><label class="label">이름</label><input class="field" id="e-name" maxlength="30"></div>'+
+   '<div><label class="label">성격 · 설정</label><textarea class="field tall" id="e-pers" rows="4" placeholder="말투, 나이, 관계, 배경 등 자유롭게"></textarea></div>'+
+   '<div><label class="label">첫 인사 (선택)</label><textarea class="field" id="e-greet" rows="2"></textarea></div>'+
+   '<div><label class="label">색상</label><div class="swatches" id="e-sw"></div></div>'+
+   '<div class="modal-foot"><button class="btn btn-ghost" data-x>취소</button><button class="btn btn-brand" id="e-ok">저장</button></div>';
+  const q=s=>m.el.querySelector(s);q('#e-name').value=d.name;q('#e-pers').value=d.personality;q('#e-greet').value=d.greeting;
+  swatches(q('#e-sw'),()=>d.hue,h=>d.hue=h);m.el.querySelectorAll('[data-x]').forEach(b=>b.onclick=m.close);
+  q('#e-ok').onclick=()=>{const n=q('#e-name').value.trim();if(!n)return D.toast('이름을 입력해 주세요.','error');
+    d.name=n;d.personality=q('#e-pers').value.trim();d.greeting=q('#e-greet').value.trim();
+    if(isNew){S.chars.push(d);S.curChar=d.id;newConv(d)}else Object.assign(ch,d);
+    save();m.close();render();if(after)after()};
+  setTimeout(()=>q('#e-name').focus(),50);
+}
+function editRoom(room){
+  const isNew=!room;const d=room?JSON.parse(JSON.stringify(room)):{id:uid(),name:'',lore:'',view:'group',auto:false,interval:25,maxAuto:5,members:[],log:[],dms:{}};
+  const m=D.modal({wide:true});
+  const draw=()=>{
+    m.el.innerHTML='<div class="modal-head"><h2>'+(isNew?'새 세계관':'세계관 설정')+'</h2><button class="icon-btn" data-x>'+D.icon('x')+'</button></div>'+
+     '<div><label class="label">세계관 이름</label><input class="field" id="r-name" maxlength="30"></div>'+
+     '<div><label class="label">세계관 설명</label><textarea class="field tall" id="r-lore" rows="4" placeholder="이 세계관의 배경·규칙·분위기. 이 세계관의 멤버들만 이 설정을 알아요."></textarea></div>'+
+     '<div><div class="label">멤버</div><div class="stack-list" id="r-mem"></div>'+
+     '<div class="row-2" style="margin-top:8px"><button class="btn btn-ghost btn-sm" id="r-add">'+D.icon('plus')+' 새 멤버</button><button class="btn btn-ghost btn-sm" id="r-imp">'+D.icon('download')+' 나의 캐릭터에서</button></div><div id="r-imp-box"></div></div>'+
+     '<div class="settings-row"><div><div class="settings-row-label">AI끼리 자동 대화</div><div class="settings-row-desc">잠시 조용하면 멤버들이 알아서 이어가요 (호출 늘어남)</div></div><button type="button" class="toggle-switch'+(d.auto?' is-on':'')+'" id="r-auto" aria-label="자동 대화"><span class="toggle-knob"></span></button></div>'+
+     '<div class="modal-foot"><button class="btn btn-ghost" data-x>취소</button><button class="btn btn-brand" id="r-ok">저장</button></div>';
+    const q=s=>m.el.querySelector(s);q('#r-name').value=d.name;q('#r-lore').value=d.lore;
+    q('#r-name').oninput=e=>d.name=e.target.value;q('#r-lore').oninput=e=>d.lore=e.target.value;
+    const box=q('#r-mem');
+    d.members.forEach((mb,i)=>{
+      const c=D.el('div','sub-card','<div class="sub-top"><input class="field" maxlength="20" placeholder="이름"><button type="button" class="icon-btn" aria-label="멤버 삭제">'+D.icon('trash')+'</button></div><textarea class="field" rows="2" placeholder="성격 · 설정"></textarea><div class="swatches"></div>');
+      const ins=c.querySelector('input'),ta=c.querySelector('textarea');ins.value=mb.name;ta.value=mb.persona;
+      ins.oninput=()=>mb.name=ins.value;ta.oninput=()=>mb.persona=ta.value;
+      swatches(c.querySelector('.swatches'),()=>mb.hue,h=>mb.hue=h);
+      c.querySelector('.icon-btn').onclick=()=>{d.members.splice(i,1);draw()};box.appendChild(c);
+    });
+    q('#r-add').onclick=()=>{d.members.push({id:uid(),name:'',persona:'',hue:D.hues[d.members.length%8]});draw()};
+    q('#r-imp').onclick=()=>{const b=q('#r-imp-box');if(b.innerHTML){b.innerHTML='';return}
+      if(!S.chars.length){b.innerHTML='<p class="hint">1:1 모드에서 만든 캐릭터가 아직 없어요.</p>';return}
+      b.className='import-panel';b.style.marginTop='8px';b.innerHTML='';
+      S.chars.forEach(ch=>{const r=D.el('div','import-row','<span class="nm"></span><button type="button" class="btn btn-ghost btn-sm">복사해 추가</button>');
+        r.insertBefore(D.avatar(ch.name,ch.hue,26),r.firstChild);r.querySelector('.nm').textContent=ch.name;
+        r.querySelector('button').onclick=()=>{d.members.push({id:uid(),name:ch.name,persona:ch.personality,hue:ch.hue});draw();D.toast(ch.name+' 복사 완료 (원본과는 별개예요)')};b.appendChild(r)})};
+    q('#r-auto').onclick=()=>{d.auto=!d.auto;q('#r-auto').classList.toggle('is-on',d.auto)};
+    m.el.querySelectorAll('[data-x]').forEach(b=>b.onclick=m.close);
+    q('#r-ok').onclick=()=>{
+      d.name=d.name.trim();if(!d.name)return D.toast('세계관 이름을 입력해 주세요.','error');
+      d.members=d.members.filter(x=>x.name.trim());d.members.forEach(x=>x.name=x.name.trim());
+      if(!d.members.length)return D.toast('멤버를 한 명 이상 넣어 주세요.','error');
+      for(const k of Object.keys(d.dms))if(!mem(d,k))delete d.dms[k];
+      if(d.view!=='group'&&!mem(d,d.view))d.view='group';
+      if(isNew){S.rooms.push(d);S.curRoom=d.id}else Object.assign(room,d);
+      tok++;save();m.close();render();
+    };
+  };draw();
+}
+
+/* ---------- 생성 ---------- */
+function newConv(ch){
+  const c={id:uid(),title:'새 대화',messages:[],createdAt:Date.now(),updatedAt:Date.now()};
+  if(ch.greeting)c.messages.push({id:uid(),sender:'char',text:ch.greeting,t:Date.now()});
+  ch.convs.push(c);ch.curConv=c.id;return c;
+}
+const zetaSys=ch=>'당신은 다음 설정과 성격을 완벽하게 모사하며 연출하는 가상 캐릭터 대화용 봇입니다.\n당신의 이름은 '+ch.name+'입니다.\n성격/설정: '+ch.personality+'\n유저의 이름은 '+S.userName+'입니다.\n\n★ 중요 연출 지침:\n1. *…* 또는 [*…*] 로 행동 묘사를 넣을 수 있습니다.\n2. 메신저 대화 톤으로 1~3문장 정도로 답합니다.\n3. 캐릭터의 말투를 일관되게 유지합니다.';
+async function replyOne(ch,cv){
+  const k=keyC(cv);pending.add(k);cv.err=null;if(cv.id===ch.curConv&&S.mode==='one')render(true);
+  const contents=cv.messages.slice(-ZWIN).map(m=>({role:m.sender==='user'?'user':'model',parts:[{text:m.text}]}));
+  try{const out=await D.generate({system:zetaSys(ch),contents});cv.messages.push({id:uid(),sender:'char',text:out,t:Date.now()});cv.updatedAt=Date.now()}
+  catch(e){cv.err=D.errText(e)}
+  pending.delete(k);save();if(S.mode==='one'&&S.curChar===ch.id&&ch.curConv===cv.id)render(true);else renderSide();
+}
+const transcript=(r,n)=>r.log.slice(-n).map(e=>(e.who==='user'?S.userName:(mem(r,e.who)||{name:'(떠난 멤버)'}).name)+': '+e.text).join('\n');
+function stripName(t,n){return t.replace(new RegExp('^\\s*\\[?'+n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\]?\\s*[:：]\\s*'),'')}
+async function speak(r,mb,myTok){
+  const others=r.members.filter(x=>x.id!==mb.id).map(x=>x.name+'('+x.persona+')').join(' / ');
+  const sys='당신은 단톡방 참여자 '+mb.name+'입니다.\n[세계관] '+(r.lore||'(따로 정해진 설정 없음)')+'\n[당신의 설정] '+mb.persona+'\n[다른 참여자] '+others+'\n[유저] '+S.userName+'\n메신저 대화처럼 짧게(1~3문장) 말하세요. *행동* 지문도 쓸 수 있어요. 말투는 스스로 정하세요. 끼어들 말이 없으면 [PASS] 라고만 쓰세요.';
+  const user=(transcript(r,GWIN)||'(방금 만들어진 방)')+'\n\n이제 '+mb.name+'의 차례입니다. 이름 접두사 없이 대사만 쓰세요.';
+  const k=keyG(r);pending.add(k);if(S.curRoom===r.id)renderTyping();
+  let out=null,err=null;
+  try{out=await D.generate({system:sys,contents:[{role:'user',parts:[{text:user}]}]})}catch(e){err=e}
+  pending.delete(k);
+  if(myTok!==tok){return false}
+  if(err){if(err.code==='ratelimit')pauseUntil=Date.now()+60000;r.err=D.errText(err);render(true);return false}
+  r.err=null;
+  if(/^\[?PASS\]?$/i.test(out.trim())){renderTyping();return true}
+  r.log.push({id:uid(),who:mb.id,text:stripName(out,mb.name),t:Date.now()});lastAct=Date.now();save();
+  if(S.mode==='group'&&S.curRoom===r.id&&r.view==='group')render(true);else renderSide();
+  return true;
+}
+async function runTurns(r,text){
+  const myTok=tok;autoCount=0;
+  const hit=r.members.filter(m=>text.toLowerCase().includes('@'+m.name.toLowerCase())||text.includes(m.name));
+  let pick=hit.length?hit:r.members.slice().sort(()=>Math.random()-.5).slice(0,Math.random()<.5?1:2);
+  pick=pick.slice(0,3);
+  for(const mb of pick){if(myTok!==tok)return;if(!await speak(r,mb,myTok))return;await D.sleep(500)}
+}
+async function replyDm(r,mid){
+  const mb=mem(r,mid);if(!mb)return;const k=keyD(r,mid);const dm=r.dms[mid]=r.dms[mid]||[];
+  pending.add(k);r.err=null;if(S.curRoom===r.id&&r.view===mid)render(true);
+  const sys='당신은 '+mb.name+'입니다.\n[세계관] '+(r.lore||'(따로 정해진 설정 없음)')+'\n[당신의 설정] '+mb.persona+'\n지금은 단톡방이 아니라 '+S.userName+'과(와) 둘만의 DM입니다. 아래는 직전까지 단톡방에서 오간 대화이니 기억하고 있어요(DM에서 다른 멤버 이야기를 해도 좋아요).\n[단톡방 대화]\n'+(transcript(r,20)||'(없음)')+'\n메신저 대화처럼 짧게(1~3문장). *행동* 지문 가능. 말투는 스스로 정하세요.';
+  const contents=dm.slice(-ZWIN).map(e=>({role:e.who==='user'?'user':'model',parts:[{text:e.text}]}));
+  try{const out=await D.generate({system:sys,contents});dm.push({id:uid(),who:mid,text:stripName(out,mb.name),t:Date.now()})}catch(e){r.err=D.errText(e)}
+  pending.delete(k);save();if(S.mode==='group'&&S.curRoom===r.id&&r.view===mid)render(true);else renderSide();
+}
+
+/* ---------- 렌더 ---------- */
+function renderSide(){
+  const b=$('#sidebar-body');b.innerHTML='';
+  document.querySelectorAll('#mode-seg button').forEach(x=>x.classList.toggle('is-active',x.dataset.m===S.mode));
+  const label=(t,fn,aria)=>{const g=D.el('div','group-label','<span></span>');g.firstChild.textContent=t;if(fn){const a=D.el('button','',D.icon('plus'));a.setAttribute('aria-label',aria);a.onclick=fn;g.appendChild(a)}b.appendChild(g)};
+  const item=(o)=>{const it=D.el('div','chat-item'+(o.active?' is-active':''));
+    it.innerHTML='<button class="ci-main"><span class="ci-text"><span class="ci-name"></span><span class="ci-prev"></span></span></button>'+(o.actions?'<div class="ci-actions"></div>':'');
+    const mb=it.querySelector('.ci-main');if(o.av)mb.insertBefore(D.avatar(o.name,o.hue),mb.firstChild);
+    it.querySelector('.ci-name').textContent=o.name;it.querySelector('.ci-prev').textContent=o.prev||'';
+    mb.onclick=()=>{o.click();sb.close()};
+    (o.actions||[]).forEach(a=>{const x=D.el('button','',D.icon(a[0]));x.setAttribute('aria-label',a[1]);x.onclick=e=>{e.stopPropagation();a[2]()};it.querySelector('.ci-actions').appendChild(x)});
+    b.appendChild(it)};
+  if(S.mode==='one'){
+    label('나의 캐릭터',()=>editChar(null),'캐릭터 추가');
+    if(!S.chars.length)b.appendChild(D.el('div','history-empty','+ 로 첫 캐릭터를 만들어요'));
+    S.chars.forEach(ch=>item({name:ch.name,hue:ch.hue,av:1,prev:ch.convs.length+'개 대화',active:ch.id===S.curChar,click:()=>{S.curChar=ch.id;tok++;if(!curConv()&&ch.convs.length)ch.curConv=ch.convs[0].id;save();render()},
+      actions:[['pen','편집',()=>editChar(ch)],['trash','삭제',async()=>{if(await D.confirm(ch.name+' 삭제',"이 캐릭터와 모든 대화가 사라져요. (세계관에 복사된 멤버는 그대로예요)",{danger:true,okText:'삭제'})){S.chars=S.chars.filter(x=>x!==ch);if(S.curChar===ch.id)S.curChar=(S.chars[0]||{}).id||null;save();render()}}]]}));
+    const ch=curChar();
+    if(ch){label('대화',()=>{newConv(ch);save();render()},'새 대화');
+      ch.convs.slice().sort((a,b)=>b.updatedAt-a.updatedAt).forEach(cv=>item({name:cv.title,active:cv.id===ch.curConv,click:()=>{ch.curConv=cv.id;save();render()},
+        actions:[['pen','이름 변경',async()=>{const v=await D.ask('대화 이름',cv.title);if(v&&v.trim()){cv.title=v.trim();save();renderSide()}}],['trash','삭제',async()=>{if(await D.confirm('대화 삭제','되돌릴 수 없어요.',{danger:true,okText:'삭제'})){ch.convs=ch.convs.filter(x=>x!==cv);if(ch.curConv===cv.id)ch.curConv=(ch.convs[0]||{}).id||null;save();render()}}]]}))}
+  }else{
+    label('세계관',()=>editRoom(null),'세계관 추가');
+    if(!S.rooms.length)b.appendChild(D.el('div','history-empty','+ 로 첫 세계관을 만들어요'));
+    S.rooms.forEach(r=>item({name:r.name,prev:'멤버 '+r.members.length+'명',active:r.id===S.curRoom,click:()=>{S.curRoom=r.id;tok++;save();render()},
+      actions:[['gear','설정',()=>editRoom(r)],['trash','삭제',async()=>{if(await D.confirm(r.name+' 삭제','이 세계관의 대화·DM·멤버가 모두 사라져요.',{danger:true,okText:'삭제'})){S.rooms=S.rooms.filter(x=>x!==r);if(S.curRoom===r.id)S.curRoom=(S.rooms[0]||{}).id||null;tok++;save();render()}}]]}));
+    const r=curRoom();
+    if(r){label('이 세계관의 대화');
+      item({name:'단체채팅',prev:(r.log.length?r.log[r.log.length-1].text:'아직 대화 없음'),active:r.view==='group',click:()=>{r.view='group';save();render()}});
+      label('DM');
+      r.members.forEach(m=>{const dm=r.dms[m.id]||[];item({name:m.name,hue:m.hue,av:1,prev:dm.length?dm[dm.length-1].text:'1:1 대화',active:r.view===m.id,click:()=>{r.view=m.id;save();render()}})})}
+  }
+}
+function rowFor(o,first,acts){
+  const row=D.el('div','msg-row'+(first?' first':'')+(o.mine?' user':''));
+  const av=o.mine?'':(first?'':'');
+  row.innerHTML=(o.mine?'':'<div class="av-slot"></div>')+'<div class="msg-col'+(o.mine?' user':'')+'">'+((!o.mine&&first)?'<span class="msg-name"></span>':'')+'<div class="bubble-line"><div class="bubble '+(o.mine?'user':'char')+'"></div><div class="msg-actions"></div></div></div>';
+  if(!o.mine){const slot=row.querySelector('.av-slot');if(first){slot.replaceWith(D.avatar(o.name,o.hue,32))}else slot.replaceWith(D.el('div','msg-spacer'));const n=row.querySelector('.msg-name');if(n)n.textContent=o.name}
+  row.querySelector('.bubble').innerHTML=D.rp(o.text);
+  const ac=row.querySelector('.msg-actions');(acts||[]).forEach(a=>{const b=D.el('button','icon-btn',D.icon(a[0]));b.setAttribute('aria-label',a[1]);b.onclick=a[2];ac.appendChild(b)});
+  const tm=D.el('span','msg-time');tm.textContent=D.fmtTime(o.t);row.querySelector('.bubble-line').insertBefore(tm,ac);
+  return row;
+}
+function renderPill(t,sub,name,hue,on){
+  const p=$('#room-pill');p.innerHTML='';
+  if(name)p.appendChild(D.avatar(name,hue,24));
+  const b=D.el('b');b.textContent=t;p.appendChild(b);
+  if(sub){const s=D.el('small');s.textContent=sub;p.appendChild(s)}
+  const dot=D.el('span');dot.id='room-dot';if(on)dot.className='on';p.appendChild(dot);
+}
+function emptyHero(title,desc,btn,fn){
+  const h=D.el('div','hero','<h1></h1><p></p><div class="chips"><button class="btn btn-brand"></button></div>');
+  h.querySelector('h1').textContent=title;h.querySelector('p').textContent=desc;const b=h.querySelector('button');b.textContent=btn;b.onclick=fn;return h;
+}
+function errBox(t){const e=D.el('div','sys err');e.textContent=t;return e}
+function renderTyping(){
+  let on=false,txt='';
+  if(S.mode==='one'){const c=curConv(),ch=curChar();on=!!c&&pending.has(keyC(c));txt=on?ch.name+' 님이 입력 중…':''}
+  else{const r=curRoom();if(r){if(r.view==='group'){on=pending.has(keyG(r));txt='누군가 입력 중…'}else{on=pending.has(keyD(r,r.view));txt=(mem(r,r.view)||{}).name+' 님이 입력 중…'}}}
+  $('#typing').classList.toggle('show',on);$('#typing-text').textContent=txt;
+}
+function render(keep){
+  renderSide();const s=$('#stream');s.innerHTML='';
+  const chips=$('#mention-chips');chips.innerHTML='';$('#btn-auto').classList.add('hidden');
+  if(S.mode==='one'){
+    const ch=curChar(),cv=curConv();
+    if(!ch){renderPill('캐릭터 없음','',null,0,false);s.appendChild(emptyHero('나만의 캐릭터를 만들어요','이름과 성격만 적으면 바로 대화할 수 있어요.','캐릭터 만들기',()=>editChar(null)));}
+    else{renderPill(ch.name,cv?cv.title:'',ch.name,ch.hue,true);
+      if(!cv)s.appendChild(emptyHero(ch.name,'대화를 시작해 보세요.','새 대화',()=>{newConv(ch);save();render()}));
+      else{let prev=null;cv.messages.forEach((m,i)=>{const mine=m.sender==='user',first=prev!==m.sender;prev=m.sender;
+        const acts=[['copy','복사',()=>D.copyText(m.text)]];
+        if(!mine&&i===cv.messages.length-1&&i>0)acts.push(['refresh','다시 생성',()=>{cv.messages.pop();save();replyOne(ch,cv)}]);
+        acts.push(['trash','삭제',()=>{cv.messages.splice(i,1);save();render()}]);
+        s.appendChild(rowFor({mine,name:ch.name,hue:ch.hue,text:m.text,t:m.t||cv.updatedAt},first,acts))});
+        if(cv.err)s.appendChild(errBox(cv.err))}}
+  }else{
+    const r=curRoom();
+    if(!r){renderPill('세계관 없음','',null,0,false);s.appendChild(emptyHero('세계관을 만들어요','세계관마다 설정과 멤버가 따로예요. 나의 캐릭터를 복사해 올 수도 있어요.','세계관 만들기',()=>editRoom(null)))}
+    else{
+      const isG=r.view==='group',m0=mem(r,r.view);
+      renderPill(isG?r.name:m0.name,isG?'멤버 '+r.members.length+'명':r.name+' · DM',isG?null:m0.name,isG?0:m0.hue,true);
+      const ab=$('#btn-auto');ab.classList.toggle('hidden',!isG);ab.innerHTML=D.icon(r.auto?'pause':'play');ab.classList.toggle('is-on',!!r.auto);
+      ab.setAttribute('aria-label',r.auto?'자동 대화 끄기':'자동 대화 켜기');
+      if(isG){
+        if(!r.log.length)s.appendChild(D.el('div','sys','"'+r.name+'" 방이에요. 먼저 말을 걸어 보세요.'+(r.lore?'\n세계관: '+r.lore:'')));
+        let prev=null;r.log.forEach((e,i)=>{const mine=e.who==='user',mb=mem(r,e.who),first=prev!==e.who;prev=e.who;
+          s.appendChild(rowFor({mine,name:mine?S.userName:(mb?mb.name:'(떠난 멤버)'),hue:mb?mb.hue:0,text:e.text,t:e.t},first,[['copy','복사',()=>D.copyText(e.text)],['trash','삭제',()=>{r.log.splice(i,1);save();render()}]]))});
+        r.members.forEach(m=>{const c=D.el('button','chip');c.textContent='@'+m.name;c.onclick=()=>{const t=$('#input');t.value+=(t.value&&!/\s$/.test(t.value)?' ':'')+'@'+m.name+' ';t.focus()};chips.appendChild(c)});
+      }else{
+        const dm=r.dms[r.view]||[];
+        if(!dm.length)s.appendChild(D.el('div','sys','단체채팅에서 있었던 일을 기억한 채로 '+m0.name+'와 둘이 얘기해요.'));
+        let prev=null;dm.forEach((e,i)=>{const mine=e.who==='user',first=prev!==e.who;prev=e.who;
+          s.appendChild(rowFor({mine,name:m0.name,hue:m0.hue,text:e.text,t:e.t},first,[['copy','복사',()=>D.copyText(e.text)],['trash','삭제',()=>{dm.splice(i,1);save();render()}]]))});
+      }
+      if(r.err)s.appendChild(errBox(r.err));
+    }
+  }
+  renderTyping();s.scrollTop=s.scrollHeight;
+}
+$('#btn-auto').onclick=()=>{const r=curRoom();if(!r)return;r.auto=!r.auto;autoCount=0;lastAct=Date.now();save();render(true);D.toast(r.auto?'자동 대화를 켰어요.':'자동 대화를 껐어요.')};
+
+/* ---------- 전송 · 자동 대화 ---------- */
+D.bindComposer($('#form'),$('#input'),text=>{
+  if(S.mode==='one'){
+    const ch=curChar();if(!ch)return D.toast('먼저 캐릭터를 만들어 주세요.','error');
+    const cv=curConv()||newConv(ch);if(pending.has(keyC(cv)))return D.toast('답변이 오는 중이에요.','error');
+    cv.messages.push({id:uid(),sender:'user',text,t:Date.now()});
+    if(cv.title==='새 대화')cv.title=text.slice(0,20);cv.updatedAt=Date.now();save();render(true);replyOne(ch,cv);
+  }else{
+    const r=curRoom();if(!r)return D.toast('먼저 세계관을 만들어 주세요.','error');
+    if(r.view==='group'){if(pending.has(keyG(r)))return D.toast('멤버가 말하는 중이에요.','error');
+      r.err=null;r.log.push({id:uid(),who:'user',text,t:Date.now()});lastAct=Date.now();save();render(true);runTurns(r,text)}
+    else{const k=keyD(r,r.view);if(pending.has(k))return D.toast('답변이 오는 중이에요.','error');
+      (r.dms[r.view]=r.dms[r.view]||[]).push({id:uid(),who:'user',text,t:Date.now()});save();render(true);replyDm(r,r.view)}
+  }
+});
+setInterval(()=>{
+  const r=curRoom();
+  if(S.mode!=='group'||!r||!r.auto||r.view!=='group'||document.hidden||pending.has(keyG(r))||Date.now()<pauseUntil)return;
+  if(autoCount>=(r.maxAuto||5)||Date.now()-lastAct<(r.interval||25)*1000||!r.members.length||!D.settings.get().key)return;
+  const lastId=(r.log[r.log.length-1]||{}).who;const c=r.members.filter(m=>m.id!==lastId);const mb=(c.length?c:r.members)[Math.floor(Math.random()*(c.length||r.members.length))];
+  autoCount++;lastAct=Date.now();speak(r,mb,tok);
+},1000);
+document.addEventListener('dai:settings',()=>{});
+render();
+})();
+</script>
+</body>
+</html>
