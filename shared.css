@@ -258,3 +258,7 @@ html.dark .composer-shell{box-shadow:0 16px 36px -22px rgb(0 0 0 / .58),0 1px 3p
 .toast.show{transform:none}
 .toast svg{font-size:15px}
 .toast.ok svg{color:var(--c-mint)} .toast.error svg{color:rgb(var(--c-red))}
+
+/* 페이지별 포인트 색: 일반 AI = 블루 (캐릭터 챗은 기본 보라) */
+html.page-chat{--c-accent:37 112 214;--c-accent-dark:27 90 182}
+html.page-chat.dark{--c-accent:96 165 250;--c-accent-dark:59 130 232}
