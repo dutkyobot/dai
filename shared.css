@@ -2,7 +2,7 @@
 :root{
   --c-bg:238 235 228; --c-surface:248 246 241; --c-surface2:229 225 217; --c-line:212 207 197;
   --c-mute:104 99 92; --c-ink:44 41 37; --c-accent:124 77 230; --c-accent-dark:99 52 200;
-  --c-shadow:60 50 30; --c-sheen-alpha:.18; --c-mint:#17b463; --c-blue:#2b84e0; --c-red:220 60 60; --c-amber:200 130 20; --radius:28px;
+  --c-shadow:60 50 30; --c-sheen-alpha:.18; --c-mint:#21D67A; --c-blue:#3B9EFF; --c-red:220 60 60; --c-amber:200 130 20; --radius:28px;
 }
 html.dark{
   --c-bg:0 0 0; --c-surface:24 24 27; --c-surface2:31 31 35; --c-line:42 42 46;
@@ -44,7 +44,7 @@ textarea.field{resize:none;line-height:1.6}
 .icon-btn:hover{color:rgb(var(--c-ink));background:rgb(var(--c-surface2))}
 .card{background:rgb(var(--c-surface));border:1px solid rgb(var(--c-line));border-radius:var(--radius);box-shadow:0 16px 32px -8px rgb(var(--c-shadow) / .16),inset 0 1px 0 rgb(255 255 255 / var(--c-sheen-alpha))}
 .av{width:32px;height:32px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;user-select:none}
-.brand-badge{width:28px;height:28px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--c-mint) 0%,var(--c-blue) 100%);color:#04140c;font-weight:800;font-size:12px;letter-spacing:-.02em;box-shadow:0 2px 8px rgb(var(--c-shadow) / .08)}
+.brand-badge{width:28px;height:28px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--c-mint) 0%,var(--c-blue) 100%);font-weight:800;font-size:12px}
 .brand-text{min-width:0;line-height:1.22}
 .brand-title{font-size:14px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
 .brand-title .b-a{color:var(--c-mint)} .brand-title .b-b{color:var(--c-blue)}
