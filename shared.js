@@ -274,14 +274,19 @@
   };
 
   /* ---------------- 웹 검색 (Tavily) ---------------- */
+  D.searchKeyOf = function () { const p = S.searchProvider || 'tavily', ks = S.searchKeys || {}; return ((ks[p] || (p === 'tavily' && S.searchKey) || '') + '').trim(); };
   D.webSearch = async function (query) {
-    const k = (S.searchKey || '').trim(); if (!k) throw new DaiError('nosearchkey');
-    let res;
-    try { res = await fetch('https://api.tavily.com/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + k }, body: JSON.stringify({ query: String(query).slice(0, 380), max_results: 5, search_depth: 'basic' }) }); }
-    catch (e) { throw new DaiError('searchnet'); }
-    if (!res.ok) { let d = ''; try { d = (await res.json()).detail.error || ''; } catch (e) {} throw new DaiError(res.status === 401 || res.status === 403 ? 'searchauth' : 'searchfail', d || res.status, res.status); }
+    const k = D.searchKeyOf(); if (!k) throw new DaiError('nosearchkey');
+    const prov = S.searchProvider || 'tavily', q = String(query).slice(0, 380); let res;
+    try {
+      res = prov === 'serper'
+        ? await fetch('https://google.serper.dev/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-KEY': k }, body: JSON.stringify({ q, num: 5, gl: 'kr', hl: 'ko' }) })
+        : await fetch('https://api.tavily.com/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + k }, body: JSON.stringify({ query: q, max_results: 5, search_depth: 'basic' }) });
+    } catch (e) { throw new DaiError('searchnet'); }
+    if (!res.ok) { let d = ''; try { const j = await res.json(); d = (j.detail && j.detail.error) || j.message || ''; } catch (e) {} throw new DaiError(res.status === 401 || res.status === 403 ? 'searchauth' : 'searchfail', d || res.status, res.status); }
     const j = await res.json();
-    return (j.results || []).slice(0, 5).map(r => ({ title: r.title || r.url, uri: r.url, content: String(r.content || '').slice(0, 700) }));
+    const list = prov === 'serper' ? (j.organic || []).map(r => ({ title: r.title, url: r.link, content: r.snippet })) : (j.results || []);
+    return list.slice(0, 5).map(r => ({ title: r.title || r.url, uri: r.url, content: String(r.content || '').slice(0, 700) }));
   };
 
   /* ---------------- 토스트 · 대화상자 · 모달 ---------------- */
@@ -411,9 +416,9 @@
         '<div class="settings-section"><div class="settings-section-title">모델</div><div class="model-list" id="st-models"></div>' +
           '<div><label class="label" for="st-custom">직접 입력</label><input id="st-custom" class="field" type="text" placeholder="예: gemini-3.1-flash-lite"></div></div>' +
         (opt.search ? '<div class="settings-section"><div class="settings-section-title">웹 검색 API</div>' +
-          '<div><label class="label" for="st-sprov">검색 제공사</label><select id="st-sprov" class="field"><option>Tavily</option></select></div>' +
-          '<div><label class="label" for="st-skey">검색 API 키</label><div class="pw-wrap"><input id="st-skey" class="field" type="password" placeholder="tvly-..." autocomplete="off"><button type="button" class="icon-btn" id="st-seye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
-          '<p class="hint">웹 검색을 켜면 이 API를 기본으로 써요. 어떤 AI 제공사를 쓰더라도 동작해요. <a href="https://app.tavily.com" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
+          '<div><label class="label" for="st-sprov">검색 제공사</label><select id="st-sprov" class="field"><option value="tavily">Tavily</option><option value="serper">Serper (Google 검색)</option></select></div>' +
+          '<div><label class="label" for="st-skey">검색 API 키</label><div class="pw-wrap"><input id="st-skey" class="field" type="password" placeholder="검색 API 키" autocomplete="off"><button type="button" class="icon-btn" id="st-seye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
+          '<p class="hint">웹 검색을 켜면 이 API를 기본으로 써요. 어떤 AI 제공사를 쓰더라도 동작해요. <a id="st-slink" href="https://app.tavily.com" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
           '<div class="settings-row"><div><div class="settings-row-label">Google AI Studio 자체 검색 사용</div><div class="settings-row-desc">Google AI Studio API를 쓸 때 위 검색 API 대신 Gemini의 자체 Google 검색을 이용해요.</div></div><button type="button" class="toggle-switch" id="st-native" aria-label="자체 구글 검색"><span class="toggle-knob"></span></button></div></div>' : '') +
         '<div class="settings-section"><div class="settings-row"><div><div class="settings-row-label">화면 테마</div><div class="settings-row-desc">눈이 편한 다크 모드로 바꿀 수 있어요.</div></div>' +
           '<div class="theme-switch"><button type="button" data-theme="light" class="theme-option" aria-label="라이트 모드">' + D.icon('sun') + '</button>' +
@@ -442,15 +447,18 @@
     back.querySelectorAll('.theme-option').forEach(b => b.onclick = () => D.theme.set(b.dataset.theme));
     $('[data-x]', back).onclick = close;
     back.addEventListener('mousedown', e => { if (e.target === back) close(); });
-    let nativeDraft = false;
+    let nativeDraft = false, sKeys = {}, sProv = 'tavily';
+    const LINKS = { tavily: 'https://app.tavily.com', serper: 'https://serper.dev' };
     const skeyEl = $('#st-skey', back), natEl = $('#st-native', back);
     if (opt.search) {
       $('#st-seye', back).onclick = () => { const t = skeyEl.type === 'password'; skeyEl.type = t ? 'text' : 'password'; $('#st-seye', back).innerHTML = D.icon(t ? 'eyeoff' : 'eye'); };
+      const sprov = $('#st-sprov', back);
+      sprov.onchange = () => { sKeys[sProv] = skeyEl.value.trim(); sProv = sprov.value; skeyEl.value = sKeys[sProv] || ''; $('#st-slink', back).href = LINKS[sProv]; };
       natEl.onclick = () => { nativeDraft = !nativeDraft; natEl.classList.toggle('is-on', nativeDraft); };
     }
     $('#st-save', back).onclick = () => {
       const patch = { key: keyEl.value.trim(), model: (draftModel || D.DEFAULT_MODEL).trim() };
-      if (opt.search) { patch.searchKey = skeyEl.value.trim(); patch.nativeSearch = nativeDraft; patch.searchProvider = 'tavily'; }
+      if (opt.search) { sKeys[sProv] = skeyEl.value.trim(); patch.searchKeys = sKeys; patch.nativeSearch = nativeDraft; patch.searchProvider = sProv; }
       D.settings.set(patch);
       if (opt.onSave) opt.onSave(); close(); D.toast('설정을 저장했어요.');
     };
@@ -459,7 +467,7 @@
     return {
       open() {
         draftModel = S.model; keyEl.value = S.key || ''; keyEl.type = 'password'; $('#st-eye', back).innerHTML = D.icon('eye'); customEl.value = '';
-        if (opt.search) { skeyEl.value = S.searchKey || ''; skeyEl.type = 'password'; nativeDraft = !!S.nativeSearch; natEl.classList.toggle('is-on', nativeDraft); }
+        if (opt.search) { sKeys = Object.assign({}, S.searchKeys || {}, S.searchKey && !(S.searchKeys || {}).tavily ? { tavily: S.searchKey } : {}); sProv = S.searchProvider || 'tavily'; $('#st-sprov', back).value = sProv; $('#st-slink', back).href = LINKS[sProv]; skeyEl.value = sKeys[sProv] || ''; skeyEl.type = 'password'; nativeDraft = !!S.nativeSearch; natEl.classList.toggle('is-on', nativeDraft); }
         warn(); renderModels(); D.theme.apply(D.theme.get()); if (opt.onOpen) opt.onOpen(box);
         back.classList.add('show'); requestAnimationFrame(() => back.classList.add('in'));
       },

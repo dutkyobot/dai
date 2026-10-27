@@ -240,7 +240,7 @@ async function ask(c){
   gens.set(c.id,{cancel(){stopped=true;if(gens.get(c.id).h)gens.get(c.id).h.cancel()}});if(c.id===cur)renderStream();
   try{
     if(searchOn){
-      const s=D.settings.get(),hasKey=!!(s.searchKey||'').trim();
+      const s=D.settings.get(),hasKey=!!D.searchKeyOf();
       if(s.nativeSearch||!hasKey){tools=[{google_search:{}}]}   // 현재는 Gemini만 지원 → 검색 키가 없으면 자체 검색으로 대체
       else{
         const lastUser=[...c.messages].reverse().find(x=>isUser(x)&&!x.live);
