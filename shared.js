@@ -432,9 +432,8 @@
         '<div class="seg st-tabs">' + tabs.map((t, i) => '<button type="button" data-tab="' + t[0] + '"' + (i ? '' : ' class="is-active"') + '>' + t[1] + '</button>').join('') + '</div>' +
         '<div class="st-panel on" data-p="api">' +
           '<div><label class="label">AI 제공사</label><div id="st-prov"></div><p class="hint">다른 회사의 AI API는 앞으로 추가될 예정이에요.</p></div>' +
-          '<div><label class="label" for="st-key">API 키</label><div class="pw-wrap"><input id="st-key" class="field" type="password" placeholder="AIzaSy..." autocomplete="off"><button type="button" class="icon-btn" id="st-eye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
-          '<p class="hint hidden" id="st-keywarn" style="color:rgb(var(--c-amber))">보통 "AIzaSy"로 시작하는 키예요. 다시 확인해 보세요.</p>' +
-          '<p class="hint">일반 AI와 캐릭터 챗이 같은 키·모델을 써요. 키는 이 브라우저에만 저장돼요. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
+          '<div><label class="label" for="st-key">API 키</label><div class="pw-wrap"><input id="st-key" class="field" type="password" placeholder="API 키를 붙여넣으세요" autocomplete="off"><button type="button" class="icon-btn" id="st-eye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
+                    '<p class="hint">일반 AI와 캐릭터 챗이 같은 키·모델을 써요. 키는 이 브라우저에만 저장돼요. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
           '<div><label class="label">모델</label><div id="st-model"></div><input id="st-custom" class="field hidden" type="text" placeholder="예: gemini-3.1-flash-lite" style="margin-top:8px"></div>' +
         '</div>' +
         (opt.search ? '<div class="st-panel" data-p="search">' +
@@ -459,8 +458,7 @@
     const modelOpts = D.MODELS.map(m => ({ value: m.id, label: m.name, desc: m.desc })).concat([{ value: '__custom', label: '직접 입력…', desc: '목록에 없는 모델 ID' }]);
     const modelDD = D.dropdown($('#st-model', back), { options: modelOpts, value: draftModel, onChange: v => { if (v === '__custom') { customEl.classList.remove('hidden'); customEl.focus(); draftModel = customEl.value.trim() || draftModel; } else { customEl.classList.add('hidden'); draftModel = v; } } });
     customEl.addEventListener('input', () => { if (customEl.value.trim()) draftModel = customEl.value.trim(); });
-    const warn = () => { const v = keyEl.value.trim(); $('#st-keywarn', back).classList.toggle('hidden', !v || v.startsWith('AIzaSy')); };
-    keyEl.addEventListener('input', warn);
+    const warn = () => {};
     $('#st-eye', back).onclick = () => { const t = keyEl.type === 'password'; keyEl.type = t ? 'text' : 'password'; $('#st-eye', back).innerHTML = D.icon(t ? 'eyeoff' : 'eye'); };
     back.querySelectorAll('.theme-option').forEach(b => b.onclick = () => D.theme.set(b.dataset.theme));
     const skeyEl = $('#st-skey', back), natEl = $('#st-native', back); let sprovDD = null;
