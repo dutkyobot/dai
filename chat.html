@@ -249,8 +249,11 @@ async function ask(c){
       }
     }
     if(stopped)throw {code:'stop'};
-    const h=D.stream({system,contents,tools,onDelta:t=>{m.content=t;paint(c,m)}});gens.get(c.id).h=h;
-    const r=await h.promise;m.content=r.text;m.sources=ext?ext.map(x=>({uri:x.uri,title:x.title})):r.sources;
+    let target='',shown=0,tm=null;
+    const tick=()=>{if(shown>=target.length){clearInterval(tm);tm=null;return}shown+=Math.max(2,Math.ceil((target.length-shown)/8));m.content=target.slice(0,shown);paint(c,m)};   // 한 번에 큰 덩어리로 와도 부드럽게 출력
+    const h=D.stream({system,contents,tools,onDelta:t=>{target=t;if(!tm)tm=setInterval(tick,30)}});gens.get(c.id).h=h;
+    let r;try{r=await h.promise}finally{if(tm){clearInterval(tm);tm=null}}
+    m.content=r.text;m.sources=ext?ext.map(x=>({uri:x.uri,title:x.title})):r.sources;
   }catch(e){if(!e||e.code!=='stop')c.err=D.errText(e)}
   delete m.live;gens.delete(c.id);
   if(!txt(m).trim())c.messages=c.messages.filter(x=>x!==m);
