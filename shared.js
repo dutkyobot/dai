@@ -29,7 +29,12 @@
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
     upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
     alert: '<circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/>',
-    okc: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>'
+    okc: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+    clip: '<path d="M21.4 11.1l-9.2 9.2a5.5 5.5 0 0 1-7.8-7.8l9.2-9.2a3.7 3.7 0 0 1 5.2 5.2l-9.2 9.2a1.8 1.8 0 0 1-2.6-2.6l8.5-8.5"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    code: '<path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/>',
+    file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+    arrow: '<path d="M9 6l6 6-6 6"/>'
   };
   D.icon = (n, px) => '<svg viewBox="0 0 24 24"' + (px ? ' style="font-size:' + px + 'px"' : '') + '>' + (IC[n] || '') + '</svg>';
 
@@ -173,16 +178,95 @@
     s = s.replace(/\[\*([^*\]]+)\*\]/g, (_, b) => '<span class="tag-act">✦ ' + b + '</span>');
     return s.replace(/\*([^*\n]+)\*/g, (_, b) => '<span class="tag-inline">(' + b + ')</span>');
   };
-  D.md = function (src) {   // 일반 AI 답변: 코드블록 · `코드` · **굵게** · 목록 (HTML 은 먼저 이스케이프)
-    return String(src == null ? '' : src).split(/(```[\s\S]*?```)/g).map(p => {
-      const m = p.match(/^```[\w+-]*\n?([\s\S]*?)```$/);
-      if (m) return '<pre class="code"><code>' + D.esc(m[1].replace(/\n$/, '')) + '</code></pre>';
-      let h = D.esc(p);
-      h = h.replace(/`([^`\n]+)`/g, '<code>$1</code>');
-      h = h.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
-      h = h.replace(/^#{1,3}\s+(.+)$/gm, '<strong class="h">$1</strong>');
-      return h.replace(/^\s*[-*]\s+/gm, '• ');
-    }).join('');
+  /* 마크다운 렌더러: 표 · 인용 · 목록 · 제목 · 링크 · 굵게/기울임 (먼저 전부 이스케이프) */
+  function inl(t) {
+    const cs = [];
+    t = t.replace(/`([^`]+)`/g, (m, c) => { cs.push(c); return '\u0001' + (cs.length - 1) + '\u0001'; });
+    t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/__(.+?)__/g, '<strong>$1</strong>').replace(/~~(.+?)~~/g, '<del>$1</del>');
+    t = t.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+    return t.replace(/\u0001(\d+)\u0001/g, (m, i) => '<code>' + cs[+i] + '</code>');
+  }
+  const row = l => { l = l.trim(); if (l[0] === '|') l = l.slice(1); if (l.endsWith('|')) l = l.slice(0, -1); return l.split('|').map(c => c.trim()); };
+  const isSep = l => { if (!l || l.indexOf('-') < 0) return false; return row(l).every(c => /^:?-{2,}:?$/.test(c)); };
+  D.mdHtml = function (text) {
+    const L = String(text == null ? '' : text).split('\n'); let h = '', para = [], lt = null;
+    const e = x => inl(D.esc(x));
+    const fp = () => { if (para.length) { h += '<p>' + e(para.join('\n')).replace(/\n/g, '<br>') + '</p>'; para = []; } };
+    const cl = () => { if (lt) { h += '</' + lt + '>'; lt = null; } };
+    for (let i = 0; i < L.length; i++) {
+      const ln = L[i];
+      if (ln.indexOf('|') >= 0 && i + 1 < L.length && isSep(L[i + 1])) {
+        fp(); cl(); const head = row(ln).map(e); i += 2; const rows = [];
+        while (i < L.length && L[i].trim() && L[i].indexOf('|') >= 0) { rows.push(row(L[i]).map(e)); i++; }
+        i--; h += '<div class="table-wrap"><table><thead><tr>' + head.map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+        continue;
+      }
+      const bq = ln.match(/^>\s?(.*)/);
+      if (bq) { fp(); cl(); const q = [bq[1]]; while (i + 1 < L.length && /^>\s?/.test(L[i + 1])) { i++; q.push(L[i].replace(/^>\s?/, '')); } h += '<blockquote>' + q.map(e).join('<br>') + '</blockquote>'; continue; }
+      if (/^ {0,3}([-*_])(?:\s*\1){2,}\s*$/.test(ln)) { fp(); cl(); h += '<hr>'; continue; }
+      const hd = ln.match(/^(#{1,6})\s+(.*)/), ul = ln.match(/^\s*[-*+]\s+(.*)/), ol = ln.match(/^\s*\d+[.)]\s+(.*)/);
+      if (hd) { fp(); cl(); h += '<h' + hd[1].length + '>' + e(hd[2]) + '</h' + hd[1].length + '>'; }
+      else if (ul) { fp(); if (lt !== 'ul') { cl(); h += '<ul>'; lt = 'ul'; } h += '<li>' + e(ul[1]) + '</li>'; }
+      else if (ol) { fp(); if (lt !== 'ol') { cl(); h += '<ol>'; lt = 'ol'; } h += '<li>' + e(ol[1]) + '</li>'; }
+      else if (!ln.trim()) { fp(); cl(); } else para.push(ln);
+    }
+    fp(); cl(); return h;
+  };
+  D.md = D.mdHtml;
+  /* 코드블록(```)은 onCode 로 넘겨 카드 등으로 그리고, 나머지는 마크다운으로 el 에 렌더 (스트리밍 중 닫히지 않은 블록도 처리) */
+  D.rich = function (el, text, onCode) {
+    el.innerHTML = ''; text = String(text || ''); const re = /```([\w+-]*)[^\n]*\n([\s\S]*?)(```|$)/g; let last = 0, m;
+    const add = t => { if (!t.trim()) return; const d = document.createElement('div'); d.innerHTML = D.mdHtml(t); el.appendChild(d); };
+    while ((m = re.exec(text))) {
+      add(text.slice(last, m.index)); el.appendChild(onCode({ lang: (m[1] || 'text').toLowerCase(), code: m[2].replace(/\n$/, ''), closed: m[3] === '```' }));
+      last = re.lastIndex; if (m[0] === '') re.lastIndex++;
+    }
+    add(text.slice(last));
+  };
+
+  /* ---------------- Gemini 스트리밍 (중단은 reader.cancel, AbortSignal 미사용) ---------------- */
+  D.stream = function (opt) {
+    let reader = null, stopped = false;
+    const promise = (async () => {
+      if (!(S.key || '').trim()) throw new DaiError('nokey');
+      const model = (S.model || D.DEFAULT_MODEL).trim();
+      const body = { contents: normalize(opt.contents), generationConfig: { temperature: opt.temperature == null ? 1 : opt.temperature, maxOutputTokens: opt.maxTokens || 8192 } };
+      if (opt.system) body.systemInstruction = { parts: [{ text: opt.system }] };
+      if (opt.tools) body.tools = opt.tools;
+      let res;
+      try { res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':streamGenerateContent?alt=sse', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': S.key.trim() }, body: JSON.stringify(body) }); }
+      catch (e) { throw new DaiError('network'); }
+      if (!res.ok) {
+        let d = ''; try { d = (await res.json()).error.message || ''; } catch (e) {}
+        const st = res.status;
+        if (st === 429) throw new DaiError('ratelimit', d, st);
+        if (st === 404) throw new DaiError('notfound', model, st);
+        if (st === 401 || st === 403 || (st === 400 && /API key/i.test(d))) throw new DaiError('auth', d, st);
+        throw new DaiError(st >= 500 ? 'server' : 'http', st + ' ' + d, st);
+      }
+      if (stopped) return { text: '', sources: [], stopped: true };
+      reader = res.body.getReader(); const dec = new TextDecoder(); let buf = '', text = '', fin = ''; const sources = [];
+      try {
+        while (true) {
+          const r = await reader.read(); if (r.done) break;
+          buf += dec.decode(r.value, { stream: true }); const lines = buf.split('\n'); buf = lines.pop();
+          for (const ln of lines) {
+            const t = ln.trim(); if (t.indexOf('data:') !== 0) continue;
+            let j; try { j = JSON.parse(t.slice(5).trim()); } catch (e) { continue; }
+            const c = j.candidates && j.candidates[0]; if (!c) continue;
+            ((c.content && c.content.parts) || []).forEach(p => { if (p.text && !p.thought) text += p.text; });
+            if (c.finishReason) fin = c.finishReason;
+            const gc = c.groundingMetadata && c.groundingMetadata.groundingChunks;
+            if (gc) gc.forEach(g => { if (g.web && g.web.uri && !sources.some(x => x.uri === g.web.uri)) sources.push({ uri: g.web.uri, title: g.web.title || g.web.uri }); });
+          }
+          if (opt.onDelta) opt.onDelta(text);
+        }
+      } catch (e) { if (!stopped) throw new DaiError('network'); }
+      if (!text.trim() && !stopped) throw new DaiError('empty', fin || '알 수 없음');
+      return { text, sources: sources.slice(0, 6), stopped };
+    })();
+    return { promise, cancel() { stopped = true; try { reader && reader.cancel(); } catch (e) {} } };
   };
 
   /* ---------------- 토스트 · 대화상자 · 모달 ---------------- */
