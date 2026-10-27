@@ -267,13 +267,13 @@
                             src="img/icon.png"
                             alt="D-AI"
                             class="h-5 w-5 rounded"
-                            onerror="this.src='https://via.placeholder.com/28?text=D'"
                         >
                     </div>
                     <span class="text-lg font-bold tracking-tight text-ink">D-AI</span>
                 </a>
 
                 <div class="flex items-center gap-4 sm:gap-6">
+                    <a href="#web" class="text-sm font-semibold text-mute hover:text-ink transition-colors">웹 버전</a>
                     <a
                         href="https://discord.gg/AdM4hFZkrE"
                         target="_blank"
@@ -325,7 +325,15 @@
                             <i class="fab fa-discord text-base"></i>
                             D-AI 초대하기
                         </a>
+                        <a
+                            href="chat.html"
+                            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-line text-ink text-sm font-semibold hover:bg-surface transition-colors"
+                        >
+                            웹에서 써보기
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
                     </div>
+                    <p class="text-xs text-mute mt-4">웹 버전은 내 Gemini API 키로 바로 쓸 수 있어요.</p>
                 </div>
 
                 <!-- 예시 대화 (JS로 순환 재생, #mock-* 요소는 하단 script 참조) -->
@@ -351,7 +359,6 @@
                                     src="img/icon.png"
                                     alt="D-AI"
                                     class="h-[22px] w-[22px] rounded"
-                                    onerror="this.src='https://via.placeholder.com/28?text=D'"
                                 >
                             </div>
                             <div class="min-w-0 w-full">
@@ -396,7 +403,7 @@
                                 <span id="fb-text-0" class="font-bold text-mute text-sm transition-colors">Ge</span>
                             </div>
                             <div class="text-center">
-                                <div class="text-xs font-semibold text-ink">Gemini</div>
+                                <div class="text-xs font-semibold text-ink">Google AI Studio</div>
                                 <div id="fb-status-0" class="text-[10px] text-mute transition-colors">대기</div>
                             </div>
                         </div>
@@ -428,8 +435,8 @@
                     </div>
                 </div>
 
-                <p class="text-xs text-mute mt-9">
-                    Gemini → OpenRouter → Groq 순서로 자동 전환돼요.
+                <p class="text-xs text-mute mt-2">
+                    Google AI Studio → OpenRouter → Groq 순서로 자동 전환돼요.
                 </p>
 
             </div>
@@ -440,7 +447,7 @@
         <!-- ============================== 주요 기능 ============================== -->
         <section class="mb-24">
 
-            <h2 class="text-lg font-bold text-ink mb-7">주요 기능</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-ink mb-8">주요 기능</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -468,7 +475,7 @@
                         사용자별로 최근 대화 흐름을 기억해서 이야기를 이어갈 수 있어요.
                     </p>
                     <p class="text-xs text-mute mt-3 flex items-center gap-1.5">
-                        <span class="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-ink font-medium">/설정</span>
+                        <span class="whitespace-nowrap px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-ink font-medium">/설정</span>
                         패널의 초기화 버튼으로 언제든 새로 시작
                     </p>
                 </div>
@@ -487,7 +494,7 @@
                     <h3 class="text-base font-bold text-ink">서버별 커스텀 프롬프트</h3>
                     <p class="text-sm text-mute mt-2 leading-relaxed">
                         서버장이라면
-                        <span class="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-xs align-middle text-ink font-medium">/설정</span>
+                        <span class="whitespace-nowrap px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-xs align-middle text-ink font-medium">/설정</span>
                         패널에서 D-AI의 말투와 캐릭터를 우리 서버에 맞게 바꿀 수 있어요.
                     </p>
                 </div>
@@ -504,12 +511,12 @@
                     <i class="fas fa-heart-pulse text-ink mb-4 block"></i>
                     <h3 class="text-base font-bold text-ink">상태 확인</h3>
                     <p class="text-sm text-mute mt-2 leading-relaxed">
-                        <span class="px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-xs align-middle text-ink font-medium">/핑</span>
+                        <span class="whitespace-nowrap px-1.5 py-0.5 rounded-md bg-white/10 border border-white/10 text-xs align-middle text-ink font-medium">/핑</span>
                         명령어로 지금 쓰고 있는 모델, 응답 속도, API 연결 상태를 한눈에 볼 수 있어요.
                     </p>
                 </div>
 
-                <div class="card p-7">
+                <div class="card p-7 lg:col-span-2">
                     <i class="fas fa-language text-ink mb-4 block"></i>
                     <h3 class="text-base font-bold text-ink">한국어 중심 응답</h3>
                     <p class="text-sm text-mute mt-2 leading-relaxed">
@@ -520,6 +527,51 @@
 
             </div>
 
+        </section>
+
+
+        <!-- ============================== 웹 버전 ============================== -->
+        <section id="web" class="mb-24 scroll-mt-28">
+
+            <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 mb-8">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-ink">웹에서도 만나요</h2>
+                    <p class="text-sm text-mute mt-2">디스코드 없이 브라우저에서 바로 쓸 수 있어요.</p>
+                </div>
+                <span class="text-xs text-mute"><i class="fas fa-key mr-1.5"></i>내 Gemini API 키가 필요해요 · 키와 대화는 내 브라우저에만 저장돼요</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <a href="chat.html" class="card p-8 block group">
+                    <div class="w-11 h-11 rounded-2xl gradient-brand flex items-center justify-center mb-5">
+                        <i class="fas fa-comments text-[#04140c]"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-ink">일반 AI 채팅</h3>
+                    <p class="text-sm text-mute mt-2 leading-relaxed">
+                        실시간 답변, 이미지·PDF 첨부, 웹 검색, 코드 미리보기 캔버스까지.
+                        가볍고 빠른 모델로 편하게 대화해요.
+                    </p>
+                    <span class="inline-flex items-center gap-2 text-sm font-semibold text-blue mt-6">
+                        열어보기 <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </a>
+
+                <a href="character.html" class="card p-8 block group">
+                    <div class="w-11 h-11 rounded-2xl bg-surface border border-line flex items-center justify-center mb-5">
+                        <i class="fas fa-masks-theater text-ink"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-ink">캐릭터 챗</h3>
+                    <p class="text-sm text-mute mt-2 leading-relaxed">
+                        나만의 캐릭터와 1:1로 대화하거나, 세계관마다 AI들이 모인 단체 채팅방을 만들어 보세요.
+                        세계관끼리는 대화가 완전히 분리돼요.
+                    </p>
+                    <span class="inline-flex items-center gap-2 text-sm font-semibold text-blue mt-6">
+                        열어보기 <i class="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                    </span>
+                </a>
+
+            </div>
         </section>
 
 
