@@ -263,3 +263,19 @@ html.dark .composer-shell{box-shadow:0 16px 36px -22px rgb(0 0 0 / .58),0 1px 3p
 html.page-chat{--c-accent:37 112 214;--c-accent-dark:27 90 182}
 html.page-chat.dark{--c-accent:96 165 250;--c-accent-dark:59 130 232}
 .brand-badge img{width:20px;height:20px;border-radius:5px;display:block}
+
+/* 설정 탭 · 드롭다운 */
+.modal-box.settings{min-height:min(560px,90dvh);gap:14px}
+.st-tabs button{padding:6px 0;font-size:12px}
+.st-panel{display:none;flex-direction:column;gap:16px;flex:1}
+.st-panel.on{display:flex}
+.st-panel .settings-section{border-top:none;padding:0}
+.modal-box.settings #st-save{margin-top:auto}
+.dd{position:relative}
+.dd-btn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;background:rgb(var(--c-surface));border:1px solid rgb(var(--c-line));border-radius:14px;padding:10px 14px;font-size:12.5px;transition:border-color .15s}
+.dd-btn:hover,.dd.open .dd-btn{border-color:rgb(var(--c-accent) / .5)}
+.dd-btn svg{font-size:12px;color:rgb(var(--c-mute));transition:transform .15s}
+.dd.open .dd-btn svg{transform:rotate(180deg)}
+.dd-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;padding:6px;max-height:260px;overflow-y:auto;opacity:0;visibility:hidden;transform:translateY(-4px);pointer-events:none;transition:opacity .15s,transform .15s,visibility .15s;border-radius:18px}
+.dd.open .dd-menu{opacity:1;visibility:visible;transform:none;pointer-events:auto}
+.st-panel .settings-section-title{display:none}.dd-menu{max-height:210px}

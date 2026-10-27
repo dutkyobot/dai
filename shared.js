@@ -399,63 +399,79 @@
     document.addEventListener('dai:settings', refresh); refresh();
   };
 
-  /* ---------------- 설정 모달 (API 키 · 모델 · 테마 + 페이지별 섹션) ---------------- */
+  /* ---------------- 드롭다운 (브라우저 기본 select 대체) ---------------- */
+  D.dropdown = function (host, o) {
+    host.classList.add('dd');
+    host.innerHTML = '<button type="button" class="dd-btn" aria-haspopup="listbox" aria-expanded="false"><span class="dd-val"></span>' + D.icon('chevron') + '</button><div class="dd-menu card" role="listbox"></div>';
+    const btn = $('.dd-btn', host), menu = $('.dd-menu', host); let val = o.value;
+    const paint = () => {
+      const cur = o.options.find(x => x.value === val) || o.options[0];
+      $('.dd-val', host).textContent = cur ? cur.label : '';
+      menu.innerHTML = '';
+      o.options.forEach(x => {
+        const b = D.el('button', 'mp-opt' + (x.value === val ? ' is-selected' : ''), '<span class="mp-name"></span>' + (x.desc ? '<span class="mp-desc"></span>' : '') + D.icon('check').replace('<svg', '<svg class="mp-check"'));
+        b.type = 'button'; $('.mp-name', b).textContent = x.label; if (x.desc) $('.mp-desc', b).textContent = x.desc;
+        b.onclick = e => { e.stopPropagation(); val = x.value; host.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); paint(); if (o.onChange) o.onChange(val); };
+        menu.appendChild(b);
+      });
+    };
+    btn.onclick = e => { e.stopPropagation(); const op = host.classList.toggle('open'); btn.setAttribute('aria-expanded', String(op)); };
+    document.addEventListener('click', e => { if (!host.contains(e.target)) { host.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); } });
+    paint();
+    return { get: () => val, set(v) { val = v; paint(); } };
+  };
+
+  /* ---------------- 설정 모달 (탭: API · 검색 · 화면 · 페이지별) ---------------- */
   D.mountSettings = function (opt) {
     opt = opt || {};
     const back = D.el('div', 'modal-back'); back.id = 'settings-modal';
+    const tabs = [['api', 'API']]; if (opt.search) tabs.push(['search', '검색']); tabs.push(['look', '화면']); if (opt.extra) tabs.push(['extra', opt.extraTitle || '기타']);
     back.innerHTML =
-      '<div class="modal-box card" role="dialog" aria-modal="true" aria-label="설정">' +
+      '<div class="modal-box card settings" role="dialog" aria-modal="true" aria-label="설정">' +
         '<div class="modal-head"><h2>설정</h2><button class="icon-btn" data-x aria-label="닫기">' + D.icon('x') + '</button></div>' +
-        '<div class="settings-section first"><div class="settings-section-title">AI API</div>' +
-          '<div><label class="label" for="st-prov">제공사</label><select id="st-prov" class="field"><option>Google AI Studio (Gemini)</option></select><p class="hint">다른 회사의 AI API는 앞으로 추가될 예정이에요.</p></div>' +
-          '<div><label class="label" for="st-key">API 키</label><div class="pw-wrap"><input id="st-key" class="field" type="password" placeholder="AIzaSy..." autocomplete="off">' +
-          '<button type="button" class="icon-btn" id="st-eye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
+        '<div class="seg st-tabs">' + tabs.map((t, i) => '<button type="button" data-tab="' + t[0] + '"' + (i ? '' : ' class="is-active"') + '>' + t[1] + '</button>').join('') + '</div>' +
+        '<div class="st-panel on" data-p="api">' +
+          '<div><label class="label">AI 제공사</label><div id="st-prov"></div><p class="hint">다른 회사의 AI API는 앞으로 추가될 예정이에요.</p></div>' +
+          '<div><label class="label" for="st-key">API 키</label><div class="pw-wrap"><input id="st-key" class="field" type="password" placeholder="AIzaSy..." autocomplete="off"><button type="button" class="icon-btn" id="st-eye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
           '<p class="hint hidden" id="st-keywarn" style="color:rgb(var(--c-amber))">보통 "AIzaSy"로 시작하는 키예요. 다시 확인해 보세요.</p>' +
-          '<p class="hint">일반 AI와 캐릭터 챗이 같은 키·모델을 써요. 키는 이 브라우저에만 저장되고 Google 외에는 전송되지 않아요. ' +
-          '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기</a></p></div></div>' +
-        '<div class="settings-section"><div class="settings-section-title">모델</div><div class="model-list" id="st-models"></div>' +
-          '<div><label class="label" for="st-custom">직접 입력</label><input id="st-custom" class="field" type="text" placeholder="예: gemini-3.1-flash-lite"></div></div>' +
-        (opt.search ? '<div class="settings-section"><div class="settings-section-title">웹 검색 API</div>' +
-          '<div><label class="label" for="st-sprov">검색 제공사</label><select id="st-sprov" class="field"><option value="tavily">Tavily</option><option value="serper">Serper (Google 검색)</option></select></div>' +
+          '<p class="hint">일반 AI와 캐릭터 챗이 같은 키·모델을 써요. 키는 이 브라우저에만 저장돼요. <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
+          '<div><label class="label">모델</label><div id="st-model"></div><input id="st-custom" class="field hidden" type="text" placeholder="예: gemini-3.1-flash-lite" style="margin-top:8px"></div>' +
+        '</div>' +
+        (opt.search ? '<div class="st-panel" data-p="search">' +
+          '<div><label class="label">검색 제공사</label><div id="st-sprov"></div></div>' +
           '<div><label class="label" for="st-skey">검색 API 키</label><div class="pw-wrap"><input id="st-skey" class="field" type="password" placeholder="검색 API 키" autocomplete="off"><button type="button" class="icon-btn" id="st-seye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
           '<p class="hint">웹 검색을 켜면 이 API를 기본으로 써요. 어떤 AI 제공사를 쓰더라도 동작해요. <a id="st-slink" href="https://app.tavily.com" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
-          '<div class="settings-row"><div><div class="settings-row-label">Google AI Studio 자체 검색 사용</div><div class="settings-row-desc">Google AI Studio API를 쓸 때 위 검색 API 대신 Gemini의 자체 Google 검색을 이용해요.</div></div><button type="button" class="toggle-switch" id="st-native" aria-label="자체 구글 검색"><span class="toggle-knob"></span></button></div></div>' : '') +
-        '<div class="settings-section"><div class="settings-row"><div><div class="settings-row-label">화면 테마</div><div class="settings-row-desc">눈이 편한 다크 모드로 바꿀 수 있어요.</div></div>' +
-          '<div class="theme-switch"><button type="button" data-theme="light" class="theme-option" aria-label="라이트 모드">' + D.icon('sun') + '</button>' +
-          '<button type="button" data-theme="dark" class="theme-option" aria-label="다크 모드">' + D.icon('moon') + '</button></div></div></div>' +
-        '<div id="st-extra"></div>' +
+          '<div class="settings-row"><div><div class="settings-row-label">Google AI Studio 자체 검색 사용</div><div class="settings-row-desc">Google AI Studio API를 쓸 때 위 검색 API 대신 Gemini의 자체 Google 검색을 이용해요.</div></div><button type="button" class="toggle-switch" id="st-native" aria-label="자체 구글 검색"><span class="toggle-knob"></span></button></div>' +
+        '</div>' : '') +
+        '<div class="st-panel" data-p="look"><div class="settings-row"><div><div class="settings-row-label">화면 테마</div><div class="settings-row-desc">눈이 편한 다크 모드로 바꿀 수 있어요.</div></div>' +
+          '<div class="theme-switch"><button type="button" data-theme="light" class="theme-option" aria-label="라이트 모드">' + D.icon('sun') + '</button><button type="button" data-theme="dark" class="theme-option" aria-label="다크 모드">' + D.icon('moon') + '</button></div></div></div>' +
+        (opt.extra ? '<div class="st-panel" data-p="extra" id="st-extra"></div>' : '') +
         '<button type="button" class="btn btn-brand" id="st-save" style="width:100%;padding:13px 0">저장</button>' +
       '</div>';
     document.body.appendChild(back);
-    const box = $('.modal-box', back), keyEl = $('#st-key', back), customEl = $('#st-custom', back), listEl = $('#st-models', back);
-    let draftModel = S.model;
+    const box = $('.modal-box', back), keyEl = $('#st-key', back), customEl = $('#st-custom', back);
+    let draftModel = S.model, nativeDraft = false, sKeys = {}, sProv = 'tavily';
+    const LINKS = { tavily: 'https://app.tavily.com', serper: 'https://serper.dev' };
     const close = () => { back.classList.remove('in'); setTimeout(() => back.classList.remove('show'), 160); };
-    const renderModels = () => {
-      listEl.innerHTML = '';
-      D.MODELS.forEach(m => {
-        const b = D.el('button', 'model-opt' + (m.id === draftModel ? ' is-selected' : ''), '<span style="flex:1;min-width:0"><span class="mp-name"></span><span class="mp-desc"></span></span>' + D.icon('check').replace('<svg', '<svg class="mp-check"'));
-        $('.mp-name', b).textContent = m.name; $('.mp-desc', b).textContent = m.desc; b.type = 'button';
-        b.onclick = () => { draftModel = m.id; customEl.value = ''; renderModels(); };
-        listEl.appendChild(b);
-      });
-      if (!D.MODELS.some(m => m.id === draftModel)) customEl.value = draftModel;
-    };
+    const tab = t => { back.querySelectorAll('.st-tabs button').forEach(b => b.classList.toggle('is-active', b.dataset.tab === t)); back.querySelectorAll('.st-panel').forEach(p => p.classList.toggle('on', p.dataset.p === t)); };
+    back.querySelectorAll('.st-tabs button').forEach(b => b.onclick = () => tab(b.dataset.tab));
+    D.dropdown($('#st-prov', back), { options: [{ value: 'google', label: 'Google AI Studio (Gemini)' }], value: 'google' });
+    const modelOpts = D.MODELS.map(m => ({ value: m.id, label: m.name, desc: m.desc })).concat([{ value: '__custom', label: '직접 입력…', desc: '목록에 없는 모델 ID' }]);
+    const modelDD = D.dropdown($('#st-model', back), { options: modelOpts, value: draftModel, onChange: v => { if (v === '__custom') { customEl.classList.remove('hidden'); customEl.focus(); draftModel = customEl.value.trim() || draftModel; } else { customEl.classList.add('hidden'); draftModel = v; } } });
+    customEl.addEventListener('input', () => { if (customEl.value.trim()) draftModel = customEl.value.trim(); });
     const warn = () => { const v = keyEl.value.trim(); $('#st-keywarn', back).classList.toggle('hidden', !v || v.startsWith('AIzaSy')); };
     keyEl.addEventListener('input', warn);
-    customEl.addEventListener('input', () => { const v = customEl.value.trim(); if (v) { draftModel = v; renderModels(); customEl.value = v; } });
     $('#st-eye', back).onclick = () => { const t = keyEl.type === 'password'; keyEl.type = t ? 'text' : 'password'; $('#st-eye', back).innerHTML = D.icon(t ? 'eyeoff' : 'eye'); };
     back.querySelectorAll('.theme-option').forEach(b => b.onclick = () => D.theme.set(b.dataset.theme));
-    $('[data-x]', back).onclick = close;
-    back.addEventListener('mousedown', e => { if (e.target === back) close(); });
-    let nativeDraft = false, sKeys = {}, sProv = 'tavily';
-    const LINKS = { tavily: 'https://app.tavily.com', serper: 'https://serper.dev' };
-    const skeyEl = $('#st-skey', back), natEl = $('#st-native', back);
+    const skeyEl = $('#st-skey', back), natEl = $('#st-native', back); let sprovDD = null;
     if (opt.search) {
+      sprovDD = D.dropdown($('#st-sprov', back), { options: [{ value: 'tavily', label: 'Tavily' }, { value: 'serper', label: 'Serper (Google 검색)' }], value: 'tavily',
+        onChange: v => { sKeys[sProv] = skeyEl.value.trim(); sProv = v; skeyEl.value = sKeys[sProv] || ''; $('#st-slink', back).href = LINKS[sProv]; } });
       $('#st-seye', back).onclick = () => { const t = skeyEl.type === 'password'; skeyEl.type = t ? 'text' : 'password'; $('#st-seye', back).innerHTML = D.icon(t ? 'eyeoff' : 'eye'); };
-      const sprov = $('#st-sprov', back);
-      sprov.onchange = () => { sKeys[sProv] = skeyEl.value.trim(); sProv = sprov.value; skeyEl.value = sKeys[sProv] || ''; $('#st-slink', back).href = LINKS[sProv]; };
       natEl.onclick = () => { nativeDraft = !nativeDraft; natEl.classList.toggle('is-on', nativeDraft); };
     }
+    $('[data-x]', back).onclick = close;
+    back.addEventListener('mousedown', e => { if (e.target === back) close(); });
     $('#st-save', back).onclick = () => {
       const patch = { key: keyEl.value.trim(), model: (draftModel || D.DEFAULT_MODEL).trim() };
       if (opt.search) { sKeys[sProv] = skeyEl.value.trim(); patch.searchKeys = sKeys; patch.nativeSearch = nativeDraft; patch.searchProvider = sProv; }
@@ -466,9 +482,13 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && back.classList.contains('show') && !modalStack.length) close(); });
     return {
       open() {
-        draftModel = S.model; keyEl.value = S.key || ''; keyEl.type = 'password'; $('#st-eye', back).innerHTML = D.icon('eye'); customEl.value = '';
-        if (opt.search) { sKeys = Object.assign({}, S.searchKeys || {}, S.searchKey && !(S.searchKeys || {}).tavily ? { tavily: S.searchKey } : {}); sProv = S.searchProvider || 'tavily'; $('#st-sprov', back).value = sProv; $('#st-slink', back).href = LINKS[sProv]; skeyEl.value = sKeys[sProv] || ''; skeyEl.type = 'password'; nativeDraft = !!S.nativeSearch; natEl.classList.toggle('is-on', nativeDraft); }
-        warn(); renderModels(); D.theme.apply(D.theme.get()); if (opt.onOpen) opt.onOpen(box);
+        draftModel = S.model; keyEl.value = S.key || ''; keyEl.type = 'password'; $('#st-eye', back).innerHTML = D.icon('eye');
+        const known = D.MODELS.some(m => m.id === draftModel); modelDD.set(known ? draftModel : '__custom'); customEl.classList.toggle('hidden', known); customEl.value = known ? '' : draftModel;
+        if (opt.search) {
+          sKeys = Object.assign({}, S.searchKeys || {}, S.searchKey && !(S.searchKeys || {}).tavily ? { tavily: S.searchKey } : {}); sProv = S.searchProvider || 'tavily';
+          sprovDD.set(sProv); $('#st-slink', back).href = LINKS[sProv]; skeyEl.value = sKeys[sProv] || ''; skeyEl.type = 'password'; nativeDraft = !!S.nativeSearch; natEl.classList.toggle('is-on', nativeDraft);
+        }
+        warn(); tab('api'); D.theme.apply(D.theme.get()); if (opt.onOpen) opt.onOpen(box);
         back.classList.add('show'); requestAnimationFrame(() => back.classList.add('in'));
       },
       close

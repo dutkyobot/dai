@@ -98,7 +98,7 @@ function dataIO(host){
     save();render();D.toast('불러왔어요.');
   });
 }
-const st=D.mountSettings({extra:dataIO,onOpen:()=>{$('#st-user').value=S.userName},onSave:()=>{const v=$('#st-user').value.trim();if(v){S.userName=v;save()}}});
+const st=D.mountSettings({extra:dataIO,extraTitle:'캐릭터',onOpen:()=>{$('#st-user').value=S.userName},onSave:()=>{const v=$('#st-user').value.trim();if(v){S.userName=v;save()}}});
 $('#btn-settings').onclick=()=>{st.open();sb.close()};
 $('#mode-seg').addEventListener('click',e=>{const m=e.target.dataset&&e.target.dataset.m;if(m&&m!==S.mode){S.mode=m;tok++;save();render();}});
 
