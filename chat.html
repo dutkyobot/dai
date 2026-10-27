@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="shared.css">
 <style>
 .msg-row{max-width:92%}@media(min-width:640px){.msg-row{max-width:86%}}
-.bubble.rich{white-space:normal}.bubble.rich.wide{min-width:min(100%,340px)}.bubble.rich>div>:first-child{margin-top:0}.bubble.rich>div>:last-child{margin-bottom:0}
+.bubble.rich{white-space:normal;background:none;border:none;padding:2px 0;width:100%;font-size:14.5px;line-height:1.8}.msg-row:not(.user){max-width:100%;width:100%}.msg-row:not(.user) .msg-col{flex:1;min-width:0}.msg-row:not(.user) .bubble-line{flex-direction:column;align-items:flex-start;gap:2px}.bubble.rich .code-card{max-width:520px}.bubble.rich>div>:first-child{margin-top:0}.bubble.rich>div>:last-child{margin-bottom:0}
 .bubble.rich p{margin:.5em 0}.bubble.rich h1,.bubble.rich h2,.bubble.rich h3,.bubble.rich h4{margin:.9em 0 .4em;line-height:1.35}
 .bubble.rich h1{font-size:1.25em}.bubble.rich h2{font-size:1.15em}.bubble.rich h3,.bubble.rich h4{font-size:1.05em}
 .bubble.rich ul,.bubble.rich ol{margin:.4em 0;padding-left:1.4em}.bubble.rich li{margin:.15em 0}
@@ -110,7 +110,7 @@ $('#btn-new').innerHTML=D.icon('plus')+'<span>새 대화</span>';$('#btn-attach'
 $('#cv-copy').innerHTML=D.icon('copy');$('#cv-close').innerHTML=D.icon('x');
 const sendBtn=$('.send-btn');
 const sb=D.bindSidebar();D.bindHeaderScroll($('#stream'),$('#header'));D.mountModelPicker($('#model-host'));
-const st=D.mountSettings({});
+const st=D.mountSettings({search:true});
 $('#btn-settings').onclick=()=>{st.open();sb.close()};$('#btn-header-settings').onclick=st.open;
 
 /* 웹 검색 토글 */
@@ -236,10 +236,22 @@ function contentsFor(c){
 async function ask(c){
   c.err=null;const contents=contentsFor(c);
   const m={id:D.uid(),role:'assistant',content:'',createdAt:Date.now(),model:D.settings.get().model,live:true};c.messages.push(m);
-  const h=D.stream({system:SYS,contents,tools:searchOn?[{google_search:{}}]:undefined,onDelta:t=>{m.content=t;paint(c,m)}});
-  gens.set(c.id,{cancel:h.cancel});if(c.id===cur)renderStream();
-  try{const r=await h.promise;m.content=r.text;m.sources=r.sources}
-  catch(e){c.err=D.errText(e)}
+  let system=SYS,tools,ext=null,stopped=false;
+  gens.set(c.id,{cancel(){stopped=true;if(gens.get(c.id).h)gens.get(c.id).h.cancel()}});if(c.id===cur)renderStream();
+  try{
+    if(searchOn){
+      const s=D.settings.get(),hasKey=!!(s.searchKey||'').trim();
+      if(s.nativeSearch||!hasKey){tools=[{google_search:{}}]}   // 현재는 Gemini만 지원 → 검색 키가 없으면 자체 검색으로 대체
+      else{
+        const lastUser=[...c.messages].reverse().find(x=>isUser(x)&&!x.live);
+        ext=await D.webSearch(((lastUser&&txt(lastUser))||'').trim()||'최신 정보');
+        if(ext.length)system+='\n\n[웹 검색 결과 — 필요하면 참고하고 출처를 자연스럽게 활용하세요]\n'+ext.map((r,i)=>(i+1)+'. '+r.title+' ('+r.uri+')\n'+r.content).join('\n\n');
+      }
+    }
+    if(stopped)throw {code:'stop'};
+    const h=D.stream({system,contents,tools,onDelta:t=>{m.content=t;paint(c,m)}});gens.get(c.id).h=h;
+    const r=await h.promise;m.content=r.text;m.sources=ext?ext.map(x=>({uri:x.uri,title:x.title})):r.sources;
+  }catch(e){if(!e||e.code!=='stop')c.err=D.errText(e)}
   delete m.live;gens.delete(c.id);
   if(!txt(m).trim())c.messages=c.messages.filter(x=>x!==m);
   c.updatedAt=Date.now();save();

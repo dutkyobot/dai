@@ -167,6 +167,10 @@
     if (c === 'ratelimit') return '요청 한도에 걸렸어요. 잠깐 쉬었다가 다시 시도해 주세요. 계속되면 설정에서 모델을 바꿔보세요.';
     if (c === 'notfound') return '모델을 찾을 수 없어요 (' + e.message + '). 설정에서 다른 모델을 골라주세요.';
     if (c === 'empty') return '빈 응답이 왔어요 (사유: ' + e.message + '). 다시 시도하거나 모델을 바꿔보세요.';
+    if (c === 'nosearchkey') return '웹 검색 API 키가 없어요. 설정에서 검색 API 키를 넣어주세요.';
+    if (c === 'searchauth') return '웹 검색 API 키가 올바르지 않아요.';
+    if (c === 'searchnet') return '웹 검색 서비스에 연결하지 못했어요. 네트워크를 확인하거나 설정에서 자체 구글 검색을 켜 보세요.';
+    if (c === 'searchfail') return '웹 검색 중 오류가 났어요 (' + e.message + ').';
     if (c === 'network') return '네트워크 오류예요. 연결을 확인하고 다시 시도해 주세요.';
     if (c === 'server') return 'Google 서버가 잠시 응답하지 않아요. 잠시 후 다시 시도해 주세요.';
     return '오류가 났어요: ' + ((e && e.message) || e);
@@ -267,6 +271,17 @@
       return { text, sources: sources.slice(0, 6), stopped };
     })();
     return { promise, cancel() { stopped = true; try { reader && reader.cancel(); } catch (e) {} } };
+  };
+
+  /* ---------------- 웹 검색 (Tavily) ---------------- */
+  D.webSearch = async function (query) {
+    const k = (S.searchKey || '').trim(); if (!k) throw new DaiError('nosearchkey');
+    let res;
+    try { res = await fetch('https://api.tavily.com/search', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + k }, body: JSON.stringify({ query: String(query).slice(0, 380), max_results: 5, search_depth: 'basic' }) }); }
+    catch (e) { throw new DaiError('searchnet'); }
+    if (!res.ok) { let d = ''; try { d = (await res.json()).detail.error || ''; } catch (e) {} throw new DaiError(res.status === 401 || res.status === 403 ? 'searchauth' : 'searchfail', d || res.status, res.status); }
+    const j = await res.json();
+    return (j.results || []).slice(0, 5).map(r => ({ title: r.title || r.url, uri: r.url, content: String(r.content || '').slice(0, 700) }));
   };
 
   /* ---------------- 토스트 · 대화상자 · 모달 ---------------- */
@@ -386,7 +401,8 @@
     back.innerHTML =
       '<div class="modal-box card" role="dialog" aria-modal="true" aria-label="설정">' +
         '<div class="modal-head"><h2>설정</h2><button class="icon-btn" data-x aria-label="닫기">' + D.icon('x') + '</button></div>' +
-        '<div class="settings-section first"><div class="settings-section-title">Gemini API</div>' +
+        '<div class="settings-section first"><div class="settings-section-title">AI API</div>' +
+          '<div><label class="label" for="st-prov">제공사</label><select id="st-prov" class="field"><option>Google AI Studio (Gemini)</option></select><p class="hint">다른 회사의 AI API는 앞으로 추가될 예정이에요.</p></div>' +
           '<div><label class="label" for="st-key">API 키</label><div class="pw-wrap"><input id="st-key" class="field" type="password" placeholder="AIzaSy..." autocomplete="off">' +
           '<button type="button" class="icon-btn" id="st-eye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
           '<p class="hint hidden" id="st-keywarn" style="color:rgb(var(--c-amber))">보통 "AIzaSy"로 시작하는 키예요. 다시 확인해 보세요.</p>' +
@@ -394,6 +410,11 @@
           '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기</a></p></div></div>' +
         '<div class="settings-section"><div class="settings-section-title">모델</div><div class="model-list" id="st-models"></div>' +
           '<div><label class="label" for="st-custom">직접 입력</label><input id="st-custom" class="field" type="text" placeholder="예: gemini-3.1-flash-lite"></div></div>' +
+        (opt.search ? '<div class="settings-section"><div class="settings-section-title">웹 검색 API</div>' +
+          '<div><label class="label" for="st-sprov">검색 제공사</label><select id="st-sprov" class="field"><option>Tavily</option></select></div>' +
+          '<div><label class="label" for="st-skey">검색 API 키</label><div class="pw-wrap"><input id="st-skey" class="field" type="password" placeholder="tvly-..." autocomplete="off"><button type="button" class="icon-btn" id="st-seye" aria-label="키 표시/숨김">' + D.icon('eye') + '</button></div>' +
+          '<p class="hint">웹 검색을 켜면 이 API를 기본으로 써요. 어떤 AI 제공사를 쓰더라도 동작해요. <a href="https://app.tavily.com" target="_blank" rel="noopener">키 발급받기</a></p></div>' +
+          '<div class="settings-row"><div><div class="settings-row-label">Google AI Studio 자체 검색 사용</div><div class="settings-row-desc">Google AI Studio API를 쓸 때 위 검색 API 대신 Gemini의 자체 Google 검색을 이용해요.</div></div><button type="button" class="toggle-switch" id="st-native" aria-label="자체 구글 검색"><span class="toggle-knob"></span></button></div></div>' : '') +
         '<div class="settings-section"><div class="settings-row"><div><div class="settings-row-label">화면 테마</div><div class="settings-row-desc">눈이 편한 다크 모드로 바꿀 수 있어요.</div></div>' +
           '<div class="theme-switch"><button type="button" data-theme="light" class="theme-option" aria-label="라이트 모드">' + D.icon('sun') + '</button>' +
           '<button type="button" data-theme="dark" class="theme-option" aria-label="다크 모드">' + D.icon('moon') + '</button></div></div></div>' +
@@ -421,8 +442,16 @@
     back.querySelectorAll('.theme-option').forEach(b => b.onclick = () => D.theme.set(b.dataset.theme));
     $('[data-x]', back).onclick = close;
     back.addEventListener('mousedown', e => { if (e.target === back) close(); });
+    let nativeDraft = false;
+    const skeyEl = $('#st-skey', back), natEl = $('#st-native', back);
+    if (opt.search) {
+      $('#st-seye', back).onclick = () => { const t = skeyEl.type === 'password'; skeyEl.type = t ? 'text' : 'password'; $('#st-seye', back).innerHTML = D.icon(t ? 'eyeoff' : 'eye'); };
+      natEl.onclick = () => { nativeDraft = !nativeDraft; natEl.classList.toggle('is-on', nativeDraft); };
+    }
     $('#st-save', back).onclick = () => {
-      D.settings.set({ key: keyEl.value.trim(), model: (draftModel || D.DEFAULT_MODEL).trim() });
+      const patch = { key: keyEl.value.trim(), model: (draftModel || D.DEFAULT_MODEL).trim() };
+      if (opt.search) { patch.searchKey = skeyEl.value.trim(); patch.nativeSearch = nativeDraft; patch.searchProvider = 'tavily'; }
+      D.settings.set(patch);
       if (opt.onSave) opt.onSave(); close(); D.toast('설정을 저장했어요.');
     };
     if (opt.extra) opt.extra($('#st-extra', back));
@@ -430,6 +459,7 @@
     return {
       open() {
         draftModel = S.model; keyEl.value = S.key || ''; keyEl.type = 'password'; $('#st-eye', back).innerHTML = D.icon('eye'); customEl.value = '';
+        if (opt.search) { skeyEl.value = S.searchKey || ''; skeyEl.type = 'password'; nativeDraft = !!S.nativeSearch; natEl.classList.toggle('is-on', nativeDraft); }
         warn(); renderModels(); D.theme.apply(D.theme.get()); if (opt.onOpen) opt.onOpen(box);
         back.classList.add('show'); requestAnimationFrame(() => back.classList.add('in'));
       },
