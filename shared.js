@@ -122,19 +122,20 @@
   function normalize(contents) {
     const out = [];
     for (const c of contents || []) {
-      const t = (c.parts || []).map(p => p.text || '').join('');
-      if (!t.trim()) continue;
+      const parts = (c.parts || []).filter(p => (p.text && p.text.trim()) || p.inlineData);   // 이미지·PDF(inlineData)도 보존
+      if (!parts.length) continue;
       const last = out[out.length - 1];
-      if (last && last.role === c.role) last.parts[0].text += '\n' + t; else out.push({ role: c.role, parts: [{ text: t }] });
+      if (last && last.role === c.role) last.parts.push(...parts); else out.push({ role: c.role, parts: parts.slice() });
     }
     if (!out.length || out[0].role === 'model') out.unshift({ role: 'user', parts: [{ text: '(대화 시작)' }] });
     return out;
   }
+  const genCfg = opt => Object.assign({ temperature: opt.temperature == null ? 1 : opt.temperature, maxOutputTokens: opt.maxTokens || 8192 }, opt.json ? { responseMimeType: 'application/json' } : {});
   D.generate = async function (opt) {
     const s = S;
     if (!(s.key || '').trim()) throw new DaiError('nokey');
     const model = (s.model || D.DEFAULT_MODEL).trim();
-    const body = { contents: normalize(opt.contents), generationConfig: { temperature: opt.temperature == null ? 1 : opt.temperature, maxOutputTokens: opt.maxTokens || 8192 } };
+    const body = { contents: normalize(opt.contents), generationConfig: genCfg(opt) };
     if (opt.system) body.systemInstruction = { parts: [{ text: opt.system }] };
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent';
     let last = null;
@@ -235,7 +236,7 @@
     const promise = (async () => {
       if (!(S.key || '').trim()) throw new DaiError('nokey');
       const model = (S.model || D.DEFAULT_MODEL).trim();
-      const body = { contents: normalize(opt.contents), generationConfig: { temperature: opt.temperature == null ? 1 : opt.temperature, maxOutputTokens: opt.maxTokens || 8192 } };
+      const body = { contents: normalize(opt.contents), generationConfig: genCfg(opt) };
       if (opt.system) body.systemInstruction = { parts: [{ text: opt.system }] };
       if (opt.tools) body.tools = opt.tools;
       let res;

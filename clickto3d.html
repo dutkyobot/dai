@@ -3,469 +3,318 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>입체도형 청사진 · 3D Solid Blueprint</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<title>D-AI | 3D Blueprint</title>
+<meta name="description" content="입체도형 사진에서 꼭짓점 좌표를 뽑아 돌려볼 수 있는 3D 모형으로 만들어 드려요.">
+<link rel="icon" href="img/favicon.png" type="image/png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-  :root{
-    --bg: #0c2338;
-    --bg-deep: #081a2b;
-    --paper: #0f2b44;
-    --paper-raised: #123252;
-    --line: #3f6f8f;
-    --line-soft: rgba(111,168,201,0.22);
-    --ink: #eaf3fa;
-    --ink-dim: #9fc1d9;
-    --ink-faint: #6c93ac;
-    --amber: #ffb84d;
-    --amber-dim: #a97a3d;
-    --mint: #7ce0c6;
-    --danger: #ff8f8f;
-    --radius: 3px;
-    font-size: 16px;
-  }
-  *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: radial-gradient(circle at 50% 0%, rgba(124,224,198,0.05), transparent 55%), var(--bg-deep);
-    color: var(--ink);
-    font-family: 'Pretendard', -apple-system, system-ui, sans-serif;
-    min-height: 100vh;
-    padding: 28px 16px 60px;
-    line-height: 1.55;
-  }
-  .grid-field{
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: linear-gradient(var(--line-soft) 1px, transparent 1px), linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: 0.35;
-    mask-image: radial-gradient(ellipse at 50% 20%, black 0%, transparent 75%);
-  }
-  .sheet{
-    position: relative; z-index: 1; max-width: 1180px; margin: 0 auto;
-    background: var(--bg); border: 1px solid var(--line); border-radius: 4px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
-  }
-  .crop{ position:absolute; width:16px; height:16px; z-index:2; }
-  .crop::before, .crop::after{ content:""; position:absolute; background: var(--ink-faint); }
-  .crop::before{ width:16px; height:1px; top:0; left:0; }
-  .crop::after{ width:1px; height:16px; top:0; left:0; }
-  .crop.tl{ top:-1px; left:-1px; }
-  .crop.tr{ top:-1px; right:-1px; transform: scaleX(-1); }
-  .crop.bl{ bottom:-1px; left:-1px; transform: scaleY(-1); }
-  .crop.br{ bottom:-1px; right:-1px; transform: scale(-1,-1); }
+:root{
+  --bg:#000; --surface:#18181B; --surface2:#1F1F23; --line:#2A2A2E; --mute:#9B9BA3; --ink:#fff;
+  --mint:#21D67A; --blue:#3B9EFF; --red:#EF4444; --amber:#F5A623;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Noto Sans KR",sans-serif;letter-spacing:-.01em;line-height:1.6;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
+input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+.gradient-brand{background:linear-gradient(135deg,var(--mint),var(--blue))}
 
-  header.masthead{
-    padding: 34px 40px 26px; border-bottom: 1px solid var(--line);
-    display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap;
-  }
-  .masthead h1{ margin: 0; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(26px, 4vw, 36px); letter-spacing: -0.01em; }
-  .masthead h1 span{ color: var(--mint); }
-  .masthead p{ margin: 8px 0 0; color: var(--ink-dim); font-size: 14.5px; max-width: 48ch; }
-  .masthead .tag{
-    font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-faint);
-    border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; white-space: nowrap;
-  }
+/* 헤더: 스크롤하면 알약 모양으로 */
+#site-header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;transition:padding .5s var(--ease)}
+#site-header.is-floating{padding:1rem}
+.hd-inner{width:100%;height:4rem;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);transition:all .5s var(--ease)}
+#site-header.is-floating .hd-inner{max-width:64rem;border-radius:9999px;background:linear-gradient(180deg,rgba(30,30,34,.65),rgba(24,24,27,.65));backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 32px -8px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.1)}
+.hd-content{width:100%;max-width:64rem;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:1.1rem;letter-spacing:-.02em}
+.logo .mark{width:2rem;height:2rem;border-radius:.5rem;display:flex;align-items:center;justify-content:center}
+.logo .mark img{width:1.25rem;height:1.25rem;border-radius:4px}
+.logo small{font-weight:600;color:var(--mute);font-size:.8rem;margin-left:.15rem}
+.hd-links{display:flex;gap:1.25rem;font-size:.875rem;font-weight:600;color:var(--mute)}
+.hd-links a:hover{color:var(--ink)}
 
-  main{ padding: 32px 40px 40px; }
-  .layout{ display: grid; grid-template-columns: 340px 1fr; gap: 28px; align-items: start; }
-  @media (max-width: 860px){ .layout{ grid-template-columns: 1fr; } }
+main{max-width:64rem;margin:0 auto;padding:8rem 1.5rem 4rem}
+.hero h1{margin:0;font-size:clamp(2rem,5vw,3rem);line-height:1.2;letter-spacing:-.03em}
+.hero p{margin:1.1rem 0 0;color:var(--mute);font-size:.95rem;max-width:34rem}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;margin-top:3rem;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
 
-  .rail{ position: relative; }
-  .step{ position: relative; padding: 0 0 26px 30px; border-left: 1px dashed var(--line); margin-left: 9px; }
-  .step:last-child{ border-left-color: transparent; padding-bottom: 0; }
-  .step .num{
-    position: absolute; left: -10px; top: -2px; width: 19px; height: 19px; border-radius: 50%;
-    background: var(--bg); border: 1px solid var(--ink-faint); color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; align-items: center; justify-content: center;
-  }
-  .step.active .num{ border-color: var(--mint); color: var(--mint); }
-  .step h2{ margin: 0 0 4px; font-size: 14px; font-weight: 600; color: var(--ink); }
-  .step .desc{ margin: 0 0 12px; font-size: 12.5px; color: var(--ink-faint); }
+.card{background:var(--surface);border:1px solid var(--line);border-radius:28px;transition:border-color .2s}
+.card:hover{border-color:rgba(255,255,255,.3)}
+.card.pad{padding:1.5rem}
+.card h2,.card h3{margin:0}
+.step-title{display:flex;align-items:center;gap:.6rem;font-size:1rem;font-weight:700}
+.step-title i{width:1.5rem;height:1.5rem;border-radius:50%;font-style:normal;font-size:.75rem;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--line);color:var(--mute)}
+.step-desc{margin:.5rem 0 1rem;color:var(--mute);font-size:.8rem}
+.rail{display:flex;flex-direction:column;gap:1.5rem}
 
-  label.field-label{ display:block; font-size: 12px; color: var(--ink-dim); margin-bottom: 6px; }
-  .key-row{ display:flex; gap:6px; }
-  input[type="password"], input[type="text"], select{
-    width: 100%; background: var(--paper); border: 1px solid var(--line); color: var(--ink);
-    border-radius: var(--radius); padding: 9px 10px; font-size: 13.5px; font-family: 'JetBrains Mono', monospace;
-  }
-  input::placeholder{ color: var(--ink-faint); }
-  input:focus, select:focus, button:focus-visible{ outline: 2px solid var(--mint); outline-offset: 1px; }
-  .icon-btn{
-    background: var(--paper); border: 1px solid var(--line); color: var(--ink-dim);
-    border-radius: var(--radius); width: 36px; cursor: pointer; font-size: 13px; flex-shrink: 0;
-  }
-  .icon-btn:hover{ color: var(--ink); }
-  .helper-link{
-    display: inline-block; margin-top: 7px; font-size: 11.5px; color: var(--mint);
-    text-decoration: none; border-bottom: 1px solid rgba(124,224,198,0.35);
-  }
-  .helper-link:hover{ color: var(--ink); }
-  .adv-toggle{ margin-top: 14px; font-size: 12px; color: var(--ink-faint); background: none; border: none; cursor: pointer; padding: 0; text-decoration: underline; text-decoration-style: dotted; }
-  .adv-panel{ display:none; margin-top: 12px; }
-  .adv-panel.open{ display:block; }
+label.lb{display:block;font-size:.72rem;font-weight:600;color:var(--mute);margin-bottom:.4rem}
+.field{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:.65rem .9rem;font-size:.8rem;outline:none;transition:border-color .15s}
+.field:focus{border-color:var(--blue)}
+.field::placeholder{color:#5f5f67}
+.key-row{display:flex;gap:.4rem}
+.icon-btn{flex-shrink:0;width:2.5rem;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--mute);font-size:.8rem}
+.icon-btn:hover{color:var(--ink)}
+.link{display:inline-block;margin-top:.5rem;font-size:.72rem;font-weight:600;color:var(--blue)}
+.link:hover{text-decoration:underline}
+.adv-toggle{margin-top:.9rem;font-size:.75rem;color:var(--mute);text-decoration:underline;text-decoration-style:dotted}
+.adv-panel{display:none;margin-top:.8rem}.adv-panel.open{display:block}
 
-  .dropzone{
-    border: 1px dashed var(--line); border-radius: var(--radius); padding: 22px 14px; text-align: center;
-    cursor: pointer; background: var(--paper); transition: border-color .15s ease, background .15s ease;
-  }
-  .dropzone:hover, .dropzone.drag{ border-color: var(--mint); background: var(--paper-raised); }
-  .dropzone .dz-icon{ font-size: 22px; color: var(--ink-faint); margin-bottom: 8px; }
-  .dropzone p{ margin: 0; font-size: 12.5px; color: var(--ink-dim); }
-  .dropzone .sub{ font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
-  .preview-thumb{ display: none; margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-  .preview-thumb img{ display:block; width:100%; }
-  .preview-thumb .thumb-cap{ display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; font-size: 11px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; border-top: 1px solid var(--line); }
-  .preview-thumb .thumb-cap button{ background:none;border:none;color:var(--amber);cursor:pointer;font-size:11px; font-family: 'JetBrains Mono', monospace; }
+.dropzone{border:1px dashed #3A3A40;border-radius:20px;padding:1.6rem 1rem;text-align:center;cursor:pointer;background:var(--bg);transition:border-color .15s,background .15s}
+.dropzone:hover,.dropzone.drag{border-color:var(--mint);background:var(--surface2)}
+.dropzone .ic{font-size:1.4rem;color:var(--mute);margin-bottom:.4rem}
+.dropzone p{margin:0;font-size:.8rem;color:var(--mute)}
+.dropzone .sub{font-size:.7rem;margin-top:.2rem;opacity:.7}
+.preview{display:none;border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.preview img{display:block;width:100%}
+.preview .cap{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;font-size:.72rem;color:var(--mute);border-top:1px solid var(--line)}
+.preview .cap button{color:var(--blue);font-size:.72rem;font-weight:600}
 
-  .go-btn{
-    width: 100%; margin-top: 4px; background: var(--amber); color: #23180a; border: none;
-    border-radius: var(--radius); padding: 12px 14px; font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600; font-size: 14.5px; cursor: pointer; transition: transform .1s ease, background .15s ease;
-  }
-  .go-btn:hover:not(:disabled){ background: #ffc669; }
-  .go-btn:active:not(:disabled){ transform: translateY(1px); }
-  .go-btn:disabled{ background: var(--amber-dim); color: #4a3c26; cursor: not-allowed; }
+.go-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1rem;border-radius:9999px;font-weight:700;font-size:.875rem;color:#04140c;background:linear-gradient(135deg,var(--mint),var(--blue));transition:opacity .2s}
+.go-btn:hover:not(:disabled){opacity:.88}
+.go-btn:disabled{opacity:.35;cursor:not-allowed}
+.status{display:none;align-items:center;gap:.5rem;margin-top:.8rem;font-size:.78rem}
+.status.show{display:flex}.status.err{color:#ff8a98}.status.ok{color:var(--mint)}.status.busy{color:var(--mute)}
+.spinner{width:.75rem;height:.75rem;border-radius:50%;border:2px solid #3A3A40;border-top-color:var(--mint);animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  .status-line{ margin-top: 10px; font-size: 12px; font-family: 'JetBrains Mono', monospace; display: none; align-items: center; gap: 8px; }
-  .status-line.show{ display:flex; }
-  .status-line.err{ color: var(--danger); }
-  .status-line.ok{ color: var(--mint); }
-  .status-line.busy{ color: var(--ink-dim); }
-  .spinner{ width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--ink-faint); border-top-color: var(--mint); animation: spin .8s linear infinite; }
-  @keyframes spin{ to{ transform: rotate(360deg); } }
+.board{min-height:26rem;display:flex;flex-direction:column;overflow:hidden}
+.board-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;padding:4rem 1.5rem;text-align:center;color:var(--mute)}
+.board-empty p{margin:0;font-size:.85rem;max-width:30ch}
+.board-body{display:none;padding:1.25rem}.board-body.show{display:block}
+.vt{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem}
+.vt b{font-size:.95rem}
+.pill{padding:.4rem .85rem;border-radius:9999px;font-size:.72rem;font-weight:600;color:var(--mute);border:1px solid var(--line);background:var(--surface2);transition:.15s}
+.pill:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+.pill.on{color:var(--mint);border-color:rgba(33,214,122,.5);background:rgba(33,214,122,.08)}
+.vt .btns{display:flex;gap:.4rem}
+.viewer{position:relative;height:26rem;border:1px solid var(--line);border-radius:22px;background:radial-gradient(circle at 50% 40%,rgba(59,158,255,.09),transparent 62%),#0b0b0d;overflow:hidden;touch-action:none;cursor:grab}
+.viewer:active{cursor:grabbing}.viewer canvas{display:block}
+.label-layer{position:absolute;inset:0;pointer-events:none}
+.v-label{position:absolute;transform:translate(-50%,-140%);font-size:.65rem;font-weight:700;color:#04140c;background:var(--mint);padding:1px 6px;border-radius:9999px;white-space:nowrap}
+.hint{text-align:center;font-size:.72rem;color:var(--mute);margin:.6rem 0 0}
+.caveat{font-size:.7rem;color:#6d6d75;margin:.3rem 0 0;line-height:1.6;text-align:center}
 
-  .board{ border: 1px solid var(--line); border-radius: 4px; background: var(--paper); min-height: 420px; display: flex; flex-direction: column; }
-  .board-empty{ flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--ink-faint); padding: 60px 20px; text-align: center; }
-  .board-empty p{ margin:0; font-size: 13px; max-width: 34ch; }
-  .board-body{ display:none; }
-  .board-body.show{ display:block; }
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.25rem}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.sub-card{background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:1.1rem}
+.sub-card h3{font-size:.72rem;font-weight:700;color:var(--mute);letter-spacing:.04em;margin-bottom:.7rem}
+.photo{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;line-height:0}
+.photo img{width:100%;display:block}
+.marker{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none}
+.marker .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);border:1px solid #04140c;margin:5px auto 0;box-shadow:0 0 0 3px rgba(33,214,122,.25)}
+.marker .tag{position:absolute;top:-2px;left:20px;font-size:.62rem;font-weight:700;color:#04140c;background:var(--mint);padding:0 5px;border-radius:9999px;white-space:nowrap;line-height:1.4}
+.shape-name{font-size:1.4rem;font-weight:700;margin:0;background:linear-gradient(135deg,var(--mint),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+.shape-type{margin:.2rem 0 0;font-size:.8rem;color:var(--mute)}
+.swatches{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+.swatch{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--mute)}
+.swatch i{width:.9rem;height:.9rem;border-radius:5px;border:1px solid rgba(255,255,255,.2)}
+.counts{display:flex;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line)}
+.counts div{flex:1;text-align:center}.counts b{display:block;font-size:1.2rem}.counts span{font-size:.68rem;color:var(--mute)}
+.euler{margin-top:.6rem;font-size:.72rem;color:var(--mute)}.euler b{color:var(--mint)}
+table.vt-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.vt-table th{text-align:left;color:var(--mute);font-weight:600;padding:.3rem .4rem;border-bottom:1px solid var(--line);font-size:.68rem}
+.vt-table td{padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);font-variant-numeric:tabular-nums}
+.vt-table td.lbl{color:var(--mint);font-weight:700}
+.copy-row{text-align:right;margin-top:.6rem}
+.note{font-size:.7rem;color:#6d6d75;margin:.6rem 0 0;line-height:1.6}
+.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.6rem .8rem;margin-bottom:.5rem;font-size:.8rem;overflow-x:auto;white-space:nowrap}
+.formula span.l{display:block;font-size:.66rem;color:var(--mute);margin-bottom:.1rem}
+.tip{font-size:.8rem;color:var(--mute);margin:.3rem 0 0}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.72rem}
+@media(max-width:620px){.meta{grid-template-columns:1fr 1fr}}
+.meta span{display:block;color:var(--mute);margin-bottom:.1rem}.meta b{font-weight:600}
 
-  /* ---- 3D viewer hero ---- */
-  .viewer-card{ padding: 16px 16px 0; }
-  .viewer-toolbar{ display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; flex-wrap: wrap; gap:8px; }
-  .viewer-toolbar .vt-label{ font-family:'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); }
-  .viewer-toolbar .vt-btns{ display:flex; gap:6px; }
-  .vt-btn{
-    background: var(--bg); border: 1px solid var(--line); color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; border-radius: 3px; padding: 6px 10px; cursor: pointer;
-  }
-  .vt-btn:hover{ border-color: var(--mint); color: var(--mint); }
-  .vt-btn.on{ border-color: var(--mint); color: var(--mint); background: rgba(124,224,198,0.08); }
-  .viewer-canvas-wrap{
-    position: relative; height: 420px; border: 1px solid var(--line); border-radius: var(--radius);
-    background:
-      radial-gradient(circle at 50% 40%, rgba(124,224,198,0.06), transparent 60%),
-      repeating-linear-gradient(var(--line-soft) 0 1px, transparent 1px 26px),
-      repeating-linear-gradient(90deg, var(--line-soft) 0 1px, transparent 1px 26px),
-      var(--bg);
-    overflow: hidden; touch-action: none; cursor: grab;
-  }
-  .viewer-canvas-wrap:active{ cursor: grabbing; }
-  .viewer-canvas-wrap canvas{ display:block; }
-  .label-layer{ position:absolute; inset:0; pointer-events:none; }
-  .v-label{
-    position:absolute; transform: translate(-50%,-140%);
-    font-family:'JetBrains Mono', monospace; font-size: 10.5px; color:#23180a;
-    background: var(--amber); padding: 1px 5px; border-radius: 2px; white-space:nowrap;
-  }
-  .viewer-hint{ text-align:center; font-size: 11px; color: var(--ink-faint); padding: 8px 0 4px; }
-  .viewer-caveat{ font-size: 10.5px; color: var(--ink-faint); padding: 0 4px 12px; line-height:1.6; }
-
-  .support-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 16px 16px; }
-  @media (max-width: 720px){ .support-grid{ grid-template-columns: 1fr; } }
-
-  .card{ border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); padding: 14px 15px; }
-  .card h3{ margin: 0 0 10px; font-size: 12px; letter-spacing: .04em; color: var(--ink-faint); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
-
-  .photo-wrap{ position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; line-height:0; }
-  .photo-wrap img{ width: 100%; display:block; }
-  .marker{ position: absolute; width: 18px; height: 18px; transform: translate(-50%, -50%); pointer-events: none; }
-  .marker .dot{ width: 7px; height: 7px; border-radius: 50%; background: var(--amber); border: 1px solid #23180a; margin: 5.5px auto 0; box-shadow: 0 0 0 3px rgba(255,184,77,0.22); }
-  .marker .tag{ position: absolute; top: -2px; left: 20px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #23180a; background: var(--amber); padding: 1px 4px; border-radius: 2px; white-space: nowrap; }
-
-  .shape-name{ font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 600; color: var(--mint); margin: 0 0 4px; }
-  .shape-type{ font-size: 12.5px; color: var(--ink-dim); margin: 0; }
-  .swatches{ display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .swatch{ display:flex; align-items:center; gap:6px; font-size: 11.5px; color: var(--ink-dim); font-family: 'JetBrains Mono', monospace; }
-  .swatch i{ width: 13px; height: 13px; border-radius: 3px; display:inline-block; border: 1px solid rgba(255,255,255,0.2); }
-  .counts{ display:flex; gap: 14px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); }
-  .counts .c{ text-align:center; flex:1; }
-  .counts .c b{ display:block; font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--ink); }
-  .counts .c span{ font-size: 10.5px; color: var(--ink-faint); }
-  .euler{ margin-top: 8px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--ink-faint); }
-  .euler b{ color: var(--mint); }
-
-  table.vtable{ width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; }
-  table.vtable th{ text-align: left; color: var(--ink-faint); font-weight: 500; padding: 4px 6px; border-bottom: 1px solid var(--line); font-size: 10px; }
-  table.vtable td{ padding: 4px 6px; color: var(--ink); border-bottom: 1px solid rgba(111,168,201,0.12); }
-  table.vtable td.label{ color: var(--amber); }
-  .copy-row{ text-align: right; margin-top: 8px; }
-  .copy-row button{ background:none;border:1px solid var(--line);color:var(--ink-dim); font-family:'JetBrains Mono', monospace; font-size: 10.5px; border-radius: 3px; padding: 4px 8px; cursor:pointer; }
-  .copy-row button:hover{ color: var(--mint); border-color: var(--mint); }
-
-  .formula{ font-family: 'JetBrains Mono', monospace; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 9px 11px; font-size: 12.5px; margin-bottom: 8px; color: var(--mint); overflow-x: auto; white-space: nowrap; }
-  .formula .lbl{ display:block; color: var(--ink-faint); font-size: 10.5px; margin-bottom: 3px; font-family: 'Pretendard'; }
-  .tip{ font-size: 12.5px; color: var(--ink-dim); margin-top: 4px; }
-
-  .titleblock{ border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
-  .titleblock div{ padding: 9px 14px; border-right: 1px solid var(--line); }
-  .titleblock div:last-child{ border-right:none; }
-  .titleblock span{ display:block; color: var(--ink-faint); margin-bottom: 3px; }
-  .titleblock b{ color: var(--ink); font-weight: 500; }
-  @media (max-width: 620px){ .titleblock{ grid-template-columns: 1fr 1fr; } }
-
-  .note{ font-size: 11px; color: var(--ink-faint); margin-top: 10px; line-height: 1.6; }
-  footer{ text-align:center; color: var(--ink-faint); font-size: 11.5px; margin-top: 22px; }
+footer{max-width:64rem;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px solid var(--line);font-size:.75rem;color:var(--mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<div class="grid-field"></div>
 
-<div class="sheet">
-  <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+<header id="site-header">
+  <div class="hd-inner"><div class="hd-content">
+    <a href="index.html" class="logo"><span class="mark gradient-brand"><img src="img/icon.png" alt="D-AI" width="20" height="20"></span>D-AI<small>| 3D Blueprint</small></a>
+    <nav class="hd-links"><a href="index.html">홈</a></nav>
+  </div></div>
+</header>
 
-  <header class="masthead">
-    <div>
-      <h1>입체도형 <span>청사진</span></h1>
-      <p>교과서·문제집 속 입체도형 사진에서 좌표와 색상을 뽑아, 직접 돌려볼 수 있는 3D 모형으로 재구성해 드려요.</p>
+<main>
+  <section class="hero">
+    <h1>사진 한 장으로,<br>돌려볼 수 있는 3D 도형.</h1>
+    <p>교과서·문제집 속 입체도형 사진에서 꼭짓점 좌표와 색상을 뽑아 3D 모형으로 만들어 드려요. 겉넓이와 부피 공식도 함께 정리해요.</p>
+  </section>
+
+  <div class="layout">
+    <div class="rail">
+      <section class="card pad">
+        <h2 class="step-title"><i>1</i>API 키</h2>
+        <p class="step-desc">Google AI Studio에서 발급받은 Gemini API 키를 넣어주세요. 키는 이 페이지에서만 쓰이고 새로고침하면 사라져요.</p>
+        <label class="lb" for="apiKey">Gemini API Key</label>
+        <div class="key-row">
+          <input class="field" type="password" id="apiKey" placeholder="API 키를 붙여넣으세요" autocomplete="off">
+          <button class="icon-btn" id="toggleKey" type="button" aria-label="키 표시/숨김">👁</button>
+        </div>
+        <a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기 ↗</a>
+        <div><button class="adv-toggle" id="advToggle" type="button">모델 옵션 펼치기</button></div>
+        <div class="adv-panel" id="advPanel">
+          <label class="lb" for="modelSelect">분석 모델</label>
+          <select class="field" id="modelSelect">
+            <option value="gemini-flash-latest">gemini-flash-latest (빠름, 기본)</option>
+            <option value="gemini-pro-latest">gemini-pro-latest (더 정확함, 느림)</option>
+            <option value="custom">직접 입력...</option>
+          </select>
+          <input class="field" type="text" id="customModel" placeholder="예: gemini-2.5-flash" style="display:none;margin-top:.5rem">
+        </div>
+      </section>
+
+      <section class="card pad">
+        <h2 class="step-title"><i>2</i>도형 이미지</h2>
+        <p class="step-desc">도형 하나가 선명하게 보이는 사진일수록 정확해요.</p>
+        <div class="dropzone" id="dropzone">
+          <div class="ic">▲</div>
+          <p>클릭하거나 이미지를 끌어다 놓으세요</p>
+          <p class="sub">JPG · PNG · WEBP</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" hidden>
+        <div class="preview" id="preview">
+          <img id="previewImg" alt="업로드한 이미지 미리보기">
+          <div class="cap"><span id="fileName">-</span><button id="clearImg" type="button">지우기</button></div>
+        </div>
+      </section>
+
+      <section class="card pad">
+        <h2 class="step-title"><i>3</i>3D로 재구성</h2>
+        <p class="step-desc">추정한 꼭짓점으로 3D 모형을 만들어요.</p>
+        <button class="go-btn" id="analyzeBtn" disabled>3D로 분석하기</button>
+        <div class="status" id="status"><span class="spinner" id="spinner"></span><span id="statusText"></span></div>
+      </section>
     </div>
-    <span class="tag">GOOGLE AI STUDIO · GEMINI VISION → 3D</span>
-  </header>
 
-  <main>
-    <div class="layout">
-
-      <div class="rail">
-        <div class="step active">
-          <span class="num">1</span>
-          <h2>API 키 입력</h2>
-          <p class="desc">Google AI Studio에서 발급받은 Gemini API 키를 입력하세요. 키는 브라우저에만 저장되고, 이 페이지를 벗어나면 사라집니다.</p>
-          <label class="field-label" for="apiKey">Gemini API Key</label>
-          <div class="key-row">
-            <input type="password" id="apiKey" placeholder="AIza...">
-            <button class="icon-btn" id="toggleKey" title="키 표시/숨기기" type="button">👁</button>
-          </div>
-          <a class="helper-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio에서 키 발급받기 ↗</a>
-
-          <button class="adv-toggle" id="advToggle" type="button">모델 옵션 펼치기</button>
-          <div class="adv-panel" id="advPanel">
-            <label class="field-label" for="modelSelect">분석 모델</label>
-            <select id="modelSelect">
-              <option value="gemini-flash-latest">gemini-flash-latest (빠름, 기본)</option>
-              <option value="gemini-pro-latest">gemini-pro-latest (더 정확함, 느림)</option>
-              <option value="custom">직접 입력...</option>
-            </select>
-            <div id="customModelWrap" style="display:none; margin-top:8px;">
-              <input type="text" id="customModel" placeholder="예: gemini-2.5-flash">
-            </div>
-          </div>
-        </div>
-
-        <div class="step active">
-          <span class="num">2</span>
-          <h2>도형 이미지 업로드</h2>
-          <p class="desc">도형 하나가 선명하게 보이는 사진일수록 좌표 추정과 3D 재구성 정확도가 높아집니다.</p>
-          <div class="dropzone" id="dropzone">
-            <div class="dz-icon">▲</div>
-            <p>클릭하거나 이미지를 끌어다 놓으세요</p>
-            <p class="sub">JPG · PNG · WEBP</p>
-          </div>
-          <input type="file" id="fileInput" accept="image/*" style="display:none;">
-          <div class="preview-thumb" id="previewThumb">
-            <img id="previewImg" alt="업로드한 이미지 미리보기">
-            <div class="thumb-cap">
-              <span id="fileName">-</span>
-              <button id="clearImg" type="button">지우기</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="step">
-          <span class="num">3</span>
-          <h2>3D로 재구성</h2>
-          <p class="desc">AI가 뽑아낸 꼭짓점 좌표·색상으로 3D 모형을 만들고, 겉넓이·부피 공식도 함께 정리합니다.</p>
-          <button class="go-btn" id="analyzeBtn" disabled>3D로 분석하기</button>
-          <div class="status-line" id="statusLine"><span class="spinner" id="spinnerEl"></span><span id="statusText"></span></div>
-        </div>
+    <section class="card board">
+      <div class="board-empty" id="boardEmpty">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M32 6L58 20V44L32 58L6 44V20L32 6Z" stroke="#3A3A40" stroke-width="1.5"/><path d="M32 6V32M32 32L58 20M32 32L6 20M32 32V58" stroke="#3A3A40" stroke-width="1.5"/></svg>
+        <p>왼쪽에서 키와 이미지를 준비하고 분석하면, 이곳에 3D 모형이 나타나요.</p>
       </div>
 
-      <div class="board">
-        <div class="board-empty" id="boardEmpty">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M32 6L58 20V44L32 58L6 44V20L32 6Z" stroke="#3f6f8f" stroke-width="1.5"/><path d="M32 6V32M32 32L58 20M32 32L6 20M32 32V58" stroke="#3f6f8f" stroke-width="1.5"/></svg>
-          <p>왼쪽에서 API 키와 이미지를 준비하고 분석을 실행하면, 이곳에 돌려볼 수 있는 3D 모형이 나타납니다.</p>
+      <div class="board-body" id="boardBody">
+        <div class="vt">
+          <b>3D 재구성 모형</b>
+          <div class="btns">
+            <button class="pill on" id="autoRotateBtn" type="button">자동회전 켜짐</button>
+            <button class="pill" id="resetViewBtn" type="button">처음 시점으로</button>
+          </div>
+        </div>
+        <div class="viewer" id="viewer"><div class="label-layer" id="labelLayer"></div></div>
+        <p class="hint">드래그해서 회전 · 스크롤(또는 핀치)로 확대·축소</p>
+        <p class="caveat">꼭짓점 좌표를 볼록 껍질(convex hull)로 이어 붙인 모형이라 실제 도형과 미세하게 다를 수 있어요. 구조를 이해하는 용도로 참고해 주세요.</p>
+
+        <div class="grid2">
+          <div class="sub-card"><h3>원본 사진 · 인식된 꼭짓점</h3><div class="photo" id="photoWrap"><img id="boardImg" alt="분석된 도형 이미지"></div></div>
+          <div class="sub-card">
+            <h3>도형 분류 · 색상</h3>
+            <p class="shape-name" id="outName">-</p><p class="shape-type" id="outType">-</p>
+            <div class="swatches" id="outSwatches"></div>
+            <div class="counts"><div><b id="cntV">-</b><span>꼭짓점 V</span></div><div><b id="cntE">-</b><span>모서리 E</span></div><div><b id="cntF">-</b><span>면 F</span></div></div>
+            <div class="euler" id="euler"></div>
+          </div>
+          <div class="sub-card">
+            <h3>꼭짓점 좌표 (AI 추정)</h3>
+            <table class="vt-table"><thead><tr><th>라벨</th><th>x</th><th>y</th><th>z</th></tr></thead><tbody id="vBody"></tbody></table>
+            <div class="copy-row"><button class="pill" id="copyVerts" type="button">표 복사하기</button></div>
+            <p class="note">실제 측정값이 아니라 구조를 보여주기 위한 <b>상대적 추정 좌표</b>예요.</p>
+          </div>
+          <div class="sub-card">
+            <h3>공식 · 학습 팁</h3>
+            <div class="formula"><span class="l">겉넓이</span><span id="outSurface">-</span></div>
+            <div class="formula"><span class="l">부피</span><span id="outVolume">-</span></div>
+            <p class="tip" id="outTip">-</p>
+          </div>
         </div>
 
-        <div class="board-body" id="boardBody">
-
-          <div class="viewer-card">
-            <div class="viewer-toolbar">
-              <span class="vt-label">3D 재구성 모형</span>
-              <div class="vt-btns">
-                <button class="vt-btn on" id="autoRotateBtn" type="button">자동회전 켜짐</button>
-                <button class="vt-btn" id="resetViewBtn" type="button">처음 시점으로</button>
-              </div>
-            </div>
-            <div class="viewer-canvas-wrap" id="viewerWrap">
-              <div class="label-layer" id="labelLayer"></div>
-            </div>
-            <div class="viewer-hint">드래그해서 회전 · 스크롤(또는 핀치)로 확대·축소</div>
-            <div class="viewer-caveat">꼭짓점 좌표를 볼록 껍질(convex hull)로 이어 붙여 재구성한 모형이에요. 실제 도형과 미세하게 다를 수 있으니, 구조를 이해하는 용도로 참고해주세요.</div>
-          </div>
-
-          <div class="support-grid">
-            <div class="card">
-              <h3>원본 사진 · 인식된 꼭짓점</h3>
-              <div class="photo-wrap" id="photoWrap">
-                <img id="boardImg" alt="분석된 도형 이미지">
-              </div>
-            </div>
-
-            <div class="card">
-              <h3>도형 분류 · 색상</h3>
-              <p class="shape-name" id="outShapeName">-</p>
-              <p class="shape-type" id="outShapeType">-</p>
-              <div class="swatches" id="outSwatches"></div>
-              <div class="counts">
-                <div class="c"><b id="cntV">-</b><span>꼭짓점 V</span></div>
-                <div class="c"><b id="cntE">-</b><span>모서리 E</span></div>
-                <div class="c"><b id="cntF">-</b><span>면 F</span></div>
-              </div>
-              <div class="euler" id="eulerNote"></div>
-            </div>
-
-            <div class="card">
-              <h3>꼭짓점 좌표 (AI 추정)</h3>
-              <table class="vtable">
-                <thead><tr><th>라벨</th><th>x</th><th>y</th><th>z</th></tr></thead>
-                <tbody id="outVerticesBody"></tbody>
-              </table>
-              <div class="copy-row"><button id="copyVerts" type="button">표 복사하기</button></div>
-              <p class="note">실제 측정값이 아니라, 도형 구조를 보여주기 위한 <b>상대적 추정 좌표</b>입니다.</p>
-            </div>
-
-            <div class="card">
-              <h3>공식 · 학습 팁</h3>
-              <div class="formula"><span class="lbl">겉넓이</span><span id="outSurface">-</span></div>
-              <div class="formula"><span class="lbl">부피</span><span id="outVolume">-</span></div>
-              <p class="tip" id="outTip">-</p>
-            </div>
-          </div>
-
-          <div class="titleblock">
-            <div><span>도형명</span><b id="tbName">-</b></div>
-            <div><span>분석 모델</span><b id="tbModel">-</b></div>
-            <div><span>생성 시각</span><b id="tbDate">-</b></div>
-            <div><span>상태</span><b id="tbStatus">-</b></div>
-          </div>
+        <div class="meta">
+          <div><span>도형명</span><b id="tbName">-</b></div>
+          <div><span>분석 모델</span><b id="tbModel">-</b></div>
+          <div><span>생성 시각</span><b id="tbDate">-</b></div>
+          <div><span>상태</span><b id="tbStatus">-</b></div>
         </div>
       </div>
+    </section>
+  </div>
+</main>
 
-    </div>
-  </main>
-</div>
-
-<footer>API 키는 서버로 전송되지 않고 이 브라우저에서 Google Gemini API로 직접 요청을 보냅니다 · 새로고침 시 키는 초기화됩니다</footer>
+<footer>
+  <span><b style="color:#fff">D-AI</b> © 2026</span>
+  <span>API 키는 서버로 전송되지 않고, 이 브라우저에서 Google Gemini API로 직접 요청해요.</span>
+</footer>
 
 <script>
 (function(){
-  const $ = (id) => document.getElementById(id);
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
 
-  const apiKeyInput = $('apiKey');
-  const toggleKeyBtn = $('toggleKey');
-  const advToggle = $('advToggle');
-  const advPanel = $('advPanel');
-  const modelSelect = $('modelSelect');
-  const customModelWrap = $('customModelWrap');
-  const customModel = $('customModel');
+  /* ================= 헤더 ================= */
+  var header = $('site-header');
+  function onScroll(){ header.classList.toggle('is-floating', window.scrollY > 24); }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
-  const dropzone = $('dropzone');
-  const fileInput = $('fileInput');
-  const previewThumb = $('previewThumb');
-  const previewImg = $('previewImg');
-  const fileNameEl = $('fileName');
-  const clearImgBtn = $('clearImg');
+  /* ================= 입력 · 상태 ================= */
+  var apiKeyInput = $('apiKey'), modelSelect = $('modelSelect'), customModel = $('customModel');
+  var dropzone = $('dropzone'), fileInput = $('fileInput'), preview = $('preview'), previewImg = $('previewImg');
+  var analyzeBtn = $('analyzeBtn');
+  var cur = { base64: null, mime: null };
 
-  const analyzeBtn = $('analyzeBtn');
-  const statusLine = $('statusLine');
-  const statusText = $('statusText');
-  const spinnerEl = $('spinnerEl');
-
-  const boardEmpty = $('boardEmpty');
-  const boardBody = $('boardBody');
-  const boardImg = $('boardImg');
-  const photoWrap = $('photoWrap');
-
-  const viewerWrap = $('viewerWrap');
-  const labelLayer = $('labelLayer');
-  const autoRotateBtn = $('autoRotateBtn');
-  const resetViewBtn = $('resetViewBtn');
-
-  let currentFile = null;
-  let currentBase64 = null;
-  let currentMime = null;
-
-  toggleKeyBtn.addEventListener('click', () => {
+  $('toggleKey').addEventListener('click', function(){
     apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
-    toggleKeyBtn.textContent = apiKeyInput.type === 'password' ? '👁' : '🙈';
+    $('toggleKey').textContent = apiKeyInput.type === 'password' ? '👁' : '🙈';
   });
-
-  advToggle.addEventListener('click', () => {
-    const open = advPanel.classList.toggle('open');
-    advToggle.textContent = open ? '모델 옵션 접기' : '모델 옵션 펼치기';
+  $('advToggle').addEventListener('click', function(){
+    var open = $('advPanel').classList.toggle('open');
+    $('advToggle').textContent = open ? '모델 옵션 접기' : '모델 옵션 펼치기';
   });
-  modelSelect.addEventListener('change', () => {
-    customModelWrap.style.display = modelSelect.value === 'custom' ? 'block' : 'none';
-  });
-  function getModelName(){
+  modelSelect.addEventListener('change', function(){ customModel.style.display = modelSelect.value === 'custom' ? 'block' : 'none'; });
+  function getModel(){
     if (modelSelect.value === 'custom') return (customModel.value || '').trim() || 'gemini-flash-latest';
     return modelSelect.value;
   }
 
-  dropzone.addEventListener('click', () => fileInput.click());
-  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
-  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
-  dropzone.addEventListener('drop', (e) => {
-    e.preventDefault(); dropzone.classList.remove('drag');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-  });
-  fileInput.addEventListener('change', (e) => { if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
-  clearImgBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    currentFile = null; currentBase64 = null; currentMime = null;
-    fileInput.value = '';
-    previewThumb.style.display = 'none';
-    dropzone.style.display = 'block';
-    updateGoState();
-  });
+  function updateGo(){ analyzeBtn.disabled = !(apiKeyInput.value.trim() && cur.base64); }
+  apiKeyInput.addEventListener('input', updateGo);
+
+  function setStatus(kind, text){
+    var el = $('status'); el.className = 'status show ' + kind;
+    $('spinner').style.display = kind === 'busy' ? 'inline-block' : 'none';
+    $('statusText').textContent = text;
+  }
 
   function handleFile(file){
-    if (!file.type.startsWith('image/')){ setStatus('err', '이미지 파일만 업로드할 수 있어요.'); return; }
-    currentFile = file; currentMime = file.type;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
-      currentBase64 = result.split(',')[1];
-      previewImg.src = result;
-      fileNameEl.textContent = file.name.length > 22 ? file.name.slice(0,19)+'...' : file.name;
-      previewThumb.style.display = 'block';
-      dropzone.style.display = 'none';
-      updateGoState();
+    if (!file.type.startsWith('image/')) { setStatus('err', '이미지 파일만 올릴 수 있어요.'); return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      cur.mime = file.type; cur.base64 = String(reader.result).split(',')[1];
+      previewImg.src = reader.result;
+      $('fileName').textContent = file.name.length > 22 ? file.name.slice(0, 19) + '...' : file.name;
+      preview.style.display = 'block'; dropzone.style.display = 'none'; updateGo();
     };
     reader.readAsDataURL(file);
   }
+  dropzone.addEventListener('click', function(){ fileInput.click(); });
+  dropzone.addEventListener('dragover', function(e){ e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', function(){ dropzone.classList.remove('drag'); });
+  dropzone.addEventListener('drop', function(e){
+    e.preventDefault(); dropzone.classList.remove('drag');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', function(e){ if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
+  $('clearImg').addEventListener('click', function(){
+    cur.base64 = null; cur.mime = null; fileInput.value = '';
+    preview.style.display = 'none'; dropzone.style.display = 'block'; updateGo();
+  });
 
-  apiKeyInput.addEventListener('input', updateGoState);
-  function updateGoState(){ analyzeBtn.disabled = !(apiKeyInput.value.trim() && currentBase64); }
-
-  function setStatus(kind, text){
-    statusLine.className = 'status-line show ' + kind;
-    spinnerEl.style.display = kind === 'busy' ? 'inline-block' : 'none';
-    statusText.textContent = text;
-  }
-
+  /* ================= AI 분석 ================= */
   const PROMPT = `당신은 한국 중·고등학교 수학 교사이자 3D 모델러입니다. 첨부된 이미지 속 입체도형(3차원 도형) 하나를 분석해서, 그 도형을 3D로 재구성할 수 있는 데이터를 만드세요.
 반드시 아래 JSON 스키마 그대로, 다른 설명 없이 JSON만 출력하세요. 모든 텍스트 값은 한국어로 작성하세요.
 
@@ -500,143 +349,120 @@
 - 최소 4개 이상의 점을 제공해야 3D 형태를 만들 수 있습니다.
 - 반드시 유효한 JSON 하나만 출력하세요.`;
 
+
   analyzeBtn.addEventListener('click', runAnalysis);
 
-  async function runAnalysis(){
-    const key = apiKeyInput.value.trim();
-    if (!key || !currentBase64) return;
-
-    analyzeBtn.disabled = true;
-    setStatus('busy', '이미지를 읽고 3D 좌표를 추정하는 중...');
-
-    const model = getModelName();
-    const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent?key=' + encodeURIComponent(key);
-
-    const body = {
-      contents: [{ parts: [ { text: PROMPT }, { inlineData: { mimeType: currentMime, data: currentBase64 } } ] }],
-      generationConfig: { temperature: 0.25, responseMimeType: 'application/json' }
-    };
-
-    try {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      const data = await res.json();
-
-      if (!res.ok) {
-        const msg = (data && data.error && data.error.message) ? data.error.message : ('요청이 거부되었습니다 (HTTP ' + res.status + ')');
-        throw new Error(msg);
-      }
-
-      const candidate = data.candidates && data.candidates[0];
-      const textPart = candidate && candidate.content && candidate.content.parts && candidate.content.parts.find(p => typeof p.text === 'string');
-      if (!textPart) throw new Error('모델 응답에서 분석 결과를 찾지 못했습니다.');
-
-      let parsed;
-      try { parsed = JSON.parse(textPart.text); }
-      catch (e) {
-        const match = textPart.text.match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
-        else throw new Error('결과를 JSON으로 해석하지 못했습니다.');
-      }
-
-      if (!parsed.vertices || parsed.vertices.length < 4) throw new Error('3D로 재구성하기에 좌표가 충분하지 않아요. 도형이 더 잘 보이는 사진으로 다시 시도해보세요.');
-
-      renderResult(parsed, model);
-      setStatus('ok', '3D 재구성이 완료됐어요.');
-    } catch (err) {
-      console.error(err);
-      let friendly = err.message || '알 수 없는 오류가 발생했습니다.';
-      if (/API key not valid|API_KEY_INVALID/i.test(friendly)) friendly = 'API 키가 올바르지 않아요. Google AI Studio에서 키를 다시 확인해 주세요.';
-      if (/quota|RESOURCE_EXHAUSTED/i.test(friendly)) friendly = 'API 사용 한도를 초과했어요. 잠시 후 다시 시도해 주세요.';
-      setStatus('err', friendly);
-    } finally {
-      analyzeBtn.disabled = false;
-    }
+  function friendlyError(msg){
+    if (/API key not valid|API_KEY_INVALID/i.test(msg)) return 'API 키가 올바르지 않아요. Google AI Studio에서 키를 다시 확인해 주세요.';
+    if (/quota|RESOURCE_EXHAUSTED/i.test(msg)) return 'API 사용 한도를 넘었어요. 잠시 후 다시 시도해 주세요.';
+    return msg || '알 수 없는 오류가 났어요.';
   }
 
+  async function runAnalysis(){
+    var key = apiKeyInput.value.trim();
+    if (!key || !cur.base64) return;
+    analyzeBtn.disabled = true;
+    setStatus('busy', '이미지를 읽고 3D 좌표를 추정하는 중...');
+    var model = getModel();
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent';
+    var body = {
+      contents: [{ parts: [{ text: PROMPT }, { inlineData: { mimeType: cur.mime, data: cur.base64 } }] }],
+      generationConfig: { temperature: 0.25, responseMimeType: 'application/json' }
+    };
+    try {
+      var res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
+      var data = await res.json();
+      if (!res.ok) throw new Error((data && data.error && data.error.message) || ('요청이 거부됐어요 (HTTP ' + res.status + ')'));
+      var cand = data.candidates && data.candidates[0];
+      var part = cand && cand.content && cand.content.parts && cand.content.parts.find(function(p){ return typeof p.text === 'string'; });
+      if (!part) throw new Error('모델 응답에서 분석 결과를 찾지 못했어요.');
+      var parsed;
+      try { parsed = JSON.parse(part.text); }
+      catch (e) { var m = part.text.match(/\{[\s\S]*\}/); if (!m) throw new Error('결과를 JSON으로 해석하지 못했어요.'); parsed = JSON.parse(m[0]); }
+      if (!parsed.vertices || parsed.vertices.length < 4) throw new Error('3D로 만들기엔 좌표가 부족해요. 도형이 더 잘 보이는 사진으로 다시 시도해 주세요.');
+      renderResult(parsed, model);
+      setStatus('ok', '3D 재구성이 끝났어요.');
+    } catch (err) {
+      console.error(err);
+      setStatus('err', friendlyError(err.message));
+    } finally { analyzeBtn.disabled = false; updateGo(); }
+  }
+
+  /* ================= 결과 표시 (모델이 준 텍스트는 모두 이스케이프) ================= */
   function fmtNum(n){ if (typeof n !== 'number' || isNaN(n)) return '-'; return Number.isInteger(n) ? n : n.toFixed(2); }
+  function safeHex(c){ var m = String(c || '').match(/#([0-9a-f]{3}){1,2}\b/i); return m ? m[0] : null; }
 
   function renderResult(r, model){
-    boardEmpty.style.display = 'none';
-    boardBody.classList.add('show');
+    $('boardEmpty').style.display = 'none';
+    $('boardBody').classList.add('show');
 
-    boardImg.src = previewImg.src;
-    Array.from(photoWrap.querySelectorAll('.marker')).forEach(m => m.remove());
+    var photoWrap = $('photoWrap');
+    $('boardImg').src = previewImg.src;
+    Array.prototype.forEach.call(photoWrap.querySelectorAll('.marker'), function(m){ m.remove(); });
 
-    $('outShapeName').textContent = r.shape_name_ko || '이름 없음';
-    $('outShapeType').textContent = r.shape_type || '';
+    $('outName').textContent = r.shape_name_ko || '이름 없음';
+    $('outType').textContent = r.shape_type || '';
 
-    const swatchWrap = $('outSwatches');
-    swatchWrap.innerHTML = '';
-    (r.colors || []).forEach(c => {
-      const hex = /^#([0-9a-f]{3}){1,2}$/i.test(c) ? c : (c.match(/#([0-9a-f]{3}){1,2}/i) || [])[0];
-      const el = document.createElement('span');
-      el.className = 'swatch';
-      el.innerHTML = '<i style="background:' + (hex || '#888') + '"></i>' + (hex || c);
-      swatchWrap.appendChild(el);
+    var sw = $('outSwatches'); sw.innerHTML = '';
+    (r.colors || []).forEach(function(c){
+      var hex = safeHex(c);
+      var el = document.createElement('span'); el.className = 'swatch';
+      el.innerHTML = '<i style="background:' + (hex || '#888') + '"></i>' + esc(hex || c);
+      sw.appendChild(el);
     });
 
-    $('cntV').textContent = r.vertex_count ?? (r.vertices ? r.vertices.length : '-');
-    $('cntE').textContent = r.edge_count ?? '-';
-    $('cntF').textContent = r.face_count ?? '-';
-
-    const v = Number(r.vertex_count), e = Number(r.edge_count), f = Number(r.face_count);
-    const eulerEl = $('eulerNote');
+    $('cntV').textContent = r.vertex_count != null ? r.vertex_count : (r.vertices ? r.vertices.length : '-');
+    $('cntE').textContent = r.edge_count != null ? r.edge_count : '-';
+    $('cntF').textContent = r.face_count != null ? r.face_count : '-';
+    var v = Number(r.vertex_count), e = Number(r.edge_count), f = Number(r.face_count), eu = $('euler');
     if (!isNaN(v) && !isNaN(e) && !isNaN(f) && v > 0) {
-      const chi = v - e + f;
-      eulerEl.innerHTML = 'V − E + F = <b>' + chi + '</b>' + (chi === 2 ? ' (볼록다면체 조건 충족)' : '');
-    } else { eulerEl.textContent = ''; }
+      var chi = v - e + f;
+      eu.innerHTML = 'V − E + F = <b>' + chi + '</b>' + (chi === 2 ? ' (볼록다면체 조건 충족)' : '');
+    } else eu.textContent = '';
 
-    const tbody = $('outVerticesBody');
-    tbody.innerHTML = '';
-    (r.vertices || []).forEach(pt => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = '<td class="label">' + (pt.label ?? '-') + '</td><td>' + fmtNum(pt.coord_x) + '</td><td>' + fmtNum(pt.coord_y) + '</td><td>' + fmtNum(pt.coord_z) + '</td>';
+    var tbody = $('vBody'); tbody.innerHTML = '';
+    (r.vertices || []).forEach(function(pt){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td class="lbl">' + esc(pt.label != null ? pt.label : '-') + '</td><td>' + fmtNum(pt.coord_x) + '</td><td>' + fmtNum(pt.coord_y) + '</td><td>' + fmtNum(pt.coord_z) + '</td>';
       tbody.appendChild(tr);
-
       if (typeof pt.image_x === 'number' && typeof pt.image_y === 'number') {
-        const marker = document.createElement('div');
-        marker.className = 'marker';
-        marker.style.left = (pt.image_x * 100) + '%';
-        marker.style.top = (pt.image_y * 100) + '%';
-        marker.innerHTML = '<span class="tag">' + (pt.label ?? '') + '</span><span class="dot"></span>';
-        photoWrap.appendChild(marker);
+        var mk = document.createElement('div'); mk.className = 'marker';
+        mk.style.left = (pt.image_x * 100) + '%'; mk.style.top = (pt.image_y * 100) + '%';
+        mk.innerHTML = '<span class="tag">' + esc(pt.label != null ? pt.label : '') + '</span><span class="dot"></span>';
+        photoWrap.appendChild(mk);
       }
     });
 
     $('outSurface').textContent = r.surface_area_formula || '정보 없음';
     $('outVolume').textContent = r.volume_formula || '정보 없음';
     $('outTip').textContent = r.study_tip || '';
-
     $('tbName').textContent = r.shape_name_ko || '-';
     $('tbModel').textContent = model;
     $('tbDate').textContent = new Date().toLocaleString('ko-KR', { hour12: false });
     $('tbStatus').textContent = '분석 완료';
 
     ensureViewer();
-    buildAndShowShape(r.vertices, r.primary_color || (r.colors && r.colors[0]) || '#ffb84d');
+    showShape(r.vertices, safeHex(r.primary_color) || safeHex(r.colors && r.colors[0]) || '#21D67A');
   }
 
-  $('copyVerts').addEventListener('click', () => {
-    const rows = Array.from(document.querySelectorAll('#outVerticesBody tr')).map(tr => Array.from(tr.children).map(td => td.textContent).join('\t'));
-    const text = ['라벨\tx\ty\tz', ...rows].join('\n');
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = $('copyVerts'); const original = btn.textContent;
-      btn.textContent = '복사됨!'; setTimeout(() => btn.textContent = original, 1400);
+  $('copyVerts').addEventListener('click', function(){
+    var rows = Array.prototype.map.call(document.querySelectorAll('#vBody tr'), function(tr){ return Array.prototype.map.call(tr.children, function(td){ return td.textContent; }).join('\t'); });
+    navigator.clipboard.writeText(['라벨\tx\ty\tz'].concat(rows).join('\n')).then(function(){
+      var b = $('copyVerts'), t = b.textContent; b.textContent = '복사했어요'; setTimeout(function(){ b.textContent = t; }, 1400);
     });
   });
 
-  // ================= 3D viewer =================
-  let scene, camera, renderer, group, viewerReady = false;
-  let dragging = false, lastX = 0, lastY = 0, rotX = 0.45, rotY = 0.7, dist = 3.4;
-  let autoRotate = true;
-  let currentPts = [], currentLabels = [], labelEls = [];
+  /* ================= 3D 뷰어 ================= */
+  var viewerWrap = $('viewer'), labelLayer = $('labelLayer');
+  var scene, camera, renderer, group, viewerReady = false;
+  var dragging = false, lastX = 0, lastY = 0, rotX = 0.45, rotY = 0.7, dist = 3.4, autoRotate = true;
+  var currentPts = [], labelEls = [];
 
   function ensureViewer(){
     if (viewerReady) { resizeViewer(); return; }
     viewerReady = true;
-
     scene = new THREE.Scene();
-    const w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
+    var w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
     camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 100);
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -644,66 +470,52 @@
     viewerWrap.insertBefore(renderer.domElement, labelLayer);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const dl = new THREE.DirectionalLight(0xffffff, 0.95); dl.position.set(3, 5, 4); scene.add(dl);
-    const dl2 = new THREE.DirectionalLight(0x7ce0c6, 0.3); dl2.position.set(-4, -2, -3); scene.add(dl2);
+    var dl = new THREE.DirectionalLight(0xffffff, 0.95); dl.position.set(3, 5, 4); scene.add(dl);
+    var dl2 = new THREE.DirectionalLight(0x3b9eff, 0.35); dl2.position.set(-4, -2, -3); scene.add(dl2);
+    group = new THREE.Group(); scene.add(group);
 
-    group = new THREE.Group();
-    scene.add(group);
-
-    renderer.domElement.addEventListener('pointerdown', (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; });
-    window.addEventListener('pointerup', () => dragging = false);
-    window.addEventListener('pointermove', (e) => {
+    renderer.domElement.addEventListener('pointerdown', function(e){ dragging = true; lastX = e.clientX; lastY = e.clientY; });
+    window.addEventListener('pointerup', function(){ dragging = false; });
+    window.addEventListener('pointermove', function(e){
       if (!dragging) return;
-      const dx = e.clientX - lastX, dy = e.clientY - lastY;
-      rotY += dx * 0.006; rotX += dy * 0.006;
-      rotX = Math.max(-1.4, Math.min(1.4, rotX));
-      lastX = e.clientX; lastY = e.clientY;
+      rotY += (e.clientX - lastX) * 0.006; rotX += (e.clientY - lastY) * 0.006;
+      rotX = Math.max(-1.4, Math.min(1.4, rotX)); lastX = e.clientX; lastY = e.clientY;
     });
-    renderer.domElement.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      dist += e.deltaY * 0.0028;
-      dist = Math.max(1.6, Math.min(7, dist));
+    renderer.domElement.addEventListener('wheel', function(e){
+      e.preventDefault(); dist = Math.max(1.6, Math.min(7, dist + e.deltaY * 0.0028));
     }, { passive: false });
-
     window.addEventListener('resize', resizeViewer);
     animate();
   }
-
   function resizeViewer(){
     if (!renderer) return;
-    const w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
-    if (w === 0 || h === 0) return;
-    camera.aspect = w / h; camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
+    var w = viewerWrap.clientWidth, h = viewerWrap.clientHeight;
+    if (!w || !h) return;
+    camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h);
   }
-
-  autoRotateBtn.addEventListener('click', () => {
+  $('autoRotateBtn').addEventListener('click', function(){
     autoRotate = !autoRotate;
-    autoRotateBtn.classList.toggle('on', autoRotate);
-    autoRotateBtn.textContent = autoRotate ? '자동회전 켜짐' : '자동회전 꺼짐';
+    $('autoRotateBtn').classList.toggle('on', autoRotate);
+    $('autoRotateBtn').textContent = autoRotate ? '자동회전 켜짐' : '자동회전 꺼짐';
   });
-  resetViewBtn.addEventListener('click', () => { rotX = 0.45; rotY = 0.7; dist = 3.4; });
+  $('resetViewBtn').addEventListener('click', function(){ rotX = 0.45; rotY = 0.7; dist = 3.4; });
 
   function animate(){
     requestAnimationFrame(animate);
     if (!renderer) return;
     if (autoRotate && !dragging) rotY += 0.0035;
-    if (group) group.rotation.set(rotX, rotY, 0);
-    camera.position.set(0, 0, dist);
-    camera.lookAt(0, 0, 0);
+    group.rotation.set(rotX, rotY, 0);
+    camera.position.set(0, 0, dist); camera.lookAt(0, 0, 0);
     renderer.render(scene, camera);
     updateLabels();
   }
-
   function updateLabels(){
-    if (!currentPts.length || !group) return;
-    const rect = viewerWrap.getBoundingClientRect();
+    if (!currentPts.length) return;
+    var rect = viewerWrap.getBoundingClientRect();
     group.updateMatrixWorld();
-    currentPts.forEach((p, i) => {
-      const el = labelEls[i];
-      if (!el) return;
-      const world = p.clone().applyMatrix4(group.matrixWorld);
-      const proj = world.project(camera);
+    currentPts.forEach(function(p, i){
+      var el = labelEls[i]; if (!el) return;
+      var proj = p.clone().applyMatrix4(group.matrixWorld).project(camera);
       if (proj.z > 1) { el.style.display = 'none'; return; }
       el.style.display = 'block';
       el.style.left = ((proj.x * 0.5 + 0.5) * rect.width) + 'px';
@@ -711,55 +523,35 @@
     });
   }
 
-  function buildAndShowShape(vertices, colorHex){
+  function showShape(vertices, colorHex){
     while (group.children.length) group.remove(group.children[0]);
-    labelLayer.innerHTML = '';
-    labelEls = [];
+    labelLayer.innerHTML = ''; labelEls = [];
 
-    const raw = vertices.map(v => new THREE.Vector3(Number(v.coord_x) || 0, Number(v.coord_y) || 0, Number(v.coord_z) || 0));
-    const box = new THREE.Box3().setFromPoints(raw);
-    const size = new THREE.Vector3(); box.getSize(size);
-    const center = new THREE.Vector3(); box.getCenter(center);
-    const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const scale = 1.5 / maxDim;
-    raw.forEach(p => p.sub(center).multiplyScalar(scale));
-
+    var raw = vertices.map(function(v){ return new THREE.Vector3(Number(v.coord_x) || 0, Number(v.coord_y) || 0, Number(v.coord_z) || 0); });
+    var box = new THREE.Box3().setFromPoints(raw), size = new THREE.Vector3(), center = new THREE.Vector3();
+    box.getSize(size); box.getCenter(center);
+    var scale = 1.5 / (Math.max(size.x, size.y, size.z) || 1);
+    raw.forEach(function(p){ p.sub(center).multiplyScalar(scale); });
     currentPts = raw;
-    currentLabels = vertices.map(v => v.label || '');
 
-    const plain = raw.map(p => ({ x: p.x, y: p.y, z: p.z }));
-    const tris = buildHullTriangles(plain);
-
+    var tris = buildHullTriangles(raw.map(function(p){ return { x: p.x, y: p.y, z: p.z }; }));
     if (tris.length) {
-      const positions = [];
-      tris.forEach(tri => tri.forEach(p => positions.push(p.x, p.y, p.z)));
-      const geo = new THREE.BufferGeometry();
+      var positions = [];
+      tris.forEach(function(t){ t.forEach(function(p){ positions.push(p.x, p.y, p.z); }); });
+      var geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
       geo.computeVertexNormals();
-      const mat = new THREE.MeshStandardMaterial({ color: colorHex || '#ffb84d', metalness: 0.08, roughness: 0.6, side: THREE.DoubleSide });
-      group.add(new THREE.Mesh(geo, mat));
-
-      const edgesGeo = new THREE.EdgesGeometry(geo, 8);
-      const edgesMat = new THREE.LineBasicMaterial({ color: 0x081a2b, transparent: true, opacity: 0.55 });
-      group.add(new THREE.LineSegments(edgesGeo, edgesMat));
+      group.add(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: colorHex, metalness: 0.08, roughness: 0.6, side: THREE.DoubleSide })));
+      group.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 8), new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.5 })));
     }
 
-    const markerGeo = new THREE.SphereGeometry(0.032, 12, 12);
-    const markerMat = new THREE.MeshBasicMaterial({ color: 0xffb84d });
-    raw.forEach((p, i) => {
-      const m = new THREE.Mesh(markerGeo, markerMat);
-      m.position.copy(p);
-      group.add(m);
-
-      const el = document.createElement('div');
-      el.className = 'v-label';
-      el.textContent = currentLabels[i];
-      labelLayer.appendChild(el);
-      labelEls.push(el);
+    var mGeo = new THREE.SphereGeometry(0.032, 12, 12), mMat = new THREE.MeshBasicMaterial({ color: 0x21d67a });
+    raw.forEach(function(p, i){
+      var m = new THREE.Mesh(mGeo, mMat); m.position.copy(p); group.add(m);
+      var el = document.createElement('div'); el.className = 'v-label';
+      el.textContent = vertices[i].label || ''; labelLayer.appendChild(el); labelEls.push(el);
     });
-
-    rotX = 0.45; rotY = 0.7; dist = 3.4;
-    resizeViewer();
+    rotX = 0.45; rotY = 0.7; dist = 3.4; resizeViewer();
   }
 
   // ---- geometry helpers: brute-force convex hull -> clean planar faces ----
@@ -843,6 +635,7 @@
     } while (p !== start && guard < n + 2);
     return hull;
   }
+
 
 })();
 </script>
