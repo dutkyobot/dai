@@ -1,254 +1,386 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>D-AI | 3D Blueprint</title>
-<meta name="description" content="입체도형 사진에서 꼭짓점 좌표를 뽑아 돌려볼 수 있는 3D 모형으로 만들어 드려요.">
-<link rel="icon" href="img/favicon.png" type="image/png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<style>
-:root{
-  --bg:#000; --surface:#18181B; --surface2:#1F1F23; --line:#2A2A2E; --mute:#9B9BA3; --ink:#fff;
-  --mint:#21D67A; --blue:#3B9EFF; --red:#EF4444; --amber:#F5A623;
-  --ease:cubic-bezier(.22,1,.36,1);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Noto Sans KR",sans-serif;letter-spacing:-.01em;line-height:1.6;min-height:100vh}
-a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;border:none;background:none;cursor:pointer}
-input,select{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
-.gradient-brand{background:linear-gradient(135deg,var(--mint),var(--blue))}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-AI | 3D Blueprint</title>
+    <meta name="description" content="입체도형 사진에서 꼭짓점 좌표를 뽑아 돌려볼 수 있는 3D 모형으로 만들어 드려요.">
+    <link rel="icon" href="img/favicon.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: "#000000",
+                        surface: "#18181B",
+                        line: "#2A2A2E",
+                        mute: "#9B9BA3",
+                        ink: "#FFFFFF",
+                        mint: "#21D67A",
+                        blue: "#3B9EFF",
+                        discord: "#5865F2",
+                    },
+                    fontFamily: {
+                        sans: ["Pretendard Variable", "Pretendard", "sans-serif"],
+                    },
+                },
+            },
+        };
+    </script>
 
-/* 헤더: 스크롤하면 알약 모양으로 */
-#site-header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:center;transition:padding .5s var(--ease)}
-#site-header.is-floating{padding:1rem}
-.hd-inner{width:100%;height:4rem;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);transition:all .5s var(--ease)}
-#site-header.is-floating .hd-inner{max-width:64rem;border-radius:9999px;background:linear-gradient(180deg,rgba(30,30,34,.65),rgba(24,24,27,.65));backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.12);box-shadow:0 16px 32px -8px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.1)}
-.hd-content{width:100%;max-width:64rem;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:.65rem;font-weight:700;font-size:1.1rem;letter-spacing:-.02em}
-.logo .mark{width:2rem;height:2rem;border-radius:.5rem;display:flex;align-items:center;justify-content:center}
-.logo .mark img{width:1.25rem;height:1.25rem;border-radius:4px}
-.logo small{font-weight:600;color:var(--mute);font-size:.8rem;margin-left:.15rem}
-.hd-links{display:flex;gap:1.25rem;font-size:.875rem;font-weight:600;color:var(--mute)}
-.hd-links a:hover{color:var(--ink)}
+    <style>
+        :root {
+            --c-mint: #21D67A;
+            --c-blue: #3B9EFF;
+            --c-red: #EF4444;
+            --c-amber: #F5A623;
 
-main{max-width:64rem;margin:0 auto;padding:8rem 1.5rem 4rem}
-.hero h1{margin:0;font-size:clamp(2rem,5vw,3rem);line-height:1.2;letter-spacing:-.03em}
-.hero p{margin:1.1rem 0 0;color:var(--mute);font-size:.95rem;max-width:34rem}
-.layout{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;margin-top:3rem;align-items:start}
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
+            --dur-header: 0.5s;
+            --ease-header: cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
-.card{background:var(--surface);border:1px solid var(--line);border-radius:28px;transition:border-color .2s}
-.card:hover{border-color:rgba(255,255,255,.3)}
-.card.pad{padding:1.5rem}
-.card h2,.card h3{margin:0}
-.step-title{display:flex;align-items:center;gap:.6rem;font-size:1rem;font-weight:700}
-.step-title i{width:1.5rem;height:1.5rem;border-radius:50%;font-style:normal;font-size:.75rem;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--line);color:var(--mute)}
-.step-desc{margin:.5rem 0 1rem;color:var(--mute);font-size:.8rem}
-.rail{display:flex;flex-direction:column;gap:1.5rem}
+        html { scroll-behavior: smooth; }
 
-label.lb{display:block;font-size:.72rem;font-weight:600;color:var(--mute);margin-bottom:.4rem}
-.field{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:.65rem .9rem;font-size:.8rem;outline:none;transition:border-color .15s}
-.field:focus{border-color:var(--blue)}
-.field::placeholder{color:#5f5f67}
-.key-row{display:flex;gap:.4rem}
-.icon-btn{flex-shrink:0;width:2.5rem;border-radius:14px;border:1px solid var(--line);background:var(--bg);color:var(--mute);font-size:.8rem}
-.icon-btn:hover{color:var(--ink)}
-.link{display:inline-block;margin-top:.5rem;font-size:.72rem;font-weight:600;color:var(--blue)}
-.link:hover{text-decoration:underline}
-.adv-toggle{margin-top:.9rem;font-size:.75rem;color:var(--mute);text-decoration:underline;text-decoration-style:dotted}
-.adv-panel{display:none;margin-top:.8rem}.adv-panel.open{display:block}
+        body {
+            background-color: #000000;
+            color: #FFFFFF;
+        }
 
-.dropzone{border:1px dashed #3A3A40;border-radius:20px;padding:1.6rem 1rem;text-align:center;cursor:pointer;background:var(--bg);transition:border-color .15s,background .15s}
-.dropzone:hover,.dropzone.drag{border-color:var(--mint);background:var(--surface2)}
-.dropzone .ic{font-size:1.4rem;color:var(--mute);margin-bottom:.4rem}
-.dropzone p{margin:0;font-size:.8rem;color:var(--mute)}
-.dropzone .sub{font-size:.7rem;margin-top:.2rem;opacity:.7}
-.preview{display:none;border:1px solid var(--line);border-radius:20px;overflow:hidden}
-.preview img{display:block;width:100%}
-.preview .cap{display:flex;justify-content:space-between;align-items:center;padding:.5rem .8rem;font-size:.72rem;color:var(--mute);border-top:1px solid var(--line)}
-.preview .cap button{color:var(--blue);font-size:.72rem;font-weight:600}
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--c-blue);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
 
-.go-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.8rem 1rem;border-radius:9999px;font-weight:700;font-size:.875rem;color:#04140c;background:linear-gradient(135deg,var(--mint),var(--blue));transition:opacity .2s}
-.go-btn:hover:not(:disabled){opacity:.88}
-.go-btn:disabled{opacity:.35;cursor:not-allowed}
-.status{display:none;align-items:center;gap:.5rem;margin-top:.8rem;font-size:.78rem}
-.status.show{display:flex}.status.err{color:#ff8a98}.status.ok{color:var(--mint)}.status.busy{color:var(--mute)}
-.spinner{width:.75rem;height:.75rem;border-radius:50%;border:2px solid #3A3A40;border-top-color:var(--mint);animation:spin .8s linear infinite;flex-shrink:0}
-@keyframes spin{to{transform:rotate(360deg)}}
+        /* ==========================================================
+           헤더: 스크롤에 따라 풀와이드 바 <-> 플로팅 알약으로 전환
+        ========================================================== */
+        #site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            transition: padding var(--dur-header) var(--ease-header);
+        }
 
-.board{min-height:26rem;display:flex;flex-direction:column;overflow:hidden}
-.board-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;padding:4rem 1.5rem;text-align:center;color:var(--mute)}
-.board-empty p{margin:0;font-size:.85rem;max-width:30ch}
-.board-body{display:none;padding:1.25rem}.board-body.show{display:block}
-.vt{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem}
-.vt b{font-size:.95rem}
-.pill{padding:.4rem .85rem;border-radius:9999px;font-size:.72rem;font-weight:600;color:var(--mute);border:1px solid var(--line);background:var(--surface2);transition:.15s}
-.pill:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
-.pill.on{color:var(--mint);border-color:rgba(33,214,122,.5);background:rgba(33,214,122,.08)}
-.vt .btns{display:flex;gap:.4rem}
-.viewer{position:relative;height:26rem;border:1px solid var(--line);border-radius:22px;background:radial-gradient(circle at 50% 40%,rgba(59,158,255,.09),transparent 62%),#0b0b0d;overflow:hidden;touch-action:none;cursor:grab}
-.viewer:active{cursor:grabbing}.viewer canvas{display:block}
-.label-layer{position:absolute;inset:0;pointer-events:none}
-.v-label{position:absolute;transform:translate(-50%,-140%);font-size:.65rem;font-weight:700;color:#04140c;background:var(--mint);padding:1px 6px;border-radius:9999px;white-space:nowrap}
-.hint{text-align:center;font-size:.72rem;color:var(--mute);margin:.6rem 0 0}
-.caveat{font-size:.7rem;color:#6d6d75;margin:.3rem 0 0;line-height:1.6;text-align:center}
+        #header-inner {
+            width: 100%;
+            max-width: 100%;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.25rem}
-@media(max-width:720px){.grid2{grid-template-columns:1fr}}
-.sub-card{background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:1.1rem}
-.sub-card h3{font-size:.72rem;font-weight:700;color:var(--mute);letter-spacing:.04em;margin-bottom:.7rem}
-.photo{position:relative;border:1px solid var(--line);border-radius:14px;overflow:hidden;line-height:0}
-.photo img{width:100%;display:block}
-.marker{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none}
-.marker .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);border:1px solid #04140c;margin:5px auto 0;box-shadow:0 0 0 3px rgba(33,214,122,.25)}
-.marker .tag{position:absolute;top:-2px;left:20px;font-size:.62rem;font-weight:700;color:#04140c;background:var(--mint);padding:0 5px;border-radius:9999px;white-space:nowrap;line-height:1.4}
-.shape-name{font-size:1.4rem;font-weight:700;margin:0;background:linear-gradient(135deg,var(--mint),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
-.shape-type{margin:.2rem 0 0;font-size:.8rem;color:var(--mute)}
-.swatches{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-.swatch{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--mute)}
-.swatch i{width:.9rem;height:.9rem;border-radius:5px;border:1px solid rgba(255,255,255,.2)}
-.counts{display:flex;margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line)}
-.counts div{flex:1;text-align:center}.counts b{display:block;font-size:1.2rem}.counts span{font-size:.68rem;color:var(--mute)}
-.euler{margin-top:.6rem;font-size:.72rem;color:var(--mute)}.euler b{color:var(--mint)}
-table.vt-table{width:100%;border-collapse:collapse;font-size:.78rem}
-.vt-table th{text-align:left;color:var(--mute);font-weight:600;padding:.3rem .4rem;border-bottom:1px solid var(--line);font-size:.68rem}
-.vt-table td{padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);font-variant-numeric:tabular-nums}
-.vt-table td.lbl{color:var(--mint);font-weight:700}
-.copy-row{text-align:right;margin-top:.6rem}
-.note{font-size:.7rem;color:#6d6d75;margin:.6rem 0 0;line-height:1.6}
-.formula{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.6rem .8rem;margin-bottom:.5rem;font-size:.8rem;overflow-x:auto;white-space:nowrap}
-.formula span.l{display:block;font-size:.66rem;color:var(--mute);margin-bottom:.1rem}
-.tip{font-size:.8rem;color:var(--mute);margin:.3rem 0 0}
-.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.72rem}
-@media(max-width:620px){.meta{grid-template-columns:1fr 1fr}}
-.meta span{display:block;color:var(--mute);margin-bottom:.1rem}.meta b{font-weight:600}
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0;
 
-footer{max-width:64rem;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px solid var(--line);font-size:.75rem;color:var(--mute);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-</style>
+            transition: all var(--dur-header) var(--ease-header);
+        }
+
+        #header-content {
+            width: 100%;
+            max-width: 64rem;
+            padding: 0 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #site-header.is-floating {
+            padding: 1rem;
+        }
+
+        #site-header.is-floating #header-inner {
+            max-width: 64rem;
+            border-radius: 9999px;
+
+            background: linear-gradient(180deg, rgba(30, 30, 34, 0.65) 0%, rgba(24, 24, 27, 0.65) 100%);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow:
+                0 16px 32px -8px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+        }
+
+        /* ==========================================================
+           공통 컴포넌트
+        ========================================================== */
+
+        /* 폴백 다이어그램 가로 스크롤 영역 커스텀 스크롤바 */
+        .themed-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #3A3A40 #18181B;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-track {
+            background: #18181B;
+            border-radius: 9999px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-thumb {
+            background: #3A3A40;
+            border-radius: 9999px;
+        }
+
+        .themed-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #55555C;
+        }
+
+        .card {
+            background: #18181B;
+            border: 1px solid #2A2A2E;
+            border-radius: 28px;
+            transition: border-color 0.2s ease;
+        }
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .invite-btn {
+            transition: opacity 0.2s ease;
+        }
+        .invite-btn:hover {
+            opacity: 0.88;
+        }
+
+        .gradient-brand {
+            background: linear-gradient(135deg, var(--c-mint) 0%, var(--c-blue) 100%);
+        }
+
+
+        /* ---- 3D 도구 전용 ---- */
+        .field{width:100%;background:#000;border:1px solid #2A2A2E;border-radius:14px;padding:.7rem .95rem;font-size:.82rem;outline:none;transition:border-color .15s;color:#fff}
+        .field:focus{border-color:var(--c-blue)}
+        .field::placeholder{color:#5f5f67}
+        .lb{display:block;font-size:.72rem;font-weight:600;color:#9B9BA3;margin-bottom:.45rem}
+        .pill{padding:.4rem .9rem;border-radius:9999px;font-size:.75rem;font-weight:600;color:#9B9BA3;border:1px solid #2A2A2E;background:#1F1F23;transition:.15s}
+        .pill:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+        .pill.on{color:var(--c-mint);border-color:rgba(33,214,122,.5);background:rgba(33,214,122,.08)}
+        .dropzone{border:1px dashed #3A3A40;border-radius:20px;padding:1.8rem 1rem;text-align:center;cursor:pointer;background:#000;transition:border-color .15s,background .15s}
+        .dropzone:hover,.dropzone.drag{border-color:var(--c-mint);background:#1F1F23}
+        .go-btn{transition:opacity .2s}.go-btn:hover:not(:disabled){opacity:.88}.go-btn:disabled{opacity:.35;cursor:not-allowed}
+        .status{display:none}.status.show{display:flex}.status.err{color:#ff8a98}.status.ok{color:var(--c-mint)}.status.busy{color:#9B9BA3}
+        .spinner{width:.75rem;height:.75rem;border-radius:50%;border:2px solid #3A3A40;border-top-color:var(--c-mint);animation:spin .8s linear infinite;flex-shrink:0}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .viewer{position:relative;height:26rem;border:1px solid #2A2A2E;border-radius:22px;background:radial-gradient(circle at 50% 40%,rgba(59,158,255,.09),transparent 62%),#0b0b0d;overflow:hidden;touch-action:none;cursor:grab}
+        .viewer:active{cursor:grabbing}.viewer canvas{display:block}
+        .label-layer{position:absolute;inset:0;pointer-events:none}
+        .v-label{position:absolute;transform:translate(-50%,-140%);font-size:.65rem;font-weight:700;color:#04140c;background:var(--c-mint);padding:1px 6px;border-radius:9999px;white-space:nowrap}
+        .sub-card{background:#000;border:1px solid #2A2A2E;border-radius:22px;padding:1.25rem}
+        .sub-card h3{font-size:.72rem;font-weight:700;color:#9B9BA3;letter-spacing:.04em;margin:0 0 .75rem}
+        .photo{position:relative;border:1px solid #2A2A2E;border-radius:14px;overflow:hidden;line-height:0}.photo img{width:100%;display:block}
+        .marker{position:absolute;width:18px;height:18px;transform:translate(-50%,-50%);pointer-events:none}
+        .marker .dot{width:8px;height:8px;border-radius:50%;background:var(--c-mint);border:1px solid #04140c;margin:5px auto 0;box-shadow:0 0 0 3px rgba(33,214,122,.25)}
+        .marker .tag{position:absolute;top:-2px;left:20px;font-size:.62rem;font-weight:700;color:#04140c;background:var(--c-mint);padding:0 5px;border-radius:9999px;white-space:nowrap;line-height:1.4}
+        .swatch{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:#9B9BA3}.swatch i{width:.9rem;height:.9rem;border-radius:5px;border:1px solid rgba(255,255,255,.2)}
+        table.vt-table{width:100%;border-collapse:collapse;font-size:.78rem}
+        .vt-table th{text-align:left;color:#9B9BA3;font-weight:600;padding:.3rem .4rem;border-bottom:1px solid #2A2A2E;font-size:.68rem}
+        .vt-table td{padding:.3rem .4rem;border-bottom:1px solid rgba(255,255,255,.05);font-variant-numeric:tabular-nums}.vt-table td.lbl{color:var(--c-mint);font-weight:700}
+        .formula{background:#18181B;border:1px solid #2A2A2E;border-radius:14px;padding:.65rem .85rem;margin-bottom:.5rem;font-size:.8rem;overflow-x:auto;white-space:nowrap}
+        .formula .l{display:block;font-size:.66rem;color:#9B9BA3;margin-bottom:.1rem}
+        .adv-panel{display:none}.adv-panel.open{display:block}
+        .preview{display:none}
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col font-sans antialiased">
 
-<header id="site-header">
-  <div class="hd-inner"><div class="hd-content">
-    <a href="index.html" class="logo"><span class="mark gradient-brand"><img src="img/icon.png" alt="D-AI" width="20" height="20"></span>D-AI<small>| 3D Blueprint</small></a>
-    <nav class="hd-links"><a href="index.html">홈</a></nav>
-  </div></div>
-</header>
+    <header id="site-header">
+        <div id="header-inner">
+            <div id="header-content">
+                <a href="index.html" class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-[0.5rem] gradient-brand flex items-center justify-center">
+                        <img
+                            src="img/icon.png"
+                            alt="D-AI"
+                            class="h-5 w-5 rounded"
+                        >
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-ink">D-AI</span>
+                </a>
 
-<main>
-  <section class="hero">
-    <h1>사진 한 장으로,<br>돌려볼 수 있는 3D 도형.</h1>
-    <p>교과서·문제집 속 입체도형 사진에서 꼭짓점 좌표와 색상을 뽑아 3D 모형으로 만들어 드려요. 겉넓이와 부피 공식도 함께 정리해요.</p>
-  </section>
-
-  <div class="layout">
-    <div class="rail">
-      <section class="card pad">
-        <h2 class="step-title"><i>1</i>API 키</h2>
-        <p class="step-desc">Google AI Studio에서 발급받은 Gemini API 키를 넣어주세요. 키는 이 페이지에서만 쓰이고 새로고침하면 사라져요.</p>
-        <label class="lb" for="apiKey">Gemini API Key</label>
-        <div class="key-row">
-          <input class="field" type="password" id="apiKey" placeholder="API 키를 붙여넣으세요" autocomplete="off">
-          <button class="icon-btn" id="toggleKey" type="button" aria-label="키 표시/숨김">👁</button>
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <a
+                        href="https://discord.gg/AdM4hFZkrE"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-sm font-semibold text-mute hover:text-ink transition-colors"
+                    >
+                        서포트 서버
+                    </a>
+                    <a
+                        href="https://buly.kr/3NKsbdE"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="invite-btn hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-discord text-white text-sm font-semibold shadow-sm"
+                    >
+                        <i class="fab fa-discord text-sm"></i>
+                        초대하기
+                    </a>
+                </div>
+            </div>
         </div>
-        <a class="link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">키 발급받기 ↗</a>
-        <div><button class="adv-toggle" id="advToggle" type="button">모델 옵션 펼치기</button></div>
-        <div class="adv-panel" id="advPanel">
-          <label class="lb" for="modelSelect">분석 모델</label>
-          <select class="field" id="modelSelect">
-            <option value="gemini-flash-latest">gemini-flash-latest (빠름, 기본)</option>
-            <option value="gemini-pro-latest">gemini-pro-latest (더 정확함, 느림)</option>
-            <option value="custom">직접 입력...</option>
-          </select>
-          <input class="field" type="text" id="customModel" placeholder="예: gemini-2.5-flash" style="display:none;margin-top:.5rem">
+    </header>
+
+
+    <main class="flex-1 max-w-5xl mx-auto w-full px-6 pt-32 pb-20 sm:pt-36 sm:pb-28">
+
+        <section class="mb-16">
+            <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-ink leading-tight">
+                사진 한 장이면,<br>3D 도형이 돼요.
+            </h1>
+            <p class="text-[15px] text-mute mt-5 leading-relaxed max-w-md">
+                교과서나 문제집 속 입체도형 사진을 올리면 꼭짓점 좌표를 읽어서
+                직접 돌려볼 수 있는 모형으로 만들어요. 겉넓이와 부피 공식도 같이 보여줘요.
+            </p>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-6 items-start">
+
+            <div class="flex flex-col gap-6">
+
+                <div class="card p-7">
+                    <h2 class="text-base font-bold text-ink">API 키</h2>
+                    <p class="text-sm text-mute mt-2 leading-relaxed">Google AI Studio에서 받은 Gemini API 키를 넣어주세요. 이 페이지에서만 쓰이고, 새로고침하면 사라져요.</p>
+                    <label class="lb mt-5" for="apiKey">Gemini API Key</label>
+                    <div class="flex gap-2">
+                        <input class="field" type="password" id="apiKey" placeholder="API 키를 붙여넣으세요" autocomplete="off">
+                        <button class="pill !rounded-2xl !px-3" id="toggleKey" type="button" aria-label="키 표시/숨김"><i class="fas fa-eye"></i></button>
+                    </div>
+                    <a class="inline-block mt-3 text-xs font-semibold text-blue hover:underline" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">키 발급받기 <i class="fas fa-arrow-up-right-from-square text-[10px]"></i></a>
+                    <div class="mt-4"><button class="text-xs text-mute underline decoration-dotted" id="advToggle" type="button">모델 옵션 펼치기</button></div>
+                    <div class="adv-panel mt-4" id="advPanel">
+                        <label class="lb" for="modelSelect">분석 모델</label>
+                        <select class="field" id="modelSelect">
+                            <option value="gemini-flash-latest">gemini-flash-latest (빠름, 기본)</option>
+                            <option value="gemini-pro-latest">gemini-pro-latest (더 정확함, 느림)</option>
+                            <option value="custom">직접 입력...</option>
+                        </select>
+                        <input class="field mt-2 hidden" type="text" id="customModel" placeholder="예: gemini-2.5-flash">
+                    </div>
+                </div>
+
+                <div class="card p-7">
+                    <h2 class="text-base font-bold text-ink">도형 이미지</h2>
+                    <p class="text-sm text-mute mt-2 leading-relaxed">도형 하나가 선명하게 보일수록 정확해요.</p>
+                    <div class="mt-5">
+                        <div class="dropzone" id="dropzone">
+                            <i class="fas fa-image text-xl text-mute"></i>
+                            <p class="text-sm text-mute mt-2">클릭하거나 이미지를 끌어다 놓으세요</p>
+                            <p class="text-xs text-mute opacity-70 mt-1">JPG · PNG · WEBP</p>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" hidden>
+                        <div class="preview border border-line rounded-2xl overflow-hidden" id="preview">
+                            <img id="previewImg" alt="업로드한 이미지 미리보기" class="block w-full">
+                            <div class="flex justify-between items-center px-4 py-2.5 text-xs text-mute border-t border-line">
+                                <span id="fileName">-</span>
+                                <button id="clearImg" type="button" class="font-semibold text-blue">지우기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-7">
+                    <button class="go-btn gradient-brand w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[#04140c] text-sm font-bold" id="analyzeBtn" disabled>
+                        <i class="fas fa-cube"></i>3D로 분석하기
+                    </button>
+                    <div class="status items-center gap-2 mt-4 text-sm" id="status"><span class="spinner" id="spinner"></span><span id="statusText"></span></div>
+                </div>
+            </div>
+
+            <div class="card p-7 sm:p-9 min-h-[26rem] flex flex-col">
+
+                <div id="boardEmpty" class="flex-1 flex flex-col items-center justify-center text-center gap-4 py-16">
+                    <svg width="56" height="56" viewBox="0 0 64 64" fill="none"><path d="M32 6L58 20V44L32 58L6 44V20L32 6Z" stroke="#3A3A40" stroke-width="1.5"/><path d="M32 6V32M32 32L58 20M32 32L6 20M32 32V58" stroke="#3A3A40" stroke-width="1.5"/></svg>
+                    <p class="text-sm text-mute max-w-[28ch] leading-relaxed">키와 이미지를 준비하고 분석하면 이곳에 3D 모형이 나타나요.</p>
+                </div>
+
+                <div id="boardBody" class="hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <h2 class="text-lg font-bold text-ink">3D 모형</h2>
+                        <div class="flex gap-2">
+                            <button class="pill on" id="autoRotateBtn" type="button">자동회전 켜짐</button>
+                            <button class="pill" id="resetViewBtn" type="button">처음 시점으로</button>
+                        </div>
+                    </div>
+                    <div class="viewer" id="viewer"><div class="label-layer" id="labelLayer"></div></div>
+                    <p class="text-xs text-mute text-center mt-3">드래그해서 회전 · 스크롤(또는 핀치)로 확대·축소</p>
+                    <p class="text-xs text-mute/70 text-center mt-1 leading-relaxed">꼭짓점을 이어 붙인 모형이라 실제 도형과 조금 다를 수 있어요. 구조를 이해하는 용도로 봐주세요.</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-7">
+                        <div class="sub-card"><h3>원본 사진 · 인식된 꼭짓점</h3><div class="photo" id="photoWrap"><img id="boardImg" alt="분석된 도형 이미지"></div></div>
+                        <div class="sub-card">
+                            <h3>도형 분류 · 색상</h3>
+                            <p class="text-2xl font-bold text-ink" id="outName">-</p>
+                            <p class="text-sm text-mute mt-1" id="outType">-</p>
+                            <div class="flex flex-wrap gap-3 mt-3" id="outSwatches"></div>
+                            <div class="flex mt-4 pt-4 border-t border-line text-center">
+                                <div class="flex-1"><b class="block text-xl" id="cntV">-</b><span class="text-[11px] text-mute">꼭짓점 V</span></div>
+                                <div class="flex-1"><b class="block text-xl" id="cntE">-</b><span class="text-[11px] text-mute">모서리 E</span></div>
+                                <div class="flex-1"><b class="block text-xl" id="cntF">-</b><span class="text-[11px] text-mute">면 F</span></div>
+                            </div>
+                            <p class="text-xs text-mute mt-3" id="euler"></p>
+                        </div>
+                        <div class="sub-card">
+                            <h3>꼭짓점 좌표 (AI 추정)</h3>
+                            <table class="vt-table"><thead><tr><th>라벨</th><th>x</th><th>y</th><th>z</th></tr></thead><tbody id="vBody"></tbody></table>
+                            <div class="text-right mt-3"><button class="pill" id="copyVerts" type="button">표 복사하기</button></div>
+                            <p class="text-[11px] text-mute/70 mt-3 leading-relaxed">실제 측정값이 아니라 구조를 보여주기 위한 상대적 추정 좌표예요.</p>
+                        </div>
+                        <div class="sub-card">
+                            <h3>공식 · 학습 팁</h3>
+                            <div class="formula"><span class="l">겉넓이</span><span id="outSurface">-</span></div>
+                            <div class="formula"><span class="l">부피</span><span id="outVolume">-</span></div>
+                            <p class="text-sm text-mute mt-2 leading-relaxed" id="outTip">-</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-line text-xs">
+                        <div><span class="block text-mute mb-0.5">도형명</span><b class="font-semibold" id="tbName">-</b></div>
+                        <div><span class="block text-mute mb-0.5">분석 모델</span><b class="font-semibold" id="tbModel">-</b></div>
+                        <div><span class="block text-mute mb-0.5">생성 시각</span><b class="font-semibold" id="tbDate">-</b></div>
+                        <div><span class="block text-mute mb-0.5">상태</span><b class="font-semibold" id="tbStatus">-</b></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="py-9 border-t border-line mt-auto">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row justify-center sm:justify-between items-center text-mute text-sm gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-ink">D-AI</span>
+                <span>&copy; 2026. All Rights Reserved.</span>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="https://discord.gg/AdM4hFZkrE" target="_blank" rel="noopener noreferrer" class="font-medium hover:text-ink transition-colors">
+                    서포트 서버
+                </a>
+                <span class="w-1 h-1 rounded-full bg-line"></span>
+                <span class="text-xs">Powered by Dutkyobot</span>
+            </div>
         </div>
-      </section>
-
-      <section class="card pad">
-        <h2 class="step-title"><i>2</i>도형 이미지</h2>
-        <p class="step-desc">도형 하나가 선명하게 보이는 사진일수록 정확해요.</p>
-        <div class="dropzone" id="dropzone">
-          <div class="ic">▲</div>
-          <p>클릭하거나 이미지를 끌어다 놓으세요</p>
-          <p class="sub">JPG · PNG · WEBP</p>
-        </div>
-        <input type="file" id="fileInput" accept="image/*" hidden>
-        <div class="preview" id="preview">
-          <img id="previewImg" alt="업로드한 이미지 미리보기">
-          <div class="cap"><span id="fileName">-</span><button id="clearImg" type="button">지우기</button></div>
-        </div>
-      </section>
-
-      <section class="card pad">
-        <h2 class="step-title"><i>3</i>3D로 재구성</h2>
-        <p class="step-desc">추정한 꼭짓점으로 3D 모형을 만들어요.</p>
-        <button class="go-btn" id="analyzeBtn" disabled>3D로 분석하기</button>
-        <div class="status" id="status"><span class="spinner" id="spinner"></span><span id="statusText"></span></div>
-      </section>
-    </div>
-
-    <section class="card board">
-      <div class="board-empty" id="boardEmpty">
-        <svg width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M32 6L58 20V44L32 58L6 44V20L32 6Z" stroke="#3A3A40" stroke-width="1.5"/><path d="M32 6V32M32 32L58 20M32 32L6 20M32 32V58" stroke="#3A3A40" stroke-width="1.5"/></svg>
-        <p>왼쪽에서 키와 이미지를 준비하고 분석하면, 이곳에 3D 모형이 나타나요.</p>
-      </div>
-
-      <div class="board-body" id="boardBody">
-        <div class="vt">
-          <b>3D 재구성 모형</b>
-          <div class="btns">
-            <button class="pill on" id="autoRotateBtn" type="button">자동회전 켜짐</button>
-            <button class="pill" id="resetViewBtn" type="button">처음 시점으로</button>
-          </div>
-        </div>
-        <div class="viewer" id="viewer"><div class="label-layer" id="labelLayer"></div></div>
-        <p class="hint">드래그해서 회전 · 스크롤(또는 핀치)로 확대·축소</p>
-        <p class="caveat">꼭짓점 좌표를 볼록 껍질(convex hull)로 이어 붙인 모형이라 실제 도형과 미세하게 다를 수 있어요. 구조를 이해하는 용도로 참고해 주세요.</p>
-
-        <div class="grid2">
-          <div class="sub-card"><h3>원본 사진 · 인식된 꼭짓점</h3><div class="photo" id="photoWrap"><img id="boardImg" alt="분석된 도형 이미지"></div></div>
-          <div class="sub-card">
-            <h3>도형 분류 · 색상</h3>
-            <p class="shape-name" id="outName">-</p><p class="shape-type" id="outType">-</p>
-            <div class="swatches" id="outSwatches"></div>
-            <div class="counts"><div><b id="cntV">-</b><span>꼭짓점 V</span></div><div><b id="cntE">-</b><span>모서리 E</span></div><div><b id="cntF">-</b><span>면 F</span></div></div>
-            <div class="euler" id="euler"></div>
-          </div>
-          <div class="sub-card">
-            <h3>꼭짓점 좌표 (AI 추정)</h3>
-            <table class="vt-table"><thead><tr><th>라벨</th><th>x</th><th>y</th><th>z</th></tr></thead><tbody id="vBody"></tbody></table>
-            <div class="copy-row"><button class="pill" id="copyVerts" type="button">표 복사하기</button></div>
-            <p class="note">실제 측정값이 아니라 구조를 보여주기 위한 <b>상대적 추정 좌표</b>예요.</p>
-          </div>
-          <div class="sub-card">
-            <h3>공식 · 학습 팁</h3>
-            <div class="formula"><span class="l">겉넓이</span><span id="outSurface">-</span></div>
-            <div class="formula"><span class="l">부피</span><span id="outVolume">-</span></div>
-            <p class="tip" id="outTip">-</p>
-          </div>
-        </div>
-
-        <div class="meta">
-          <div><span>도형명</span><b id="tbName">-</b></div>
-          <div><span>분석 모델</span><b id="tbModel">-</b></div>
-          <div><span>생성 시각</span><b id="tbDate">-</b></div>
-          <div><span>상태</span><b id="tbStatus">-</b></div>
-        </div>
-      </div>
-    </section>
-  </div>
-</main>
-
-<footer>
-  <span><b style="color:#fff">D-AI</b> © 2026</span>
-  <span>API 키는 서버로 전송되지 않고, 이 브라우저에서 Google Gemini API로 직접 요청해요.</span>
-</footer>
+    </footer>
 
 <script>
 (function(){
@@ -258,7 +390,7 @@ footer{max-width:64rem;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px sol
 
   /* ================= 헤더 ================= */
   var header = $('site-header');
-  function onScroll(){ header.classList.toggle('is-floating', window.scrollY > 24); }
+  function onScroll(){ header.classList.toggle('is-floating', window.scrollY > 20); }
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
   /* ================= 입력 · 상태 ================= */
@@ -269,7 +401,7 @@ footer{max-width:64rem;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px sol
 
   $('toggleKey').addEventListener('click', function(){
     apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
-    $('toggleKey').textContent = apiKeyInput.type === 'password' ? '👁' : '🙈';
+    $('toggleKey').innerHTML = '<i class="fas fa-eye' + (apiKeyInput.type === 'password' ? '' : '-slash') + '"></i>';
   });
   $('advToggle').addEventListener('click', function(){
     var open = $('advPanel').classList.toggle('open');
@@ -394,7 +526,7 @@ footer{max-width:64rem;margin:0 auto;padding:2rem 1.5rem 3rem;border-top:1px sol
 
   function renderResult(r, model){
     $('boardEmpty').style.display = 'none';
-    $('boardBody').classList.add('show');
+    $('boardBody').classList.remove('hidden');
 
     var photoWrap = $('photoWrap');
     $('boardImg').src = previewImg.src;
